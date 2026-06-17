@@ -1525,4 +1525,273 @@ function runBatteryAnalysis() {
 
       // CPP event bonus: events are called on high-demand days (hot = high AC regionally)
       // On those days, on-peak draw is much higher than average (~25+ kWh in 2-7 PM window).
-      // Battery is fully uti
+      // Battery is fully utilized on event days up to its capacity.
+      // Using min(effCap, CPP_EVENT_KWH) rather than avgShift — captures real event-day usage.
+      const eventShift = Math.min(effCap, CPP_EVENT_KWH);
+      cppYr += cppEvents * eventShift * (CPP_EV_ARB - CPP_ARB);
+
+      touTotal += touYr;
+      cppTotal += cppYr;
+      touCumulative.push(Math.round(touTotal));
+      cppCumulative.push(Math.round(cppTotal));
+    }
+
+    // No 25D tax credit — expired per OBBB Act (July 2025). Full cost.
+    const effCost = cfg.cost;
+    const touPayback = touCumulative[0] > 0 ? effCost / touCumulative[0] : Infinity;
+    const cppPayback = cppCumulative[0] > 0 ? effCost / cppCumulative[0] : Infinity;
+
+    return {
+      ...cfg,
+      effCost,
+      touYr1: touCumulative[0],
+      cppYr1: cppCumulative[0],
+      touTotal: touCumulative[BATT_LIFE-1],
+      cppTotal: cppCumulative[BATT_LIFE-1],
+      touPayback,
+      cppPayback,
+      touCumulative,
+      cppCumulative,
+    };
+  });
+}
+
+function renderBattCards(data) {
+  const outageVal = +document.getElementById('outageSlider').value;
+  const homeVal   = +document.getElementById('homeValSlider').value;
+  const totalAdj  = outageVal + homeVal;
+
+  const el = document.getElementById('battCards');
+  el.innerHTML = data.map(d => {
+    const adjCost = Math.max(0, d.effCost - totalAdj);
+    const touNet = d.touTotal - d.effCost;
+    const cppNet = d.cppTotal - d.effCost;
+    const touAdjPayback = d.touYr1 > 0 ? adjCost / d.touYr1 : Infinity;
+    const cppAdjPayback = d.cppYr1 > 0 ? adjCost / d.cppYr1 : Infinity;
+    const touColor = touNet >= 0 ? '#16a34a' : '#dc2626';
+    const cppColor = cppNet >= 0 ? '#16a34a' : '#dc2626';
+    const fmtPb = (pb, adj) => {
+      if (pb === Infinity) return 'never pays back';
+      const base = pb.toFixed(0) + 'yr';
+      if (adj === pb || totalAdj === 0) return base;
+      return `${base} → <b>${adj.toFixed(0)}yr adj</b>`;
+    };
+    const adjBlock = totalAdj > 0 ? `
+      <div style="background:#f0fdf4;border-radius:5px;padding:5px 8px;margin:6px 0;font-size:11px">
+        <span style="color:#15803d;font-weight:700">After $${totalAdj.toLocaleString()} non-arb value → net cost $${adjCost.toLocaleString(undefined,{maximumFractionDigits:0})}</span><br>
+        <b style="color:${RATES.tou.color}">TOU adj payback:</b> ${touAdjPayback===Infinity?'never':touAdjPayback.toFixed(1)+'yr'} &nbsp;
+        <b style="color:${RATES.cpp.color}">CPP adj payback:</b> ${cppAdjPayback===Infinity?'never':cppAdjPayback.toFixed(1)+'yr'}
+      </div>` : '';
+    return `<div class="sim-card" style="border-top:3px solid #475569;text-align:left;padding:12px">
+      <div class="plan-name" style="color:#1e40af;font-size:14px">${d.name} (${d.kwh.toFixed(1)} kWh)</div>
+      <div style="font-size:12px;margin:4px 0">Full cost: <b>$${d.effCost.toLocaleString(undefined,{maximumFractionDigits:0})}</b></div>
+      ${adjBlock}
+      <div style="font-size:11px;color:#334155;line-height:1.9">
+        <b style="color:${RATES.tou.color}">TOU:</b> $${d.touYr1}/yr &nbsp; base payback ${fmtPb(d.touPayback, Infinity)}<br>
+        <span style="color:${touColor};font-weight:700">15yr net: ${touNet>=0?'+':''}$${touNet.toFixed(0)}</span><br>
+        <b style="color:${RATES.cpp.color}">CPP:</b> $${d.cppYr1}/yr &nbsp; base payback ${fmtPb(d.cppPayback, Infinity)}<br>
+        <span style="color:${cppColor};font-weight:700">15yr net: ${cppNet>=0?'+':''}$${cppNet.toFixed(0)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateRateInc() {
+  const pct = +document.getElementById('rateIncSlider').value;
+  document.getElementById('rateIncVal').textContent = pct + '%';
+  const el = document.getElementById('rateIncImpact');
+  const banner = document.getElementById('rateIncBanner');
+  if (pct === 0) {
+    el.textContent = '(slide to model impact on all charts)';
+    if (banner) banner.style.display = 'none';
+  } else {
+    el.textContent = `— ALL charts now reflect +${pct}% energy rate increase`;
+    if (banner) { banner.style.display = 'block'; banner.textContent = `⚠ Rate case what-if active: +${pct}% on energy charges`; }
+  }
+  // Re-render active chart so sim/batt/proj all update live
+  renderChart();
+}
+window.updateRateInc = updateRateInc;
+// Initialize on load
+setTimeout(updateRateInc, 50);
+
+function updateBatt() {
+  document.getElementById('battCppVal').textContent = document.getElementById('battCppSlider').value;
+  const ov = +document.getElementById('outageSlider').value;
+  const hv = +document.getElementById('homeValSlider').value;
+  document.getElementById('outageVal').textContent = '$' + ov.toLocaleString();
+  document.getElementById('homeValVal').textContent = '$' + hv.toLocaleString();
+  const n = +document.getElementById('battCountSlider').value;
+  const cfg = BATT_CONFIGS[n - 1];
+  document.getElementById('battCountVal').textContent = `${n}× (${cfg.kwh.toFixed(1)} kWh · $${cfg.cost.toLocaleString(undefined,{maximumFractionDigits:0})})`;
+  if (activeView === 'batt') renderChart();
+}
+window.updateBatt = updateBatt;
+
+function renderSimTable(simData) {
+  const tbl = document.getElementById('simTable');
+  // 10 columns: Month | Actual Plan | Net kWh | Season | Standard | TOU | TOU+CPP | CPP Events | Actual | Best
+  tbl.innerHTML = `<thead><tr>
+    <th style="text-align:left">Month</th>
+    <th style="text-align:left">Actual Plan</th>
+    <th>Net kWh</th>
+    <th>Season</th>
+    <th style="color:${RATES.std.color}">Standard</th>
+    <th style="color:${RATES.tou.color}">TOU</th>
+    <th style="color:${RATES.cpp.color}">TOU+CPP</th>
+    <th>CPP Evts</th>
+    <th style="color:#dc2626">Actual $</th>
+    <th>Best</th>
+  </tr></thead>`;
+  const tbody = document.createElement('tbody');
+
+  let totStd=0, totTou=0, totCpp=0, totActual=0, totKwh=0;
+
+  simData.forEach(s => {
+    const vals = [s.std.allIn, s.tou.allIn, s.cpp.allIn];
+    const minVal = Math.min(...vals);
+    const bestIdx = vals.indexOf(minVal);
+    const bestName = ['Std','TOU','CPP'][bestIdx];
+    const bestColor = [RATES.std.color, RATES.tou.color, RATES.cpp.color][bestIdx];
+
+    totStd   += s.std.allIn;
+    totTou   += s.tou.allIn;
+    totCpp   += s.cpp.allIn;
+    totActual += s.actual;
+    const posKwh = Math.max(s.net, 0);
+    totKwh   += posKwh;
+
+    // Actual plan this bill was on
+    const ap = getActualPlan(s.bill);
+    const apColor = ap==='Standard' ? RATES.std.color : ap==='TOU' ? RATES.tou.color : RATES.cpp.color;
+
+    // Effective all-in ¢/kWh for each plan
+    const denom = Math.max(s.net, 1);
+    const stdC = (s.std.allIn / denom * 100).toFixed(1);
+    const touC = (s.tou.allIn / denom * 100).toFixed(1);
+    const cppC = (s.cpp.allIn / denom * 100).toFixed(1);
+    // Actual plan effective rate (match whichever plan was active)
+    const actC = (s.actual / denom * 100).toFixed(1);
+
+    const tr = document.createElement('tr');
+    if(isSummer(s.bill)) tr.className='summer';
+    tr.innerHTML = `
+      <td style="font-weight:600">${s.label}</td>
+      <td style="font-weight:600;font-size:10px;color:${apColor}">${ap}</td>
+      <td>${s.net}</td>
+      <td style="font-size:10px">${isSummer(s.bill)?'Summer':'Non-Sum'}</td>
+      <td class="${bestIdx===0?'best':''}" style="color:${RATES.std.color}">$${s.std.allIn.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${stdC}¢</span></td>
+      <td class="${bestIdx===1?'best':''}" style="color:${RATES.tou.color}">$${s.tou.allIn.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${touC}¢</span></td>
+      <td class="${bestIdx===2?'best':''}" style="color:${RATES.cpp.color}">$${s.cpp.allIn.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${cppC}¢</span></td>
+      <td style="color:#94a3b8">${s.cpp.events||'\u2013'}</td>
+      <td style="color:#dc2626;font-weight:600">$${s.actual.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${actC}¢</span></td>
+      <td style="font-weight:700;color:${bestColor}">${bestName}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Totals row
+  const totVals = [totStd, totTou, totCpp];
+  const totMin = Math.min(...totVals);
+  const totBestIdx = totVals.indexOf(totMin);
+  const totBestColor = [RATES.std.color, RATES.tou.color, RATES.cpp.color][totBestIdx];
+  const totBestName = ['Std','TOU','CPP'][totBestIdx];
+
+  const totTr = document.createElement('tr');
+  totTr.style.cssText = 'border-top:3px solid #1e40af;font-weight:800;font-size:12px;background:#f8fafc';
+  totTr.innerHTML = `
+    <td style="font-weight:800">TOTAL</td>
+    <td></td><td></td><td></td>
+    <td style="color:${RATES.std.color}">$${totStd.toFixed(0)}</td>
+    <td style="color:${RATES.tou.color}">$${totTou.toFixed(0)}</td>
+    <td style="color:${RATES.cpp.color}">$${totCpp.toFixed(0)}</td>
+    <td></td>
+    <td style="color:#dc2626">$${totActual.toFixed(0)}</td>
+    <td style="color:${totBestColor}">${totBestName}</td>
+  `;
+  tbody.appendChild(totTr);
+
+  // Weighted-average ¢/kWh row (total all-in ÷ total positive net kWh × 100)
+  const safeKwh = totKwh > 0 ? totKwh : 1;
+  const stdW = (totStd   / safeKwh * 100).toFixed(1);
+  const touW = (totTou   / safeKwh * 100).toFixed(1);
+  const cppW = (totCpp   / safeKwh * 100).toFixed(1);
+  const actW = (totActual / safeKwh * 100).toFixed(1);
+  const wtdTr = document.createElement('tr');
+  wtdTr.style.cssText = 'font-size:11px;background:#f8fafc;border-bottom:1px solid #e2e8f0';
+  wtdTr.innerHTML = `
+    <td style="color:#64748b;font-style:italic">Wtd avg ¢/kWh</td>
+    <td></td><td style="color:#64748b;font-size:10px">${totKwh.toLocaleString()} kWh</td><td></td>
+    <td style="color:${RATES.std.color};font-weight:700">${stdW}¢</td>
+    <td style="color:${RATES.tou.color};font-weight:700">${touW}¢</td>
+    <td style="color:${RATES.cpp.color};font-weight:700">${cppW}¢</td>
+    <td></td>
+    <td style="color:#dc2626;font-weight:700">${actW}¢</td>
+    <td></td>
+  `;
+  tbody.appendChild(wtdTr);
+
+  // Savings vs best row
+  const savTr = document.createElement('tr');
+  savTr.style.cssText = 'font-size:11px;color:#64748b';
+  savTr.innerHTML = `
+    <td>vs Best</td><td></td><td></td><td></td>
+    <td>${totBestIdx===0?'\u2013':'+$'+(totStd-totMin).toFixed(0)}</td>
+    <td>${totBestIdx===1?'\u2013':'+$'+(totTou-totMin).toFixed(0)}</td>
+    <td>${totBestIdx===2?'\u2013':'+$'+(totCpp-totMin).toFixed(0)}</td>
+    <td></td><td></td><td></td>
+  `;
+  tbody.appendChild(savTr);
+
+  tbl.appendChild(tbody);
+}
+
+function chartOpts(yLabel, y2Label, dualAxis){
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{position:'top',labels:{font:{size:11}}} },
+    scales:{
+      x:{ grid:{color:'#f1f5f9'}, ticks:{maxRotation:40,font:{size:10}} },
+      y:{ grid:{color:'#f1f5f9'}, position:'left', title:{display:true,text:yLabel,font:{size:11}}, stacked:true },
+      y2: dualAxis ? { position:'right', title:{display:true,text:y2Label,font:{size:11}}, grid:{display:false}, ticks:{callback:v=>'$'+v} } : undefined
+    }
+  };
+}
+
+// ── Bill table ────────────────────────────────────────────────────────────
+const tbl = document.getElementById('billTable');
+tbl.innerHTML = `<thead><tr>
+  <th>Date</th><th>Period</th>
+  <th>Grid DEL</th><th>Grid RCVD</th><th>Net</th>
+  <th>Solar Gen</th><th>Solar Self-Used</th><th>Home Total</th>
+  <th>On-Peak</th><th>Off-Peak</th><th>Bill $</th><th></th>
+</tr></thead>`;
+const tbody = document.createElement('tbody');
+BILLS.forEach(b => {
+  const sh = b.sol!=null ? Math.round(b.sol-b.rcvd) : '\u2013';
+  const tr = document.createElement('tr');
+  if(b.sum) tr.className='summer';
+  tr.innerHTML = `
+    <td style="font-weight:600">${b.d}</td>
+    <td style="color:#64748b;font-size:10px">${b.s}\u2013${b.e}</td>
+    <td>${b.del}</td>
+    <td style="color:#22c55e">${b.rcvd}</td>
+    <td style="font-weight:${b.net<0?700:400};color:${b.net<0?'#22c55e':'inherit'}">${b.net}</td>
+    <td style="color:#f97316">${b.sol??'\u2013'}</td>
+    <td style="color:#b45309">${sh}</td>
+    <td style="font-weight:600">${b.home??'\u2013'}</td>
+    <td style="color:#dc2626">${b.opk??'\u2013'}</td>
+    <td style="color:#6366f1">${b.fpk??'\u2013'}</td>
+    <td style="font-weight:600">$${b.bill.toFixed(2)}</td>
+    <td>${b.sum?'\u2600\uFE0F':''}</td>
+  `;
+  tbody.appendChild(tr);
+});
+tbl.appendChild(tbody);
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderTabs();
+renderChart();
+</script>
+</body>
+</html>
