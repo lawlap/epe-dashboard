@@ -1,0 +1,12 @@
+# PUBLIC repo (github.com/lawlap/epe-dashboard).
+# Ignore everything by default, then whitelist ONLY the dashboard files.
+# This keeps personal/sensitive material OUT of the public repo:
+#   EPE bills, income self-certification, invoices, panel-upgrade docs,
+#   Emporia exports, photos, and analysis memos with personal context.
+*
+
+# Whitelisted (safe to publish) dashboard files:
+!.gitignore
+!index.html
+!Rate_Plan_Decision_Tool.html
+!EPE_Usage_Dashboard.jsx

@@ -56,7 +56,144 @@ input[type=range]{width:200px;accent-color:#1e40af}
 <body>
 <div class="page">
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
-  <p class="sub">2333 Cheyenne Dr Las Cruces NM · 23 bills · May 2024–Mar 2026 · Acct 8611863488</p>
+  <p class="sub">Las Cruces, NM · 23 bills · May 2024–Mar 2026</p>
+
+  <!-- ====================================================================== -->
+  <!-- PLAN DECISION BANNER — added Jun 17 2026 after EPE pairing ruling       -->
+  <!-- ====================================================================== -->
+  <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:12px;padding:18px 20px;margin-bottom:18px">
+    <div style="font-size:17px;font-weight:800;color:#9a3412;margin-bottom:6px">⚖️ Plan Decision: CPP vs. TOD (Power Hours), with/without WHEV</div>
+    <a href="Rate_Plan_Decision_Tool.html" style="display:inline-block;background:#ea580c;color:#fff;font-size:12px;font-weight:700;text-decoration:none;padding:7px 14px;border-radius:7px;margin-bottom:10px">🎛️ Open interactive decision tool — stress-test rates, usage &amp; battery →</a>
+    <p style="font-size:12.5px;color:#7c2d12;line-height:1.55;margin:0 0 12px">
+      <b>EPE confirmed the CPP pilot CANNOT be paired with the WHEV rider</b> (Jun 2026). But WHEV is a <b>Rate No. 01 rider</b>, and the
+      standard <b>TOD / Power Hours</b> rate is part of Rate No. 01 — so WHEV should attach to TOD (<em>verify by phone</em>). That reframes the
+      real choice as <b>CPP vs. TOD</b>. Figures are <b>annual all-in</b>, built on your <b>actual billed usage</b> (incl. the summer travel month),
+      monthly net-metered, with the <b>18 kWh battery</b> doing daily arbitrage and CPP critical-events assumed battery-covered (excluded).
+      Model reconciles to your real bills: CPP ≈ $822 vs ~$802 actual. <b>Riders &amp; taxes are broken out separately</b> (RPS/TEP/FPPCAC per-kWh,
+      EUEF, AMS, customer charge, franchise 2.0% + tax 8.56%) — they're nearly plan-neutral, so the <em>differences</em> are what matter.
+    </p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;background:white;border-radius:8px;overflow:hidden">
+        <thead>
+          <tr style="background:#fed7aa;color:#7c2d12">
+            <th style="text-align:left;padding:8px 10px">Annual, battery on (current rates)</th>
+            <th style="padding:8px 10px">Energy</th>
+            <th style="padding:8px 10px">Riders&nbsp;+&nbsp;tax</th>
+            <th style="padding:8px 10px">TOTAL</th>
+            <th style="padding:8px 10px">vs CPP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #fde68a">
+            <td style="padding:8px 10px;font-weight:600">CPP — current plan (no WHEV)</td>
+            <td style="padding:8px 10px;text-align:center">$460</td><td style="padding:8px 10px;text-align:center">$362</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:700">$822</td><td style="padding:8px 10px;text-align:center">—</td>
+          </tr>
+          <tr style="border-bottom:1px solid #fde68a;background:#f0fdf4">
+            <td style="padding:8px 10px;font-weight:700">TOD + WHEV  ⟵ best</td>
+            <td style="padding:8px 10px;text-align:center">$108</td><td style="padding:8px 10px;text-align:center">$333</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:800">$441</td><td style="padding:8px 10px;text-align:center;color:#15803d;font-weight:700">−$381</td>
+          </tr>
+          <tr style="border-bottom:1px solid #fde68a">
+            <td style="padding:8px 10px;font-weight:600">TOD, no WHEV <span style="font-weight:400">(if WHEV denied/revoked)</span></td>
+            <td style="padding:8px 10px;text-align:center">$409</td><td style="padding:8px 10px;text-align:center">$356</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:700">$765</td><td style="padding:8px 10px;text-align:center;color:#15803d;font-weight:700">−$57</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 10px;font-weight:600">Standard (flat) + WHEV <span style="font-weight:400">(dominated)</span></td>
+            <td style="padding:8px 10px;text-align:center">$302</td><td style="padding:8px 10px;text-align:center">$353</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:700">$655</td><td style="padding:8px 10px;text-align:center;color:#15803d;font-weight:700">−$167</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="overflow-x:auto;margin-top:10px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;background:white;border-radius:8px;overflow:hidden">
+        <thead>
+          <tr style="background:#fde68a;color:#7c2d12">
+            <th style="text-align:left;padding:6px 10px">TOTAL $/yr (Δ vs CPP) — rate-case sensitivity</th>
+            <th style="padding:6px 10px">Current</th><th style="padding:6px 10px">Phase 1 (+27%)</th><th style="padding:6px 10px">Phase 2 (+50%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #fde68a"><td style="padding:6px 10px;font-weight:600">CPP</td><td style="padding:6px 10px;text-align:center">$822</td><td style="padding:6px 10px;text-align:center">$959</td><td style="padding:6px 10px;text-align:center">$1,076</td></tr>
+          <tr style="border-bottom:1px solid #fde68a;background:#f0fdf4"><td style="padding:6px 10px;font-weight:700">TOD + WHEV</td><td style="padding:6px 10px;text-align:center">$441 <span style="color:#15803d">(−381)</span></td><td style="padding:6px 10px;text-align:center">$518 <span style="color:#15803d">(−441)</span></td><td style="padding:6px 10px;text-align:center">$605 <span style="color:#15803d">(−471)</span></td></tr>
+          <tr style="border-bottom:1px solid #fde68a"><td style="padding:6px 10px;font-weight:600">TOD, no WHEV</td><td style="padding:6px 10px;text-align:center">$765 <span style="color:#15803d">(−57)</span></td><td style="padding:6px 10px;text-align:center">$887 <span style="color:#15803d">(−72)</span></td><td style="padding:6px 10px;text-align:center">$991 <span style="color:#15803d">(−85)</span></td></tr>
+          <tr><td style="padding:6px 10px;font-weight:600">Standard + WHEV</td><td style="padding:6px 10px;text-align:center">$655 <span style="color:#15803d">(−167)</span></td><td style="padding:6px 10px;text-align:center">$842 <span style="color:#15803d">(−117)</span></td><td style="padding:6px 10px;text-align:center">$1,010 <span style="color:#15803d">(−66)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:12px 0 0">
+      <b>TOD wins because:</b> your usage is overnight/evening-heavy with midday solar export, and on-peak is only ~11% of summer use (your Jun bill: 144 of 1,363 kWh),
+      which the battery easily covers. TOD's off-peak (5.5¢) beats CPP's (6.8¢) and crushes Standard's tier-2 (10.9¢); WHEV then adds a 4.74¢/kWh credit on all
+      midnight–8AM kWh, a year-round night→day arbitrage on top of the summer on-peak shifting.
+    </p>
+    <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:10px 0 0">
+      <b>Lean: switch to TOD (Power Hours); add WHEV if EPE confirms it stacks.</b> The one-way nature of leaving the CPP <em>pilot</em> (no re-entry, and no guarantee how
+      long the pilot runs) is not a real obstacle — <b>TOD beats CPP in every rate scenario even with no WHEV at all</b> (−$57 to −$85/yr), so the downside of losing
+      CPP is covered. Remaining risks, all modest: (1) confirm WHEV attaches to TOD by phone; (2) WHEV "outlier" review risk from battery arbitrage — but the TOD-no-WHEV
+      fallback still beats CPP; (3) TOD's 22¢ on-peak makes you battery-dependent on summer afternoons — only a problem if the battery is down a whole summer <em>and</em>
+      WHEV is gone (≈$15/yr worse than CPP). FPPCAC is variable (±~1¢/kWh, plan-neutral); minimum-bill floor caps the WHEV credit in low-usage months.
+    </p>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MONTHLY ALL-PLAN COMPARISON (static, bill-anchored) — added Jun 17 2026 -->
+  <!-- ====================================================================== -->
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+    <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">📅 Monthly all-plan comparison (battery on, all-in $)</div>
+    <p style="font-size:11.5px;color:#64748b;margin:0 0 12px;line-height:1.5">
+      Worst→best: <b>Standard → CPP → TOD → TOD+WHEV</b>. All-in $ (energy + riders + taxes + customer charge), CPP events excluded (battery-covered),
+      18 kWh/day battery arbitrage. "Your bill kWh" = actual billed net; "Model kWh" = Emporia-derived (runs ~20% high vs meter, billing periods offset ~½ month —
+      annual & differences are sound, individual months approximate). Validated: model CPP ≈ $808 vs your actual ~$802.
+    </p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:2px solid #e2e8f0;color:#64748b">
+            <th style="text-align:left;padding:5px 8px">Month</th>
+            <th style="text-align:right;padding:5px 8px">Bill kWh</th>
+            <th style="text-align:right;padding:5px 8px">Model kWh</th>
+            <th style="text-align:right;padding:5px 8px">Standard</th>
+            <th style="text-align:right;padding:5px 8px">CPP</th>
+            <th style="text-align:right;padding:5px 8px">TOD</th>
+            <th style="text-align:right;padding:5px 8px;background:#f0fdf4;color:#15803d">TOD+WHEV</th>
+          </tr>
+        </thead>
+        <tbody id="monthlyCmpBody"></tbody>
+        <tfoot>
+          <tr style="border-top:2px solid #e2e8f0;font-weight:800;color:#0f172a">
+            <td style="padding:6px 8px">YEAR</td><td style="text-align:right;padding:6px 8px">7,358</td><td style="text-align:right;padding:6px 8px">~8,940</td>
+            <td style="text-align:right;padding:6px 8px">$1,023</td><td style="text-align:right;padding:6px 8px">$808</td><td style="text-align:right;padding:6px 8px">$751</td>
+            <td style="text-align:right;padding:6px 8px;background:#f0fdf4;color:#15803d">$428</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Standard is the do-nothing baseline (flat/tiered, no rider) — ~$215/yr worse than CPP, driven by summer tier-2 (10.9¢). For the live decision use the interactive tool above; the "Sim" tab below has been corrected so the WHEV credit applies only to Standard/TOU (never CPP), but the new tool is the authoritative view.</p>
+  </div>
+  <script>
+  (function(){
+    var rows=[["Apr '25","274","231",31,25,25,17],["May '25","288","387",44,33,33,20],
+      ["Jun '25 (travel)","361","0",12,12,12,12],["Jul '25","558","1,312",164,135,116,66],
+      ["Aug '25","1,271","1,657",210,173,153,99],["Sep '25","1,248","1,244",154,130,112,65],
+      ["Oct '25","968","878",84,61,61,28],["Nov '25","366","653",65,48,48,24],
+      ["Dec '25","492","953",90,65,65,30],["Jan '26","734","854",82,59,59,28],
+      ["Feb '26","487","475",51,38,38,21],["Mar '26","311","294",36,28,28,18]];
+    var b=document.getElementById('monthlyCmpBody');
+    rows.forEach(function(r){
+      var tr=document.createElement('tr'); tr.style.borderBottom='1px solid #f1f5f9';
+      tr.innerHTML='<td style="padding:5px 8px;font-weight:600;color:#334155">'+r[0]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;color:#64748b">'+r[1]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;color:#64748b">'+r[2]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px">$'+r[3]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px">$'+r[4]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px">$'+r[5]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;background:#f0fdf4;color:#15803d;font-weight:700">$'+r[6]+'</td>';
+      b.appendChild(tr);
+    });
+  })();
+  </script>
 
   <!-- Summary cards -->
   <div class="cards" id="cards"></div>
@@ -89,10 +226,10 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <div class="ev-row" id="r42Row" style="opacity:0.4;pointer-events:none">
         <div class="ev-toggle">
           <input type="checkbox" id="r42Toggle" onchange="updateSim()">
-          <label for="r42Toggle"><b>Add WHEV Rider</b> (Whole House EV — Rate No. 01 rider, confirmed from 14th Rev AN289 tariff) — <b>4.74¢/kWh</b> bill credit on <em>all</em> midnight–8AM kWh (EV + any overnight base load). <b>Stacks on top of current plan</b> (TOU or TOU+CPP) — does NOT require switching. Requires qualifying EV registered at service address.</label>
+          <label for="r42Toggle"><b>Add WHEV Rider</b> (Whole House EV — Rate No. 01 rider, confirmed from 14th Rev AN289 tariff) — <b>4.74¢/kWh</b> bill credit on <em>all</em> midnight–8AM kWh (EV + any overnight base load). <b style="color:#b91c1c">⚠ Requires switching to Standard Rate No. 01 — EPE ruled (Jun 2026) it CANNOT be combined with the CPP pilot.</b> So this toggle now models the <b>Standard + WHEV</b> alternative, not an add-on to CPP. Requires qualifying EV registered at service address.</label>
         </div>
       </div>
-      <p class="note" style="margin-top:10px"><b>All charges included:</b> Energy + Customer ($7) + FPPCAC (per-bill actual) + RPS + TEP + AMS (era-matched) + EUEF (~3.4–3.75%) + Franchise Fee (2.0%) + Taxes (8.4%). Verified against all 19 TOU bills — mean error $0.15/bill. <b>Plan history:</b> Standard (May–Aug 2024) → TOU Power Hours (Sep 2024–Oct 2025) → TOU+CPP (Nov 2025–present, plan switch). <b>Key rates:</b> TOU non-summer = $0.05816 always (same as Standard). CPP non-summer = $0.03428 always (CPP plan's 41% non-summer advantage). October is a shoulder month on TOU: on-peak $0.221 applies but off-peak = $0.058 (non-summer rate). CPP summer = Jun–Sep only. <b>WHEV rider</b> (confirmed rider, not standalone — AN289 tariff, $0.0474/kWh credit): stacks on any Rate No. 01 plan; reduces EV/battery midnight–8AM charging cost: CPP non-summer 3.4¢→0¢ (credit exceeds rate), CPP summer 6.8¢→2.1¢, TOU non-summer 5.8¢→1.1¢/kWh.</p>
+      <p class="note" style="margin-top:10px"><b>All charges included:</b> Energy + Customer ($7) + FPPCAC (per-bill actual) + RPS + TEP + AMS (era-matched) + EUEF (~3.4–3.75%) + Franchise Fee (2.0%) + Taxes (8.4%). Verified against all 19 TOU bills — mean error $0.15/bill. <b>Plan history:</b> Standard (May–Aug 2024) → TOU Power Hours (Sep 2024–Oct 2025) → TOU+CPP (Nov 2025–present, plan switch). <b>Key rates:</b> TOU non-summer = $0.05816 always (same as Standard). CPP non-summer = $0.03428 always (CPP plan's 41% non-summer advantage). October is a shoulder month on TOU: on-peak $0.221 applies but off-peak = $0.058 (non-summer rate). CPP summer = Jun–Sep only. <b>WHEV rider</b> (AN289 tariff, $0.0474/kWh credit on midnight–8AM kWh): <b style="color:#b91c1c">per EPE's Jun 2026 ruling it attaches to Standard Rate No. 01 only and CANNOT be paired with the CPP pilot</b> — it is the Standard-plan alternative, not a CPP add-on. On Standard the credited overnight rate is 5.8¢→1.1¢/kWh. (The CPP-stacked figures shown in older scenarios, e.g. 3.4¢→0¢, are no longer attainable and are retained only for historical reference.)</p>
     </div>
 
     <!-- Sim summary cards -->
@@ -123,7 +260,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <div class="sim-row" style="margin-top:4px">
         <div class="ev-toggle">
           <input type="checkbox" id="battR42Toggle" onchange="updateBatt()">
-          <label for="battR42Toggle"><b>WHEV Rider</b> (Whole House EV, Rate No. 01 rider — stacks on current plan, confirmed from AN289 tariff) — 4.74¢/kWh credit on midnight–8AM kWh reduces battery charging cost from ~6.1¢ → ~1.1¢/kWh (CPP summer); dramatically improves arbitrage spread. Requires qualifying EV registered at service address.</label>
+          <label for="battR42Toggle"><b>WHEV Rider</b> (Whole House EV, Rate No. 01 rider, AN289 tariff) — 4.74¢/kWh credit on midnight–8AM kWh. <b style="color:#b91c1c">⚠ EPE ruled Jun 2026 this requires Standard Rate No. 01 and CANNOT be combined with CPP</b> — enabling it models the <b>Standard + WHEV</b> plan (overnight charging ~1.1¢/kWh on Standard), not a CPP add-on. Requires qualifying EV registered at service address.</label>
         </div>
       </div>
       <div class="sim-row">
@@ -198,7 +335,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <div class="ev-row" id="projWhevRow" style="opacity:0.4;pointer-events:none">
         <div class="ev-toggle">
           <input type="checkbox" id="projWhevToggle" onchange="updateProj()">
-          <label for="projWhevToggle"><b>WHEV Rider</b> — 4.74¢/kWh credit on ALL midnight–8AM kWh (EV + base load). Stacks on CPP plan.</label>
+          <label for="projWhevToggle"><b>WHEV Rider</b> — 4.74¢/kWh credit on ALL midnight–8AM kWh (EV + base load). <b style="color:#b91c1c">⚠ Requires Standard Rate No. 01 (NOT combinable with CPP per EPE Jun 2026).</b></label>
         </div>
       </div>
       <div class="sim-row">
@@ -245,7 +382,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <span id="rateIncImpact" style="color:#92400e;font-style:italic"></span>
     </div>
   </div>
-  <p class="footer">Data: El Paso Electric bills parsed from PDF · Solar meter I347016257 · Grid meter I346971117 · Apr 2026<br>
+  <p class="footer">Data: El Paso Electric bills parsed from PDF · Solar &amp; grid meters · Apr 2026<br>
   Simulator: All-in costs include Energy + Customer + FPPCAC + RPS + TEP + AMS + EUEF + Franchise Fee + Taxes · Rider rates era-matched to each bill period · FPPCAC extracted per-bill from PDFs<br>
   Updated Apr 2026: isSummer corrected (TOU/Standard Jun–Oct, CPP Jun–Sep) · Plan history corrected (Nov 2025 rate drop = plan switch TOU→CPP, not tariff revision) · WHEV rider confirmed as Rate No. 01 rider ($0.0474/kWh, AN289) · CPP event model updated (full battery utilization on high-demand event days) · Battery non-arbitrage value adjustments added · Rate case what-if tracker added · Emporia Vue hourly data integrated (actual on-peak ratios replace estimates) · 2026 forward projection tab added with EV + WHEV scenario modeling</p>
 </div>
@@ -675,11 +812,12 @@ function runSimulation() {
       cppResult = cpp;
     }
 
-    // Apply Rate 42 EV credit (reduces energy charge before riders/taxes)
+    // Apply WHEV (Rate No. 01 rider) credit — ONLY on Standard & TOU/Power Hours (both Rate No. 01).
+    // EPE ruled (Jun 2026) WHEV CANNOT pair with the CPP pilot, so CPP receives NO credit.
     if (r42Credit > 0) {
       stdResult = { ...stdResult, energy: Math.max(0, stdResult.energy - r42Credit) };
       touResult = { ...touResult, energy: Math.max(0, touResult.energy - r42Credit) };
-      cppResult = { ...cppResult, energy: Math.max(0, cppResult.energy - r42Credit) };
+      // cppResult intentionally NOT credited — WHEV is not combinable with CPP.
     }
 
     // All-in costs (use historical riders to match actual bill periods)
@@ -795,7 +933,7 @@ function runProjection() {
     // CPP cost: EV adds to off-peak overnight
     const baseCpp = calcCPP(baseNet, b, cppEvents, cppKwhPerEvent);
     const cppEvRate = getCPPNonSummerRate(b);
-    const cppEnergy = baseCpp.energy + evKwh * cppEvRate - r42Credit;
+    const cppEnergy = baseCpp.energy + evKwh * cppEvRate; // WHEV NOT applied to CPP — not combinable per EPE (Jun 2026)
     const cppResult = { energy: Math.max(0, cppEnergy), cppSurcharge: baseCpp.cppSurcharge || 0, events: baseCpp.eventsThisMonth || 0 };
 
     // All-in costs (forward projection — use CURRENT_RIDERS, no FPPCAC)
@@ -1387,273 +1525,4 @@ function runBatteryAnalysis() {
 
       // CPP event bonus: events are called on high-demand days (hot = high AC regionally)
       // On those days, on-peak draw is much higher than average (~25+ kWh in 2-7 PM window).
-      // Battery is fully utilized on event days up to its capacity.
-      // Using min(effCap, CPP_EVENT_KWH) rather than avgShift — captures real event-day usage.
-      const eventShift = Math.min(effCap, CPP_EVENT_KWH);
-      cppYr += cppEvents * eventShift * (CPP_EV_ARB - CPP_ARB);
-
-      touTotal += touYr;
-      cppTotal += cppYr;
-      touCumulative.push(Math.round(touTotal));
-      cppCumulative.push(Math.round(cppTotal));
-    }
-
-    // No 25D tax credit — expired per OBBB Act (July 2025). Full cost.
-    const effCost = cfg.cost;
-    const touPayback = touCumulative[0] > 0 ? effCost / touCumulative[0] : Infinity;
-    const cppPayback = cppCumulative[0] > 0 ? effCost / cppCumulative[0] : Infinity;
-
-    return {
-      ...cfg,
-      effCost,
-      touYr1: touCumulative[0],
-      cppYr1: cppCumulative[0],
-      touTotal: touCumulative[BATT_LIFE-1],
-      cppTotal: cppCumulative[BATT_LIFE-1],
-      touPayback,
-      cppPayback,
-      touCumulative,
-      cppCumulative,
-    };
-  });
-}
-
-function renderBattCards(data) {
-  const outageVal = +document.getElementById('outageSlider').value;
-  const homeVal   = +document.getElementById('homeValSlider').value;
-  const totalAdj  = outageVal + homeVal;
-
-  const el = document.getElementById('battCards');
-  el.innerHTML = data.map(d => {
-    const adjCost = Math.max(0, d.effCost - totalAdj);
-    const touNet = d.touTotal - d.effCost;
-    const cppNet = d.cppTotal - d.effCost;
-    const touAdjPayback = d.touYr1 > 0 ? adjCost / d.touYr1 : Infinity;
-    const cppAdjPayback = d.cppYr1 > 0 ? adjCost / d.cppYr1 : Infinity;
-    const touColor = touNet >= 0 ? '#16a34a' : '#dc2626';
-    const cppColor = cppNet >= 0 ? '#16a34a' : '#dc2626';
-    const fmtPb = (pb, adj) => {
-      if (pb === Infinity) return 'never pays back';
-      const base = pb.toFixed(0) + 'yr';
-      if (adj === pb || totalAdj === 0) return base;
-      return `${base} → <b>${adj.toFixed(0)}yr adj</b>`;
-    };
-    const adjBlock = totalAdj > 0 ? `
-      <div style="background:#f0fdf4;border-radius:5px;padding:5px 8px;margin:6px 0;font-size:11px">
-        <span style="color:#15803d;font-weight:700">After $${totalAdj.toLocaleString()} non-arb value → net cost $${adjCost.toLocaleString(undefined,{maximumFractionDigits:0})}</span><br>
-        <b style="color:${RATES.tou.color}">TOU adj payback:</b> ${touAdjPayback===Infinity?'never':touAdjPayback.toFixed(1)+'yr'} &nbsp;
-        <b style="color:${RATES.cpp.color}">CPP adj payback:</b> ${cppAdjPayback===Infinity?'never':cppAdjPayback.toFixed(1)+'yr'}
-      </div>` : '';
-    return `<div class="sim-card" style="border-top:3px solid #475569;text-align:left;padding:12px">
-      <div class="plan-name" style="color:#1e40af;font-size:14px">${d.name} (${d.kwh.toFixed(1)} kWh)</div>
-      <div style="font-size:12px;margin:4px 0">Full cost: <b>$${d.effCost.toLocaleString(undefined,{maximumFractionDigits:0})}</b></div>
-      ${adjBlock}
-      <div style="font-size:11px;color:#334155;line-height:1.9">
-        <b style="color:${RATES.tou.color}">TOU:</b> $${d.touYr1}/yr &nbsp; base payback ${fmtPb(d.touPayback, Infinity)}<br>
-        <span style="color:${touColor};font-weight:700">15yr net: ${touNet>=0?'+':''}$${touNet.toFixed(0)}</span><br>
-        <b style="color:${RATES.cpp.color}">CPP:</b> $${d.cppYr1}/yr &nbsp; base payback ${fmtPb(d.cppPayback, Infinity)}<br>
-        <span style="color:${cppColor};font-weight:700">15yr net: ${cppNet>=0?'+':''}$${cppNet.toFixed(0)}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function updateRateInc() {
-  const pct = +document.getElementById('rateIncSlider').value;
-  document.getElementById('rateIncVal').textContent = pct + '%';
-  const el = document.getElementById('rateIncImpact');
-  const banner = document.getElementById('rateIncBanner');
-  if (pct === 0) {
-    el.textContent = '(slide to model impact on all charts)';
-    if (banner) banner.style.display = 'none';
-  } else {
-    el.textContent = `— ALL charts now reflect +${pct}% energy rate increase`;
-    if (banner) { banner.style.display = 'block'; banner.textContent = `⚠ Rate case what-if active: +${pct}% on energy charges`; }
-  }
-  // Re-render active chart so sim/batt/proj all update live
-  renderChart();
-}
-window.updateRateInc = updateRateInc;
-// Initialize on load
-setTimeout(updateRateInc, 50);
-
-function updateBatt() {
-  document.getElementById('battCppVal').textContent = document.getElementById('battCppSlider').value;
-  const ov = +document.getElementById('outageSlider').value;
-  const hv = +document.getElementById('homeValSlider').value;
-  document.getElementById('outageVal').textContent = '$' + ov.toLocaleString();
-  document.getElementById('homeValVal').textContent = '$' + hv.toLocaleString();
-  const n = +document.getElementById('battCountSlider').value;
-  const cfg = BATT_CONFIGS[n - 1];
-  document.getElementById('battCountVal').textContent = `${n}× (${cfg.kwh.toFixed(1)} kWh · $${cfg.cost.toLocaleString(undefined,{maximumFractionDigits:0})})`;
-  if (activeView === 'batt') renderChart();
-}
-window.updateBatt = updateBatt;
-
-function renderSimTable(simData) {
-  const tbl = document.getElementById('simTable');
-  // 10 columns: Month | Actual Plan | Net kWh | Season | Standard | TOU | TOU+CPP | CPP Events | Actual | Best
-  tbl.innerHTML = `<thead><tr>
-    <th style="text-align:left">Month</th>
-    <th style="text-align:left">Actual Plan</th>
-    <th>Net kWh</th>
-    <th>Season</th>
-    <th style="color:${RATES.std.color}">Standard</th>
-    <th style="color:${RATES.tou.color}">TOU</th>
-    <th style="color:${RATES.cpp.color}">TOU+CPP</th>
-    <th>CPP Evts</th>
-    <th style="color:#dc2626">Actual $</th>
-    <th>Best</th>
-  </tr></thead>`;
-  const tbody = document.createElement('tbody');
-
-  let totStd=0, totTou=0, totCpp=0, totActual=0, totKwh=0;
-
-  simData.forEach(s => {
-    const vals = [s.std.allIn, s.tou.allIn, s.cpp.allIn];
-    const minVal = Math.min(...vals);
-    const bestIdx = vals.indexOf(minVal);
-    const bestName = ['Std','TOU','CPP'][bestIdx];
-    const bestColor = [RATES.std.color, RATES.tou.color, RATES.cpp.color][bestIdx];
-
-    totStd   += s.std.allIn;
-    totTou   += s.tou.allIn;
-    totCpp   += s.cpp.allIn;
-    totActual += s.actual;
-    const posKwh = Math.max(s.net, 0);
-    totKwh   += posKwh;
-
-    // Actual plan this bill was on
-    const ap = getActualPlan(s.bill);
-    const apColor = ap==='Standard' ? RATES.std.color : ap==='TOU' ? RATES.tou.color : RATES.cpp.color;
-
-    // Effective all-in ¢/kWh for each plan
-    const denom = Math.max(s.net, 1);
-    const stdC = (s.std.allIn / denom * 100).toFixed(1);
-    const touC = (s.tou.allIn / denom * 100).toFixed(1);
-    const cppC = (s.cpp.allIn / denom * 100).toFixed(1);
-    // Actual plan effective rate (match whichever plan was active)
-    const actC = (s.actual / denom * 100).toFixed(1);
-
-    const tr = document.createElement('tr');
-    if(isSummer(s.bill)) tr.className='summer';
-    tr.innerHTML = `
-      <td style="font-weight:600">${s.label}</td>
-      <td style="font-weight:600;font-size:10px;color:${apColor}">${ap}</td>
-      <td>${s.net}</td>
-      <td style="font-size:10px">${isSummer(s.bill)?'Summer':'Non-Sum'}</td>
-      <td class="${bestIdx===0?'best':''}" style="color:${RATES.std.color}">$${s.std.allIn.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${stdC}¢</span></td>
-      <td class="${bestIdx===1?'best':''}" style="color:${RATES.tou.color}">$${s.tou.allIn.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${touC}¢</span></td>
-      <td class="${bestIdx===2?'best':''}" style="color:${RATES.cpp.color}">$${s.cpp.allIn.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${cppC}¢</span></td>
-      <td style="color:#94a3b8">${s.cpp.events||'\u2013'}</td>
-      <td style="color:#dc2626;font-weight:600">$${s.actual.toFixed(2)}<br><span style="color:#94a3b8;font-size:10px;font-weight:400">${actC}¢</span></td>
-      <td style="font-weight:700;color:${bestColor}">${bestName}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // Totals row
-  const totVals = [totStd, totTou, totCpp];
-  const totMin = Math.min(...totVals);
-  const totBestIdx = totVals.indexOf(totMin);
-  const totBestColor = [RATES.std.color, RATES.tou.color, RATES.cpp.color][totBestIdx];
-  const totBestName = ['Std','TOU','CPP'][totBestIdx];
-
-  const totTr = document.createElement('tr');
-  totTr.style.cssText = 'border-top:3px solid #1e40af;font-weight:800;font-size:12px;background:#f8fafc';
-  totTr.innerHTML = `
-    <td style="font-weight:800">TOTAL</td>
-    <td></td><td></td><td></td>
-    <td style="color:${RATES.std.color}">$${totStd.toFixed(0)}</td>
-    <td style="color:${RATES.tou.color}">$${totTou.toFixed(0)}</td>
-    <td style="color:${RATES.cpp.color}">$${totCpp.toFixed(0)}</td>
-    <td></td>
-    <td style="color:#dc2626">$${totActual.toFixed(0)}</td>
-    <td style="color:${totBestColor}">${totBestName}</td>
-  `;
-  tbody.appendChild(totTr);
-
-  // Weighted-average ¢/kWh row (total all-in ÷ total positive net kWh × 100)
-  const safeKwh = totKwh > 0 ? totKwh : 1;
-  const stdW = (totStd   / safeKwh * 100).toFixed(1);
-  const touW = (totTou   / safeKwh * 100).toFixed(1);
-  const cppW = (totCpp   / safeKwh * 100).toFixed(1);
-  const actW = (totActual / safeKwh * 100).toFixed(1);
-  const wtdTr = document.createElement('tr');
-  wtdTr.style.cssText = 'font-size:11px;background:#f8fafc;border-bottom:1px solid #e2e8f0';
-  wtdTr.innerHTML = `
-    <td style="color:#64748b;font-style:italic">Wtd avg ¢/kWh</td>
-    <td></td><td style="color:#64748b;font-size:10px">${totKwh.toLocaleString()} kWh</td><td></td>
-    <td style="color:${RATES.std.color};font-weight:700">${stdW}¢</td>
-    <td style="color:${RATES.tou.color};font-weight:700">${touW}¢</td>
-    <td style="color:${RATES.cpp.color};font-weight:700">${cppW}¢</td>
-    <td></td>
-    <td style="color:#dc2626;font-weight:700">${actW}¢</td>
-    <td></td>
-  `;
-  tbody.appendChild(wtdTr);
-
-  // Savings vs best row
-  const savTr = document.createElement('tr');
-  savTr.style.cssText = 'font-size:11px;color:#64748b';
-  savTr.innerHTML = `
-    <td>vs Best</td><td></td><td></td><td></td>
-    <td>${totBestIdx===0?'\u2013':'+$'+(totStd-totMin).toFixed(0)}</td>
-    <td>${totBestIdx===1?'\u2013':'+$'+(totTou-totMin).toFixed(0)}</td>
-    <td>${totBestIdx===2?'\u2013':'+$'+(totCpp-totMin).toFixed(0)}</td>
-    <td></td><td></td><td></td>
-  `;
-  tbody.appendChild(savTr);
-
-  tbl.appendChild(tbody);
-}
-
-function chartOpts(yLabel, y2Label, dualAxis){
-  return {
-    responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{position:'top',labels:{font:{size:11}}} },
-    scales:{
-      x:{ grid:{color:'#f1f5f9'}, ticks:{maxRotation:40,font:{size:10}} },
-      y:{ grid:{color:'#f1f5f9'}, position:'left', title:{display:true,text:yLabel,font:{size:11}}, stacked:true },
-      y2: dualAxis ? { position:'right', title:{display:true,text:y2Label,font:{size:11}}, grid:{display:false}, ticks:{callback:v=>'$'+v} } : undefined
-    }
-  };
-}
-
-// ── Bill table ────────────────────────────────────────────────────────────
-const tbl = document.getElementById('billTable');
-tbl.innerHTML = `<thead><tr>
-  <th>Date</th><th>Period</th>
-  <th>Grid DEL</th><th>Grid RCVD</th><th>Net</th>
-  <th>Solar Gen</th><th>Solar Self-Used</th><th>Home Total</th>
-  <th>On-Peak</th><th>Off-Peak</th><th>Bill $</th><th></th>
-</tr></thead>`;
-const tbody = document.createElement('tbody');
-BILLS.forEach(b => {
-  const sh = b.sol!=null ? Math.round(b.sol-b.rcvd) : '\u2013';
-  const tr = document.createElement('tr');
-  if(b.sum) tr.className='summer';
-  tr.innerHTML = `
-    <td style="font-weight:600">${b.d}</td>
-    <td style="color:#64748b;font-size:10px">${b.s}\u2013${b.e}</td>
-    <td>${b.del}</td>
-    <td style="color:#22c55e">${b.rcvd}</td>
-    <td style="font-weight:${b.net<0?700:400};color:${b.net<0?'#22c55e':'inherit'}">${b.net}</td>
-    <td style="color:#f97316">${b.sol??'\u2013'}</td>
-    <td style="color:#b45309">${sh}</td>
-    <td style="font-weight:600">${b.home??'\u2013'}</td>
-    <td style="color:#dc2626">${b.opk??'\u2013'}</td>
-    <td style="color:#6366f1">${b.fpk??'\u2013'}</td>
-    <td style="font-weight:600">$${b.bill.toFixed(2)}</td>
-    <td>${b.sum?'\u2600\uFE0F':''}</td>
-  `;
-  tbody.appendChild(tr);
-});
-tbl.appendChild(tbody);
-
-// ── Init ──────────────────────────────────────────────────────────────────
-renderTabs();
-renderChart();
-</script>
-</body>
-</html>
+      // Battery is fully uti

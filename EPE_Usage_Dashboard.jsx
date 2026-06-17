@@ -143,7 +143,7 @@ export default function Dashboard() {
       <div style={{ marginBottom:20 }}>
         <h1 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:0 }}>EPE Usage & Solar Dashboard</h1>
         <p style={{ color:"#64748b", fontSize:13, margin:"4px 0 0" }}>
-          2333 Cheyenne Dr Las Cruces NM · 23 bills · May 2024 – Mar 2026 · Account 8611863488
+          Las Cruces, NM · 23 bills · May 2024 – Mar 2026
         </p>
       </div>
 
@@ -321,8 +321,9 @@ export default function Dashboard() {
       </div>
 
       <p style={{ fontSize:10, color:"#94a3b8", marginTop:12, textAlign:"center" }}>
-        Data source: El Paso Electric bills parsed from PDF · Solar meter I347016257 (generation) · Grid meter I346971117 (DEL/RCVD/NET)
+        Data source: El Paso Electric bills parsed from PDF · Solar meter (generation) · Grid meter (DEL/RCVD/NET)
       </p>
     </div>
   );
 }
+                                                            
