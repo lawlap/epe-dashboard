@@ -56,7 +56,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
 <body>
 <div class="page">
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
-  <p class="sub">Las Cruces, NM · 23 bills · May 2024–Mar 2026</p>
+  <p class="sub">Las Cruces, NM · 27 bills · May 2024–Jul 2026 · Anker batteries live since Jul 29 2026</p>
 
   <!-- ====================================================================== -->
   <!-- PLAN DECISION BANNER — added Jun 17 2026 after EPE pairing ruling       -->
@@ -287,6 +287,62 @@ input[type=range]{width:200px;accent-color:#1e40af}
     <div class="sim-cards" id="battCards"></div>
   </div>
 
+  <!-- Live Usage & Battery (hidden unless live tab) -->
+  <div id="liveSection" style="display:none">
+    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">⚡ Anker SOLIX — measured operation (10-min telemetry, Jun 9 – Aug 4 2026)</div>
+      Actual metered data exported from the Anker app. The batteries began <b>active daily arbitrage on July 29, 2026</b>
+      (SOC cycling 20%→100% daily). Before that: solar/load monitoring only (Jun 9–18), a brief commissioning test
+      (Jun 19–21), then grid-tied with the battery idle (Jun 22–Jul 28). The chart below stacks how each day's home load
+      was served; the second chart shows the average hourly dispatch during the first week of battery operation.
+    </div>
+    <div class="sim-cards" id="liveCards"></div>
+    <div style="margin-top:10px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average day — battery-active week (Jul 30–Aug 3)</div>
+      <p class="note" style="margin-top:2px;margin-bottom:6px">Average power by hour (W). The battery <b>charges overnight (midnight–3AM, the WHEV credit window) and from midday solar</b>, then <b>discharges hard 3–7PM</b> — collapsing grid import to near zero during the TOD on-peak window. This is the arbitrage the whole plan is built around, now visible in real data.</p>
+      <div class="chart-box" style="height:300px"><canvas id="liveProfChart"></canvas></div>
+    </div>
+    <p class="note" style="margin-top:10px"><b>Caveat:</b> the battery-active window is only 7 days and coincides with unusually high load (~76 kWh/day — heavy EV charging + peak-summer AC after a low-use travel period). Self-sufficiency (share of load met by solar+battery) reads low (~22%) because the load is large, not because the battery underperforms — its job here is <em>shifting</em> the 3–7PM on-peak kWh to cheap overnight/solar, not powering the whole house. Round-trip efficiency measured ~92%, in line with the 90% modeling assumption.</p>
+  </div>
+
+  <!-- GreenButton meter data (hidden unless gb tab) -->
+  <div id="gbSection" style="display:none">
+    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">📊 EPE AMI meter — 15-minute interval data (GreenButton export, Aug 4 2025 – Aug 3 2026)</div>
+      This is the <b>utility billing meter itself</b> at 15-minute resolution: separate IMPORT / EXPORT channels plus the solar-production (REC) meter. It's the authoritative measurement — more reliable than the Emporia CT export (which ran ~20% high) — and since the battery only went live Jul 29 2026, this whole year is the <b>pre-battery baseline</b>. The measured summer on-peak share (~14–20% of import) confirms the estimate the plan analysis was built on, and the July 2026 measured share (13.6%) matches that bill's billed split (13.9%) almost exactly.
+    </div>
+    <div class="sim-cards" id="gbCards"></div>
+    <div style="margin-top:10px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average weekday grid load-shape — the meter's own view</div>
+      <p class="note" style="margin-top:2px;margin-bottom:6px">Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison.</p>
+      <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
+    </div>
+    <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month meter totals — import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
+  </div>
+
+  <!-- Counterfactual "vs regular rate" (hidden unless cf tab) -->
+  <div id="cfSection" style="display:none">
+    <div class="sim-controls" style="margin-bottom:12px">
+      <div class="sim-row" style="align-items:center">
+        <span class="sim-label"><b>Compare against:</b></span>
+        <span id="cfBaselineBtns">
+          <button type="button" class="on" onclick="setCfBaseline('std')">Standard Rate No. 01</button>
+          <button type="button" class="off" onclick="setCfBaseline('cpp')">CPP (prior plan)</button>
+          <button type="button" class="off" onclick="setCfBaseline('tou')">TOD / Power Hours</button>
+        </span>
+      </div>
+      <p class="note" style="margin-top:8px">"What would the same usage have cost on the <b>regular rate</b>?" Each bill's actual net kWh is repriced on the chosen plan, all-in, with that month's real riders/taxes. The running total is cumulative; running savings = the gap. <b>Standard</b> = the do-nothing baseline (the return on the whole TOU/CPP/TOD+battery strategy). <b>CPP</b> = your prior plan (closest to the marginal "return on switching to TOD, which the battery enables"). Note this is a <em>joint</em> plan+battery return — the two weren't separate choices.</p>
+    </div>
+    <div class="sim-cards" id="cfCards"></div>
+  </div>
+
+  <!-- Counterfactual detail table -->
+  <div class="section" id="cfTableSection" style="display:none">
+    <h3 style="margin-bottom:4px">Per-bill detail — actual vs. counterfactual, with running totals</h3>
+    <p class="note" style="margin-bottom:10px">⚡ = TOD/WHEV + battery era (from Jul 2026). Battery went live Jul 29 2026 — the first bill to actually reflect battery arbitrage will be the <b>August 2026</b> bill (not yet available); the Jul 2026 bill's period ended Jul 15, so it shows the TOD-plan switch but essentially no battery operation yet.</p>
+    <div style="overflow-x:auto"><table class="sim-table" id="cfTable"></table></div>
+  </div>
+
   <!-- Solar Savings controls (hidden unless solar tab) -->
   <div id="solarSection" style="display:none">
     <div class="sim-controls">
@@ -303,7 +359,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
         </div>
         <span style="font-size:12px;font-weight:700;color:#0f172a;margin-left:12px">Net cost: <span id="solarNetCost">$3,500</span></span>
       </div>
-      <p class="note" style="margin-top:8px">Monthly savings = estimated bill <em>without</em> solar (using actual home consumption kWh on the plan you were on) minus actual bill paid. Net metering is full retail in NM — solar export earns the same rate as import. Data available May 2024 – present (~23 months). Pre-2024 savings estimated from annual run rate. Payback line shows when cumulative savings crosses system net cost.</p>
+      <p class="note" style="margin-top:8px">Monthly savings = estimated bill <em>without</em> solar (using actual home consumption kWh on the plan you were on) minus actual bill paid. Net metering is full retail in NM — solar export earns the same rate as import. Data available May 2024 – present (~27 months). Pre-2024 savings estimated from annual run rate. Payback line shows when cumulative savings crosses system net cost.</p>
     </div>
     <div class="sim-cards" id="solarCards"></div>
 
@@ -417,6 +473,10 @@ const BILLS = [
   {d:"2026-01-14",s:"12/11",e:"01/14/2026",del:801, rcvd:67, net:734,  sol:276, home:1010, opk:null,fpk:734,  bill:53.32,sum:false},
   {d:"2026-02-12",s:"01/14",e:"02/12/2026",del:600, rcvd:113,net:487,  sol:312, home:799,  opk:null,fpk:487,  bill:39.86,sum:false},
   {d:"2026-03-16",s:"02/12",e:"03/16/2026",del:537, rcvd:226,net:311,  sol:469, home:780,  opk:null,fpk:311,  bill:32.28,sum:false},
+  {d:"2026-04-15",s:"03/16",e:"04/15/2026",del:651, rcvd:174,net:477,  sol:485, home:962,  opk:null,fpk:477,  bill:42.50,sum:false},  // TOD off-peak 3.428¢
+  {d:"2026-05-14",s:"04/15",e:"05/14/2026",del:914, rcvd:192,net:722,  sol:531, home:1253, opk:null,fpk:722,  bill:41.90,sum:false},  // TOD off-peak 3.428¢
+  {d:"2026-06-15",s:"05/14",e:"06/15/2026",del:1522,rcvd:160,net:1362, sol:641, home:2003, opk:144, fpk:1219, bill:144.28,sum:true },  // still CPP: on-peak 13.689¢, off-peak 6.845¢
+  {d:"2026-07-15",s:"06/15",e:"07/15/2026",del:831, rcvd:193,net:638,  sol:571, home:1209, opk:89,  fpk:549,  bill:58.28,sum:true },  // switched to TOD+WHEV: on-peak 22.108¢, off-peak 5.527¢, WHEV credit 294 kWh @ 4.74¢
 ];
 
 const MN=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -500,7 +560,8 @@ function getActualPlan(b) {
   const d = new Date(b.d);
   if (d < new Date('2024-09-01')) return 'Standard';
   if (d < new Date('2025-11-12')) return 'TOU';
-  return 'CPP';
+  if (d < new Date('2026-07-01')) return 'CPP';   // Nov 2025 – Jun 2026 on CPP
+  return 'TOU';                                    // Jul 2026+: switched to TOD/Power Hours (+WHEV), TOU rate structure
 }
 // TOU non-summer = Standard non-summer, always $0.05816 (confirmed Sep2024–Oct2025 bills)
 function getTOUNonSummerRate()  { return RATES.tou.nonSummerOld; }  // $0.05816
@@ -550,6 +611,10 @@ const FPPCAC = {
   '2026-01-14': -0.005404,
   '2026-02-12': -0.004205,
   '2026-03-16':  0.000517,
+  '2026-04-15': -0.000247,
+  '2026-05-14': -0.019725,
+  '2026-06-15': -0.012249,
+  '2026-07-15': -0.014824,
 };
 
 // Rider rates by era (verified against each bill's line items)
@@ -574,7 +639,7 @@ function getRiderRates(billDate) {
   } else if (d < new Date('2026-03-01')) {
     return { rps: 0.020215, tep: 0.000944, ams: 2.92, euef }; // Jan-Feb 2026 (RPS changed)
   } else {
-    return { rps: 0.020215, tep: 0.000997, ams: 3.82, euef }; // Mar 2026+ (TEP+AMS changed)
+    return { rps: 0.020215, tep: 0.001002, ams: 3.82, euef }; // Mar 2026+ (TEP+AMS changed; TEP 0.001002 per Apr–Jul 2026 bills)
   }
 }
 
@@ -1035,8 +1100,77 @@ YEARS.forEach(yr => {
 });
 
 // ── Chart management ──────────────────────────────────────────────────────
+// ── Anker SOLIX post-install telemetry (10-min data, Jun 9–Aug 4 2026) ──────
+const ANKER_DAILY = [
+{d:'06-09',ph:'monitor',load:null,pv:0.0,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-10',ph:'monitor',load:null,pv:20.4,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-11',ph:'monitor',load:null,pv:22.0,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-12',ph:'monitor',load:null,pv:20.2,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-13',ph:'monitor',load:null,pv:20.4,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-14',ph:'monitor',load:null,pv:18.2,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-15',ph:'monitor',load:null,pv:18.0,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-16',ph:'monitor',load:null,pv:22.3,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-17',ph:'monitor',load:null,pv:15.7,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-18',ph:'monitor',load:null,pv:14.9,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
+{d:'06-19',ph:'commission',load:51.7,pv:20.0,bc:0.4,bd:1.7,gi:30.9,ge:0.1,stl:19.2,btl:1.7,gtl:30.9,gtb:0.0,smin:0,smax:50},
+{d:'06-20',ph:'commission',load:96.3,pv:22.0,bc:8.5,bd:6.0,gi:76.8,ge:0.0,stl:19.4,btl:6.0,gtl:70.8,gtb:6.0,smin:20,smax:100},
+{d:'06-21',ph:'commission',load:78.9,pv:22.8,bc:5.9,bd:0.0,gi:65.4,ge:3.4,stl:19.4,btl:0.0,gtl:59.5,gtb:5.9,smin:0,smax:100},
+{d:'06-22',ph:'idle',load:58.2,pv:22.4,bc:0.0,bd:0.0,gi:39.9,ge:4.1,stl:18.3,btl:0.0,gtl:39.9,gtb:0.0,smin:0,smax:0},
+{d:'06-23',ph:'idle',load:62.2,pv:22.2,bc:0.0,bd:0.0,gi:43.0,ge:3.0,stl:19.2,btl:0.0,gtl:43.0,gtb:0.0,smin:0,smax:0},
+{d:'06-24',ph:'idle',load:44.5,pv:19.9,bc:0.0,bd:0.0,gi:32.1,ge:7.5,stl:12.5,btl:0.0,gtl:32.1,gtb:0.0,smin:0,smax:0},
+{d:'06-25',ph:'idle',load:25.2,pv:18.2,bc:0.0,bd:0.0,gi:15.9,ge:8.8,stl:9.3,btl:0.0,gtl:15.9,gtb:0.0,smin:0,smax:0},
+{d:'06-26',ph:'idle',load:18.7,pv:19.9,bc:0.0,bd:0.0,gi:9.5,ge:10.7,stl:9.2,btl:0.0,gtl:9.5,gtb:0.0,smin:0,smax:0},
+{d:'06-27',ph:'idle',load:22.6,pv:19.2,bc:0.0,bd:0.0,gi:12.2,ge:8.8,stl:10.4,btl:0.0,gtl:12.2,gtb:0.0,smin:0,smax:0},
+{d:'06-28',ph:'idle',load:21.9,pv:21.7,bc:0.0,bd:0.0,gi:10.9,ge:10.7,stl:11.0,btl:0.0,gtl:10.9,gtb:0.0,smin:0,smax:0},
+{d:'06-29',ph:'idle',load:21.5,pv:22.1,bc:0.0,bd:0.0,gi:11.0,ge:11.6,stl:10.5,btl:0.0,gtl:11.0,gtb:0.0,smin:0,smax:0},
+{d:'06-30',ph:'idle',load:23.2,pv:19.6,bc:0.0,bd:0.0,gi:11.9,ge:8.3,stl:11.3,btl:0.0,gtl:11.9,gtb:0.0,smin:0,smax:0},
+{d:'07-01',ph:'idle',load:23.2,pv:19.1,bc:0.0,bd:0.0,gi:11.9,ge:7.8,stl:11.3,btl:0.0,gtl:11.9,gtb:0.0,smin:0,smax:0},
+{d:'07-02',ph:'idle',load:23.5,pv:21.0,bc:0.0,bd:0.0,gi:11.8,ge:9.3,stl:11.7,btl:0.0,gtl:11.8,gtb:0.0,smin:0,smax:0},
+{d:'07-03',ph:'idle',load:31.7,pv:20.2,bc:0.0,bd:0.0,gi:18.6,ge:7.1,stl:13.0,btl:0.0,gtl:18.6,gtb:0.0,smin:0,smax:0},
+{d:'07-04',ph:'idle',load:27.2,pv:18.6,bc:0.0,bd:0.0,gi:15.5,ge:6.8,stl:11.8,btl:0.0,gtl:15.5,gtb:0.0,smin:0,smax:0},
+{d:'07-05',ph:'idle',load:19.3,pv:10.4,bc:0.0,bd:0.0,gi:12.8,ge:3.9,stl:6.5,btl:0.0,gtl:12.8,gtb:0.0,smin:0,smax:0},
+{d:'07-06',ph:'idle',load:25.2,pv:19.9,bc:0.0,bd:0.0,gi:14.2,ge:9.0,stl:10.9,btl:0.0,gtl:14.2,gtb:0.0,smin:0,smax:0},
+{d:'07-07',ph:'idle',load:27.1,pv:20.1,bc:0.0,bd:0.0,gi:14.5,ge:7.5,stl:12.6,btl:0.0,gtl:14.5,gtb:0.0,smin:0,smax:0},
+{d:'07-08',ph:'idle',load:28.9,pv:21.0,bc:0.0,bd:0.0,gi:16.2,ge:8.3,stl:12.7,btl:0.0,gtl:16.2,gtb:0.0,smin:0,smax:0},
+{d:'07-09',ph:'idle',load:31.1,pv:20.6,bc:0.0,bd:0.0,gi:18.2,ge:7.6,stl:13.0,btl:0.0,gtl:18.2,gtb:0.0,smin:0,smax:0},
+{d:'07-10',ph:'idle',load:29.5,pv:14.7,bc:0.0,bd:0.0,gi:18.9,ge:4.1,stl:10.6,btl:0.0,gtl:18.9,gtb:0.0,smin:0,smax:0},
+{d:'07-11',ph:'idle',load:25.5,pv:19.7,bc:0.0,bd:0.0,gi:13.3,ge:7.5,stl:12.2,btl:0.0,gtl:13.3,gtb:0.0,smin:0,smax:0},
+{d:'07-12',ph:'idle',load:21.5,pv:16.2,bc:0.0,bd:0.0,gi:13.0,ge:7.7,stl:8.5,btl:0.0,gtl:13.0,gtb:0.0,smin:0,smax:0},
+{d:'07-13',ph:'idle',load:20.2,pv:13.4,bc:0.0,bd:0.0,gi:11.9,ge:5.2,stl:8.2,btl:0.0,gtl:11.9,gtb:0.0,smin:0,smax:0},
+{d:'07-14',ph:'idle',load:21.5,pv:18.0,bc:0.0,bd:0.0,gi:12.1,ge:8.6,stl:9.4,btl:0.0,gtl:12.1,gtb:0.0,smin:0,smax:0},
+{d:'07-15',ph:'idle',load:21.3,pv:17.1,bc:0.0,bd:0.0,gi:11.2,ge:7.1,stl:10.1,btl:0.0,gtl:11.2,gtb:0.0,smin:0,smax:0},
+{d:'07-16',ph:'idle',load:25.5,pv:19.5,bc:0.0,bd:0.0,gi:14.0,ge:7.9,stl:11.6,btl:0.0,gtl:14.0,gtb:0.0,smin:0,smax:0},
+{d:'07-17',ph:'idle',load:19.0,pv:14.1,bc:0.0,bd:0.0,gi:11.8,ge:6.9,stl:7.2,btl:0.0,gtl:11.8,gtb:0.0,smin:0,smax:0},
+{d:'07-18',ph:'idle',load:14.3,pv:15.1,bc:0.0,bd:0.0,gi:8.4,ge:9.1,stl:5.9,btl:0.0,gtl:8.4,gtb:0.0,smin:0,smax:0},
+{d:'07-19',ph:'idle',load:13.7,pv:13.1,bc:0.0,bd:0.0,gi:8.6,ge:8.1,stl:5.1,btl:0.0,gtl:8.6,gtb:0.0,smin:0,smax:0},
+{d:'07-20',ph:'idle',load:14.6,pv:13.2,bc:0.0,bd:0.0,gi:8.9,ge:7.5,stl:5.7,btl:0.0,gtl:8.9,gtb:0.0,smin:0,smax:0},
+{d:'07-21',ph:'idle',load:13.7,pv:18.4,bc:0.0,bd:0.0,gi:7.1,ge:11.9,stl:6.6,btl:0.0,gtl:7.1,gtb:0.0,smin:0,smax:0},
+{d:'07-22',ph:'idle',load:23.6,pv:20.9,bc:0.0,bd:0.0,gi:12.4,ge:9.7,stl:11.2,btl:0.0,gtl:12.4,gtb:0.0,smin:0,smax:0},
+{d:'07-23',ph:'idle',load:28.9,pv:20.9,bc:0.0,bd:0.0,gi:15.6,ge:7.6,stl:13.3,btl:0.0,gtl:15.6,gtb:0.0,smin:0,smax:0},
+{d:'07-24',ph:'idle',load:30.8,pv:20.4,bc:0.0,bd:0.0,gi:17.8,ge:7.4,stl:13.0,btl:0.0,gtl:17.8,gtb:0.0,smin:0,smax:0},
+{d:'07-25',ph:'idle',load:32.8,pv:19.9,bc:0.0,bd:0.0,gi:19.3,ge:6.4,stl:13.4,btl:0.0,gtl:19.3,gtb:0.0,smin:0,smax:0},
+{d:'07-26',ph:'idle',load:33.4,pv:20.8,bc:0.0,bd:0.0,gi:19.1,ge:6.4,stl:14.4,btl:0.0,gtl:19.1,gtb:0.0,smin:0,smax:0},
+{d:'07-27',ph:'idle',load:38.0,pv:19.2,bc:0.0,bd:0.0,gi:23.8,ge:4.9,stl:14.2,btl:0.0,gtl:23.8,gtb:0.0,smin:0,smax:0},
+{d:'07-28',ph:'idle',load:61.0,pv:20.2,bc:0.0,bd:0.0,gi:45.5,ge:4.6,stl:15.6,btl:0.0,gtl:45.5,gtb:0.0,smin:0,smax:0},
+{d:'07-29',ph:'active',load:89.7,pv:20.4,bc:7.8,bd:13.6,gi:63.9,ge:0.4,stl:19.5,btl:13.6,gtl:56.5,gtb:7.4,smin:0,smax:100},
+{d:'07-30',ph:'active',load:93.6,pv:20.2,bc:16.3,bd:14.1,gi:76.3,ge:0.7,stl:19.3,btl:14.1,gtl:60.2,gtb:16.1,smin:20,smax:100},
+{d:'07-31',ph:'active',load:81.3,pv:16.8,bc:24.1,bd:19.6,gi:70.5,ge:1.5,stl:15.0,btl:19.6,gtl:46.6,gtb:23.9,smin:20,smax:100},
+{d:'08-01',ph:'active',load:73.3,pv:17.3,bc:16.5,bd:13.9,gi:59.5,ge:0.9,stl:16.4,btl:13.9,gtl:43.0,gtb:16.5,smin:20,smax:100},
+{d:'08-02',ph:'active',load:53.8,pv:20.4,bc:15.1,bd:12.0,gi:41.3,ge:4.8,stl:14.5,btl:12.0,gtl:27.4,gtb:13.9,smin:31,smax:100},
+{d:'08-03',ph:'active',load:72.7,pv:20.3,bc:14.1,bd:13.8,gi:55.0,ge:2.3,stl:17.8,btl:13.8,gtl:41.1,gtb:13.9,smin:20,smax:100},
+{d:'08-04',ph:'active',load:68.4,pv:19.6,bc:16.5,bd:15.0,gi:51.6,ge:1.3,stl:18.2,btl:15.0,gtl:35.3,gtb:16.3,smin:20,smax:100}
+];
+const ANKER_PROF_ACTIVE = [{h:0,load:2642,pv:0,gi:4156,ge:0,bc:1514,bd:0},{h:1,load:2184,pv:0,gi:9485,ge:0,bc:7302,bd:0},{h:2,load:1672,pv:0,gi:7450,ge:0,bc:5778,bd:0},{h:3,load:1713,pv:0,gi:2462,ge:0,bc:749,bd:0},{h:4,load:1617,pv:0,gi:1617,ge:0,bc:0,bd:0},{h:5,load:1199,pv:0,gi:1002,ge:0,bc:0,bd:196},{h:6,load:1217,pv:7,gi:887,ge:0,bc:0,bd:323},{h:7,load:745,pv:112,gi:515,ge:0,bc:0,bd:118},{h:8,load:2012,pv:261,gi:1330,ge:0,bc:0,bd:421},{h:9,load:3038,pv:812,gi:3482,ge:21,bc:1267,bd:31},{h:10,load:3702,pv:1459,gi:2570,ge:70,bc:257,bd:0},{h:11,load:4866,pv:1952,gi:3017,ge:103,bc:0,bd:0},{h:12,load:2927,pv:2255,gi:1239,ge:568,bc:0,bd:0},{h:13,load:3535,pv:2449,gi:1656,ge:570,bc:0,bd:0},{h:14,load:4088,pv:2527,gi:2045,ge:484,bc:0,bd:0},{h:15,load:5129,pv:2467,gi:204,ge:177,bc:118,bd:2753},{h:16,load:5480,pv:2306,gi:209,ge:29,bc:206,bd:3200},{h:17,load:5005,pv:1345,gi:190,ge:28,bc:22,bd:3520},{h:18,load:4675,pv:839,gi:941,ge:5,bc:18,bd:2918},{h:19,load:4309,pv:251,gi:4058,ge:0,bc:0,bd:0},{h:20,load:3746,pv:0,gi:3746,ge:0,bc:0,bd:0},{h:21,load:3373,pv:0,gi:3373,ge:0,bc:0,bd:0},{h:22,load:3368,pv:0,gi:2641,ge:5,bc:0,bd:732},{h:23,load:2823,pv:0,gi:2268,ge:3,bc:0,bd:558}];
+const ANKER_PROF_IDLE = [{h:0,load:676,pv:0,gi:676,ge:0,bc:0,bd:0},{h:1,load:518,pv:0,gi:518,ge:0,bc:0,bd:0},{h:2,load:581,pv:0,gi:581,ge:0,bc:0,bd:0},{h:3,load:547,pv:0,gi:547,ge:0,bc:0,bd:0},{h:4,load:534,pv:0,gi:534,ge:0,bc:0,bd:0},{h:5,load:491,pv:0,gi:491,ge:0,bc:0,bd:0},{h:6,load:492,pv:10,gi:482,ge:0,bc:0,bd:0},{h:7,load:508,pv:125,gi:383,ge:0,bc:0,bd:0},{h:8,load:596,pv:315,gi:285,ge:4,bc:0,bd:0},{h:9,load:1020,pv:884,gi:402,ge:267,bc:0,bd:0},{h:10,load:1452,pv:1504,gi:531,ge:583,bc:0,bd:0},{h:11,load:1241,pv:1957,gi:265,ge:981,bc:0,bd:0},{h:12,load:1627,pv:2291,gi:414,ge:1078,bc:0,bd:0},{h:13,load:1873,pv:2465,gi:497,ge:1089,bc:0,bd:0},{h:14,load:1749,pv:2551,gi:430,ge:1232,bc:0,bd:0},{h:15,load:2854,pv:2486,gi:1186,ge:818,bc:0,bd:0},{h:16,load:2146,pv:2309,gi:601,ge:765,bc:0,bd:0},{h:17,load:2045,pv:1814,gi:751,ge:520,bc:0,bd:0},{h:18,load:2355,pv:1363,gi:1116,ge:123,bc:0,bd:0},{h:19,load:1948,pv:499,gi:1497,ge:48,bc:0,bd:0},{h:20,load:1432,pv:0,gi:1432,ge:0,bc:0,bd:0},{h:21,load:1339,pv:0,gi:1339,ge:0,bc:0,bd:0},{h:22,load:1104,pv:0,gi:1104,ge:0,bc:0,bd:0},{h:23,load:782,pv:0,gi:782,ge:0,bc:0,bd:0}];
+// ── EPE GreenButton 15-min meter data (Aug 2025–Aug 2026, authoritative) ──
+const GB_MONTHLY = [{mo:'2025-08',imp:1344,exp:63,net:1282,prod:482,onpk:19.6},{mo:'2025-09',imp:1091,exp:96,net:995,prod:448,onpk:17.1},{mo:'2025-10',imp:784,exp:137,net:647,prod:406,onpk:14.7},{mo:'2025-11',imp:554,exp:119,net:434,prod:317,onpk:null},{mo:'2025-12',imp:705,exp:60,net:645,prod:262,onpk:null},{mo:'2026-01',imp:705,exp:97,net:609,prod:290,onpk:null},{mo:'2026-02',imp:496,exp:163,net:334,prod:364,onpk:null},{mo:'2026-03',imp:599,exp:215,net:384,prod:516,onpk:null},{mo:'2026-04',imp:729,exp:184,net:545,prod:488,onpk:null},{mo:'2026-05',imp:1124,exp:195,net:929,prod:614,onpk:null},{mo:'2026-06',imp:1487,exp:142,net:1345,prod:583,onpk:15.7},{mo:'2026-07',imp:658,exp:211,net:447,prod:563,onpk:13.6},{mo:'2026-08',imp:158,exp:8,net:150,prod:58,onpk:0.6}];
+const GB_PROF_SUM = [{h:0,imp:1.92,exp:0.0},{h:1,imp:1.69,exp:0.0},{h:2,imp:1.32,exp:0.0},{h:3,imp:1.19,exp:0.0},{h:4,imp:1.1,exp:0.0},{h:5,imp:1.01,exp:0.0},{h:6,imp:0.88,exp:0.0},{h:7,imp:0.96,exp:0.0},{h:8,imp:0.95,exp:0.01},{h:9,imp:0.99,exp:0.15},{h:10,imp:1.05,exp:0.37},{h:11,imp:1.32,exp:0.5},{h:12,imp:0.59,exp:0.88},{h:13,imp:1.53,exp:0.65},{h:14,imp:2.13,exp:0.4},{h:15,imp:1.3,exp:0.6},{h:16,imp:1.73,exp:0.42},{h:17,imp:2.72,exp:0.21},{h:18,imp:3.05,exp:0.07},{h:19,imp:2.62,exp:0.01},{h:20,imp:2.93,exp:0.0},{h:21,imp:2.9,exp:0.0},{h:22,imp:2.57,exp:0.0},{h:23,imp:2.13,exp:0.0}];
+const GB_PROF_WIN = [{h:0,imp:1.05,exp:0.0},{h:1,imp:0.89,exp:0.0},{h:2,imp:0.74,exp:0.0},{h:3,imp:0.71,exp:0.0},{h:4,imp:0.69,exp:0.0},{h:5,imp:0.68,exp:0.0},{h:6,imp:0.93,exp:0.0},{h:7,imp:1.09,exp:0.0},{h:8,imp:1.02,exp:0.0},{h:9,imp:0.71,exp:0.07},{h:10,imp:0.51,exp:0.32},{h:11,imp:0.43,exp:0.63},{h:12,imp:0.53,exp:0.79},{h:13,imp:0.57,exp:0.85},{h:14,imp:0.59,exp:0.8},{h:15,imp:0.56,exp:0.68},{h:16,imp:1.03,exp:0.39},{h:17,imp:1.96,exp:0.13},{h:18,imp:1.8,exp:0.03},{h:19,imp:1.53,exp:0.0},{h:20,imp:1.77,exp:0.0},{h:21,imp:1.53,exp:0.0},{h:22,imp:1.53,exp:0.0},{h:23,imp:1.31,exp:0.0}];
+const GB_ANNUAL = {imp:10276,exp:1682,net:8594,prod:5333,home:13927};
+
 let chart = null;
-function destroyChart(){ if(chart){ chart.destroy(); chart=null; } }
+let liveChart = null;
+function destroyChart(){ if(chart){ chart.destroy(); chart=null; } if(liveChart){ liveChart.destroy(); liveChart=null; } }
 
 const VIEWS = [
   {key:'chrono',  label:'Chronological'},
@@ -1046,6 +1180,9 @@ const VIEWS = [
   {key:'sim',     label:'Rate Plan Simulator'},
   {key:'batt',    label:'Battery Economics'},
   {key:'proj',    label:'2026 Projection'},
+  {key:'live',    label:'⚡ Usage & Battery (Live)'},
+  {key:'gb',      label:'📊 Meter Data (15-min)'},
+  {key:'cf',      label:'⚖️ vs Regular Rate'},
 ];
 let activeView = 'chrono';
 
@@ -1065,6 +1202,10 @@ function setView(v){
   document.getElementById('projSection').style.display = v==='proj' ? 'block' : 'none';
   document.getElementById('projTableSection').style.display = v==='proj' ? 'block' : 'none';
   document.getElementById('solarSection').style.display = v==='solar' ? 'block' : 'none';
+  document.getElementById('liveSection').style.display = v==='live' ? 'block' : 'none';
+  document.getElementById('cfSection').style.display = v==='cf' ? 'block' : 'none';
+  document.getElementById('cfTableSection').style.display = v==='cf' ? 'block' : 'none';
+  document.getElementById('gbSection').style.display = v==='gb' ? 'block' : 'none';
   renderChart();
 }
 window.setView = setView;
@@ -1429,6 +1570,294 @@ function renderChart(){
     });
 
     renderProjection(projData);
+  } else if(activeView==='live'){
+    renderLive(ctx, title, note);
+  } else if(activeView==='cf'){
+    renderCounterfactual(ctx, title, note);
+  } else if(activeView==='gb'){
+    renderGreenButton(ctx, title, note);
+  }
+}
+
+// ── EPE GreenButton meter view (authoritative 15-min interval data) ──────────
+function renderGreenButton(ctx, title, note){
+  title.textContent = 'EPE billing meter — monthly grid import / export / solar (15-min data, Aug 2025–Aug 2026)';
+  note.textContent = 'Straight from the utility AMI meter (the billing source of truth): blue = grid import, green = grid export (below 0), yellow line = solar produced (REC meter). This is the authoritative measurement — it supersedes the Emporia estimates for on-peak share. Almost the entire year is pre-battery, so it is the clean "no-battery" baseline.';
+  const M = GB_MONTHLY;
+  const labels = M.map(r=>r.mo);
+  chart = new Chart(ctx, {
+    data:{ labels, datasets:[
+      { type:'bar', label:'Grid import (kWh)', data:M.map(r=>r.imp), backgroundColor:'#3b82f6', yAxisID:'y', order:3 },
+      { type:'bar', label:'Grid export (kWh)', data:M.map(r=>-r.exp), backgroundColor:'#22c55e', yAxisID:'y', order:3 },
+      { type:'line', label:'Solar produced (kWh)', data:M.map(r=>r.prod), borderColor:'#f59e0b', backgroundColor:'transparent', borderWidth:2.5, pointRadius:3, yAxisID:'y', order:1 },
+      { type:'line', label:'Net billed (kWh)', data:M.map(r=>r.net), borderColor:'#0f172a', borderDash:[4,3], backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, yAxisID:'y', order:0 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top',labels:{font:{size:10},boxWidth:12}},
+        tooltip:{ callbacks:{ afterBody:(items)=>{ const r=M[items[0].dataIndex]; return r.onpk!=null?`On-peak share of import: ${r.onpk}%`:''; } } } },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:10}} },
+        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh / month (export below 0)'} } }
+    }
+  });
+  renderGBCards();
+  renderGBProfile();
+}
+
+function renderGBCards(){
+  const el=document.getElementById('gbCards'); if(!el) return;
+  const a=GB_ANNUAL;
+  const summers=GB_MONTHLY.filter(r=>r.onpk!=null && r.imp>250 && ['06','07','08','09'].includes(r.mo.slice(5)));
+  const avgOnpk=(summers.reduce((s,r)=>s+r.onpk,0)/summers.length).toFixed(1);
+  const cards=[
+    {t:'Grid import (12 mo)', v:a.imp.toLocaleString()+' kWh', s:'Aug 2025 – Jul 2026'},
+    {t:'Solar produced', v:a.prod.toLocaleString()+' kWh', s:((a.prod-a.exp)/a.prod*100).toFixed(0)+'% self-consumed'},
+    {t:'Home load (measured)', v:a.home.toLocaleString()+' kWh', s:'import + solar − export'},
+    {t:'Self-sufficiency', v:((a.home-a.imp)/a.home*100).toFixed(0)+'%', s:'solar share of total load'},
+    {t:'On-peak import share', v:avgOnpk+'%', s:'summer 3–7PM M–F (measured)'},
+    {t:'Net billed', v:a.net.toLocaleString()+' kWh', s:'import − export (net metered)'},
+  ];
+  el.innerHTML=cards.map(c=>`<div class="sim-card" style="border-top:4px solid #0891b2"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#0e7490;font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`).join('');
+}
+
+function renderGBProfile(){
+  const cv=document.getElementById('gbProfChart'); if(!cv) return;
+  const S=GB_PROF_SUM, W=GB_PROF_WIN;
+  const labels=S.map(r=> (r.h%12===0?12:r.h%12)+(r.h<12?'a':'p'));
+  const onpkBg = S.map(r=> (r.h>=15&&r.h<19) ? 'rgba(249,115,22,.85)' : 'rgba(59,130,246,.8)');
+  liveChart = new Chart(cv.getContext('2d'), {
+    data:{ labels, datasets:[
+      { type:'bar', label:'Summer weekday grid import (kWh/h)', data:S.map(r=>r.imp), backgroundColor:onpkBg, order:3 },
+      { type:'bar', label:'Summer weekday export (kWh/h)', data:S.map(r=>-r.exp), backgroundColor:'rgba(34,197,94,.7)', order:3 },
+      { type:'line', label:'Non-summer weekday import (kWh/h)', data:W.map(r=>r.imp), borderColor:'#64748b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.3, order:0 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top',labels:{font:{size:10},boxWidth:12}},
+        tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+Math.abs(c.raw).toFixed(2)+' kWh' } } },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:9}} },
+        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Avg kWh per hour (orange = 3–7PM on-peak; export below 0)'} } }
+    }
+  });
+}
+
+// ── Live Usage & Battery (Anker measured data) ───────────────────────────
+function renderLive(ctx, title, note){
+  title.textContent = 'Daily Energy Flow — how each day’s home load was served (measured)';
+  note.textContent = 'Bars stack to the black load line = solar-to-load + battery-to-load + grid-to-load. '+
+    'Grid draw is split so battery charging is NOT double-counted: the light-red "grid → battery charging" bar (below zero) is the extra overnight grid import that only refills the battery — it is not shown as serving load. Green (below zero) = grid export. Dashed line = daily peak SOC. Jun 9–18 = solar-only monitoring (grid/load not yet live).';
+
+  const D = ANKER_DAILY;
+  const labels = D.map(r=>r.d);
+
+  chart = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        // Serving load (stacks up to the load line, no double count):
+        { type:'bar', label:'Solar → load (kWh)', data:D.map(r=>r.stl), backgroundColor:'#fbbf24', stack:'e', yAxisID:'y', order:3 },
+        { type:'bar', label:'Battery → load (kWh)', data:D.map(r=>r.btl), backgroundColor:'#f97316', stack:'e', yAxisID:'y', order:3 },
+        { type:'bar', label:'Grid → load (kWh)', data:D.map(r=>r.gtl), backgroundColor:'#3b82f6', stack:'e', yAxisID:'y', order:3 },
+        // Below zero: flows that do NOT serve load
+        { type:'bar', label:'Grid → battery charging (kWh)', data:D.map(r=>r.gtb==null?null:-r.gtb), backgroundColor:'#fecaca', stack:'e', yAxisID:'y', order:3 },
+        { type:'bar', label:'Grid export (kWh)', data:D.map(r=>r.ge==null?null:-r.ge), backgroundColor:'#22c55e', stack:'e', yAxisID:'y', order:3 },
+        { type:'line', label:'Home load (kWh)', data:D.map(r=>r.load), borderColor:'#0f172a', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.25, yAxisID:'y', order:0 },
+        { type:'line', label:'Battery SOC max %', data:D.map(r=>r.smax), borderColor:'#a855f7', borderDash:[3,3], backgroundColor:'transparent', borderWidth:1.2, pointRadius:0, yAxisID:'y2', order:1 },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top', labels:{font:{size:10}, boxWidth:12}},
+        tooltip:{ callbacks:{ title:items=>'2026-'+items[0].label,
+          afterBody:(items)=>{ const r=D[items[0].dataIndex]; const raw=(r.gi==null?'':`  ·  raw grid import ${r.gi} kWh`); return `phase: ${r.ph}  ·  SOC ${r.smin}–${r.smax}%${raw}`; } } },
+      },
+      scales:{
+        x:{ stacked:true, grid:{display:false}, ticks:{maxRotation:90, minRotation:90, font:{size:8}, autoSkip:true, maxTicksLimit:30} },
+        y:{ stacked:true, grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh / day  (below 0 = not serving load)'} },
+        y2:{ position:'right', min:0, max:100, grid:{display:false}, ticks:{callback:v=>v+'%'}, title:{display:true,text:'Battery SOC %'} }
+      }
+    }
+  });
+
+  renderLiveCards();
+  renderLiveProfile();
+}
+
+function renderLiveCards(){
+  const el = document.getElementById('liveCards');
+  if(!el) return;
+  const act = ANKER_DAILY.filter(r=>r.ph==='active');
+  const n = act.length;
+  const sum = k => act.reduce((a,r)=>a+(r[k]||0),0);
+  const load=sum('load'), pv=sum('pv'), bc=sum('bc'), bd=sum('bd'), gi=sum('gi'), ge=sum('ge'), gtl=sum('gtl'), gtb=sum('gtb');
+  const perDay = v => (v/n).toFixed(1);
+  const stl=sum('stl'), btl=sum('btl');
+  const solShare=(stl/load*100).toFixed(0);   // genuinely grid-independent (own solar)
+  const battShare=(btl/load*100).toFixed(0);  // time-shifted (mostly grid-charged) — arbitrage
+  const cards = [
+    {t:'Battery-active days', v:n+' days', s:'Jul 29 – Aug 4 (first week live)'},
+    {t:'Avg home load', v:perDay(load)+' kWh/day', s:'high — post-travel EV + AC'},
+    {t:'Battery throughput', v:perDay((bc+bd)/2)+' kWh/day', s:'~'+(bd/bc*100).toFixed(0)+'% round-trip'},
+    {t:'Avg solar', v:perDay(pv)+' kWh/day', s:(( (pv-ge)/pv*100).toFixed(0))+'% self-consumed'},
+    {t:'Solar share of load', v:solShare+'%', s:'+'+battShare+'% via battery (time-shifted grid, not extra supply)'},
+    {t:'Grid → load / → charging', v:perDay(gtl)+' / '+perDay(gtb), s:'kWh/day — charging is the arbitrage, not load'},
+  ];
+  el.innerHTML = cards.map(c=>
+    `<div class="sim-card" style="border-top:4px solid #06b6d4"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#0891b2;font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`
+  ).join('');
+}
+
+function renderLiveProfile(){
+  const cv = document.getElementById('liveProfChart');
+  if(!cv) return;
+  const P = ANKER_PROF_ACTIVE;
+  const labels = P.map(r=> (r.h%12===0?12:r.h%12)+(r.h<12?'a':'p'));
+  const kw = w => +(w/1000).toFixed(2);
+  liveChart = new Chart(cv.getContext('2d'), {
+    data:{
+      labels,
+      datasets:[
+        { type:'bar', label:'Grid import', data:P.map(r=>kw(r.gi)),  backgroundColor:'#3b82f6', stack:'p', order:3 },
+        { type:'bar', label:'Battery discharge', data:P.map(r=>kw(r.bd)), backgroundColor:'#f97316', stack:'p', order:3 },
+        { type:'bar', label:'Battery charge', data:P.map(r=>-kw(r.bc)), backgroundColor:'#fca5a5', stack:'p', order:3 },
+        { type:'bar', label:'Grid export', data:P.map(r=>-kw(r.ge)), backgroundColor:'#22c55e', stack:'p', order:3 },
+        { type:'line', label:'Solar', data:P.map(r=>kw(r.pv)), borderColor:'#f59e0b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.3, order:0 },
+        { type:'line', label:'Home load', data:P.map(r=>kw(r.load)), borderColor:'#0f172a', backgroundColor:'transparent', borderWidth:2.2, pointRadius:0, tension:0.3, order:0 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top', labels:{font:{size:10}, boxWidth:12}},
+        tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+Math.abs(c.raw).toFixed(2)+' kW' } } },
+      scales:{
+        x:{ stacked:true, grid:{display:false}, ticks:{font:{size:9}} },
+        y:{ stacked:true, grid:{color:'#f1f5f9'}, title:{display:true,text:'Avg power (kW) — charge/export shown below zero'} }
+      }
+    }
+  });
+}
+
+// ── Counterfactual: "what if I'd stayed on the regular (Standard) rate?" ─────
+// Reprices each bill's ACTUAL net kWh on a chosen baseline plan, all-in, using the
+// same historical riders/FPPCAC that were in effect. Solar is held constant (it is
+// already baked into net kWh on BOTH sides), so this isolates the value of the
+// rate-plan strategy (TOU/CPP/TOD+WHEV) — the strategy the battery exists to enable.
+let cfBaseline = 'std';  // 'std' | 'cpp' | 'tou'
+const CF_LABELS = { std:'Standard Rate No. 01', cpp:'CPP (prior plan)', tou:'TOD / Power Hours' };
+function setCfBaseline(x){
+  cfBaseline = x;
+  const order = ['std','cpp','tou'];
+  const btns = document.querySelectorAll('#cfBaselineBtns button');
+  btns.forEach((btn,i)=>{ btn.className = order[i]===x ? 'on' : 'off'; });
+  renderChart();
+}
+window.setCfBaseline = setCfBaseline;
+
+// All-in bill from an energy charge, using historical riders, WITHOUT the rate-increase
+// slider (this is a historical-actuals view). Mirrors calcAllIn's verified chain.
+function cfAllInHist(energy, net, date){
+  const riders = getRiderRates(date);
+  const fppcac = FPPCAC[date] || 0;
+  const kwh = Math.max(net, 0);
+  const subA = energy + 7.00 + kwh*fppcac + kwh*riders.rps + kwh*riders.tep + riders.ams;
+  const subB = subA * (1 + riders.euef);
+  const subC = subB * (1 + FRANCHISE_RATE);
+  return subC * (1 + TAX_RATE);
+}
+function cfEnergyFor(baseline, b){
+  if (baseline === 'std') return calcStandard(b.net, b).energy;
+  if (baseline === 'tou') return calcTOU(b.net, b).energy;
+  return calcCPP(b.net, b, 10, 7).energy; // cpp with default event assumptions
+}
+const BATTERY_LIVE = new Date('2026-07-29');
+const TOD_SWITCH  = new Date('2026-07-01');
+function runCounterfactual(){
+  let cumA = 0, cumC = 0;
+  return BILLS.map((b,i) => {
+    const actual = b.bill;
+    const cf = cfAllInHist(cfEnergyFor(cfBaseline, b), b.net, b.d);
+    cumA += actual; cumC += cf;
+    return { b, label: LABELS[i], actual, cf, delta: cf - actual,
+             cumA:+cumA.toFixed(2), cumC:+cumC.toFixed(2), cumDelta:+(cumC-cumA).toFixed(2),
+             era: (new Date(b.d) >= TOD_SWITCH) ? 'tod' : 'pre' };
+  });
+}
+
+function renderCounterfactual(ctx, title, note){
+  if (cfBaseline === 'std') cfBaseline = 'std';
+  const rows = runCounterfactual();
+  const base = CF_LABELS[cfBaseline];
+  title.textContent = `Counterfactual: same usage on ${base} — running total & savings`;
+  note.textContent = `For every bill, your ACTUAL net kWh is repriced on ${base} (all-in, using that month's actual riders). ` +
+    `Gap between the two cumulative lines = money saved by your rate-plan choices vs. ${cfBaseline==='std'?'staying on the default rate':base}. ` +
+    `Bars = each month's difference (right axis). Solar is held constant on both sides, so this isolates the rate-plan/battery strategy, not solar.`;
+
+  const labels = rows.map(r=>r.label);
+  chart = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        { type:'bar', label:'Monthly difference ($)', data:rows.map(r=>+r.delta.toFixed(2)),
+          backgroundColor: rows.map(r=> r.era==='tod' ? '#f97316' : (r.delta>=0 ? '#86efac' : '#fca5a5')),
+          yAxisID:'y2', order:3 },
+        { type:'line', label:`Cumulative on ${base} ($)`, data:rows.map(r=>r.cumC),
+          borderColor:'#94a3b8', backgroundColor:'rgba(148,163,184,.12)', borderWidth:2, pointRadius:0, fill:'+1', yAxisID:'y', order:1 },
+        { type:'line', label:'Cumulative actually paid ($)', data:rows.map(r=>r.cumA),
+          borderColor:'#2563eb', backgroundColor:'transparent', borderWidth:2.5, pointRadius:0, yAxisID:'y', order:0 },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top', labels:{font:{size:10}, boxWidth:12}},
+        tooltip:{ callbacks:{
+          label:c=>c.dataset.label+': $'+(+c.raw).toFixed(2),
+          afterBody:(items)=>{ const r=rows[items[0].dataIndex]; return `Running savings: $${r.cumDelta.toFixed(2)}`+(r.era==='tod'?'  · TOD+WHEV / battery era':''); } } }
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{maxRotation:90,minRotation:90,font:{size:9},autoSkip:true,maxTicksLimit:30} },
+        y:{ position:'left', grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative $'} },
+        y2:{ position:'right', grid:{display:false}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Monthly Δ ($)'} }
+      }
+    }
+  });
+
+  const last = rows[rows.length-1];
+  const nMonths = rows.length;
+  const todRows = rows.filter(r=>r.era==='tod');
+  const todSaved = todRows.reduce((a,r)=>a+r.delta,0);
+  const pct = last.cumC>0 ? (last.cumDelta/last.cumC*100) : 0;
+  const cards = [
+    {t:'Actually paid (27 bills)', v:'$'+last.cumA.toLocaleString(undefined,{maximumFractionDigits:0}), s:'May 2024 – Jul 2026'},
+    {t:'If on '+base, v:'$'+last.cumC.toLocaleString(undefined,{maximumFractionDigits:0}), s:'same usage, all-in'},
+    {t:'Total saved', v:'$'+last.cumDelta.toLocaleString(undefined,{maximumFractionDigits:0}), s:pct.toFixed(0)+'% lower · $'+(last.cumDelta/nMonths).toFixed(0)+'/mo avg'},
+    {t:'Since TOD switch (Jul 26)', v:(todSaved>=0?'+':'')+'$'+todSaved.toFixed(0), s:todRows.length+' bill(s) · battery live Jul 29'},
+  ];
+  const cardEl = document.getElementById('cfCards');
+  if (cardEl) cardEl.innerHTML = cards.map(c=>
+    `<div class="sim-card" style="border-top:4px solid #2563eb"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#1d4ed8;font-size:20px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`
+  ).join('');
+
+  const tbl = document.getElementById('cfTable');
+  if (tbl){
+    tbl.innerHTML =
+      `<thead><tr>
+        <th style="text-align:left">Bill</th><th>Net kWh</th><th>Actual $</th><th>${base} $</th>
+        <th>Month Δ</th><th>Cumulative actual</th><th>Cumulative ${cfBaseline==='std'?'Standard':base}</th><th>Running savings</th>
+      </tr></thead><tbody>` +
+      rows.map(r=>{
+        const dCol = r.delta>=0 ? '#15803d' : '#dc2626';
+        const bg = r.era==='tod' ? 'background:#fff7ed;' : '';
+        return `<tr style="${bg}">
+          <td style="text-align:left;font-weight:600">${r.label}${r.era==='tod'?' ⚡':''}</td>
+          <td>${r.b.net}</td>
+          <td>$${r.actual.toFixed(2)}</td>
+          <td style="color:#64748b">$${r.cf.toFixed(2)}</td>
+          <td style="color:${dCol};font-weight:600">${r.delta>=0?'+':''}$${r.delta.toFixed(2)}</td>
+          <td>$${r.cumA.toFixed(0)}</td>
+          <td style="color:#64748b">$${r.cumC.toFixed(0)}</td>
+          <td style="color:#1d4ed8;font-weight:700">$${r.cumDelta.toFixed(0)}</td>
+        </tr>`;
+      }).join('') + '</tbody>';
   }
 }
 
