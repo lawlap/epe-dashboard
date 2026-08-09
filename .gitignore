@@ -7,6 +7,7 @@
 
 # Whitelisted (safe to publish) dashboard files:
 !.gitignore
+!.gitattributes
 !index.html
 !Rate_Plan_Decision_Tool.html
 !EPE_Usage_Dashboard.jsx

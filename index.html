@@ -65,9 +65,9 @@ input[type=range]{width:200px;accent-color:#1e40af}
     <div style="font-size:17px;font-weight:800;color:#9a3412;margin-bottom:6px">⚖️ Plan Decision: CPP vs. TOD (Power Hours), with/without WHEV</div>
     <a href="Rate_Plan_Decision_Tool.html" style="display:inline-block;background:#ea580c;color:#fff;font-size:12px;font-weight:700;text-decoration:none;padding:7px 14px;border-radius:7px;margin-bottom:10px">🎛️ Open interactive decision tool — stress-test rates, usage &amp; battery →</a>
     <p style="font-size:12.5px;color:#7c2d12;line-height:1.55;margin:0 0 12px">
-      <b>EPE confirmed the CPP pilot CANNOT be paired with the WHEV rider</b> (Jun 2026). But WHEV is a <b>Rate No. 01 rider</b>, and the
-      standard <b>TOD / Power Hours</b> rate is part of Rate No. 01 — so WHEV should attach to TOD (<em>verify by phone</em>). That reframes the
-      real choice as <b>CPP vs. TOD</b>. Figures are <b>annual all-in</b>, built on your <b>actual billed usage</b> (incl. the summer travel month),
+      <b style="color:#15803d">DONE — switched to TOD + WHEV (July 2026).</b> CPP couldn't be paired with the WHEV rider, but TOD/Power Hours is part of Rate No. 01, so WHEV attaches to it —
+      and your <b>Jul 2026 bill confirms it</b>: the WHEV credit (294 kWh × 4.74¢ = −$13.94) is stacked on the TOD rate. WHEV is <b>active, not pending</b>.
+      Figures are <b>annual all-in</b>, built on your <b>actual billed usage</b> (incl. the summer travel month),
       monthly net-metered, with the <b>18 kWh battery</b> doing daily arbitrage and CPP critical-events assumed battery-covered (excluded).
       Model reconciles to your real bills: CPP ≈ $822 vs ~$802 actual. <b>Riders &amp; taxes are broken out separately</b> (RPS/TEP/FPPCAC per-kWh,
       EUEF, AMS, customer charge, franchise 2.0% + tax 8.56%) — they're nearly plan-neutral, so the <em>differences</em> are what matter.
@@ -85,7 +85,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
         </thead>
         <tbody>
           <tr style="border-bottom:1px solid #fde68a">
-            <td style="padding:8px 10px;font-weight:600">CPP — current plan (no WHEV)</td>
+            <td style="padding:8px 10px;font-weight:600">CPP — prior plan (no WHEV)</td>
             <td style="padding:8px 10px;text-align:center">$460</td><td style="padding:8px 10px;text-align:center">$362</td>
             <td style="padding:8px 10px;text-align:center;font-weight:700">$822</td><td style="padding:8px 10px;text-align:center">—</td>
           </tr>
@@ -129,11 +129,10 @@ input[type=range]{width:200px;accent-color:#1e40af}
       midnight–8AM kWh, a year-round night→day arbitrage on top of the summer on-peak shifting.
     </p>
     <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:10px 0 0">
-      <b>Lean: switch to TOD (Power Hours); add WHEV if EPE confirms it stacks.</b> The one-way nature of leaving the CPP <em>pilot</em> (no re-entry, and no guarantee how
-      long the pilot runs) is not a real obstacle — <b>TOD beats CPP in every rate scenario even with no WHEV at all</b> (−$57 to −$85/yr), so the downside of losing
-      CPP is covered. Remaining risks, all modest: (1) confirm WHEV attaches to TOD by phone; (2) WHEV "outlier" review risk from battery arbitrage — but the TOD-no-WHEV
-      fallback still beats CPP; (3) TOD's 22¢ on-peak makes you battery-dependent on summer afternoons — only a problem if the battery is down a whole summer <em>and</em>
-      WHEV is gone (≈$15/yr worse than CPP). FPPCAC is variable (±~1¢/kWh, plan-neutral); minimum-bill floor caps the WHEV credit in low-usage months.
+      <b>Done: on TOD (Power Hours) + WHEV since July 2026.</b> Leaving the CPP <em>pilot</em> was a one-way door, but <b>TOD beats CPP in every rate scenario even with no WHEV at all</b>
+      (−$57 to −$85/yr), so that was covered regardless — and WHEV did stack, so you're on the best case. Remaining watch-items, all modest: (1) WHEV "outlier" review risk from battery
+      arbitrage — but the TOD-no-WHEV fallback still beats CPP; (2) TOD's 22¢ on-peak makes you battery-dependent on summer afternoons — only a problem if the battery is down a whole
+      summer <em>and</em> WHEV is revoked (≈$15/yr worse than CPP). FPPCAC is variable (±~1¢/kWh, plan-neutral); minimum-bill floor caps the WHEV credit in low-usage months.
     </p>
   </div>
 
@@ -141,19 +140,18 @@ input[type=range]{width:200px;accent-color:#1e40af}
   <!-- MONTHLY ALL-PLAN COMPARISON (static, bill-anchored) — added Jun 17 2026 -->
   <!-- ====================================================================== -->
   <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">📅 Monthly all-plan comparison (battery on, all-in $)</div>
+    <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">📅 Monthly all-plan comparison (with your 3× battery, all-in $)</div>
     <p style="font-size:11.5px;color:#64748b;margin:0 0 12px;line-height:1.5">
-      Worst→best: <b>Standard → CPP → TOD → TOD+WHEV</b>. All-in $ (energy + riders + taxes + customer charge), CPP events excluded (battery-covered),
-      18 kWh/day battery arbitrage. "Your bill kWh" = actual billed net; "Model kWh" = Emporia-derived (runs ~20% high vs meter, billing periods offset ~½ month —
-      annual & differences are sound, individual months approximate). Validated: model CPP ≈ $808 vs your actual ~$802.
+      Worst→best: <b>Standard → CPP → TOD → TOD+WHEV</b>. Each column is the all-in bill (energy + riders + taxes + customer charge) computed <b>directly from your 12-month GreenButton
+      15-min meter data</b> (Aug 2025–Jul 2026), with your <b>3× battery simulated</b> the same way as the Battery Economics tab — one engine. CPP/TOD/TOD+WHEV are billed with the battery
+      covering the highest-rate load; Standard has no time-of-use so the battery adds ~nothing there. CPP critical-events excluded (battery-covered). Net kWh = meter import − export.
     </p>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead>
           <tr style="border-bottom:2px solid #e2e8f0;color:#64748b">
             <th style="text-align:left;padding:5px 8px">Month</th>
-            <th style="text-align:right;padding:5px 8px">Bill kWh</th>
-            <th style="text-align:right;padding:5px 8px">Model kWh</th>
+            <th style="text-align:right;padding:5px 8px">Net kWh</th>
             <th style="text-align:right;padding:5px 8px">Standard</th>
             <th style="text-align:right;padding:5px 8px">CPP</th>
             <th style="text-align:right;padding:5px 8px">TOD</th>
@@ -162,36 +160,40 @@ input[type=range]{width:200px;accent-color:#1e40af}
         </thead>
         <tbody id="monthlyCmpBody"></tbody>
         <tfoot>
-          <tr style="border-top:2px solid #e2e8f0;font-weight:800;color:#0f172a">
-            <td style="padding:6px 8px">YEAR</td><td style="text-align:right;padding:6px 8px">7,358</td><td style="text-align:right;padding:6px 8px">~8,940</td>
-            <td style="text-align:right;padding:6px 8px">$1,023</td><td style="text-align:right;padding:6px 8px">$808</td><td style="text-align:right;padding:6px 8px">$751</td>
-            <td style="text-align:right;padding:6px 8px;background:#f0fdf4;color:#15803d">$428</td>
-          </tr>
+          <tr id="monthlyCmpFoot" style="border-top:2px solid #e2e8f0;font-weight:800;color:#0f172a"></tr>
         </tfoot>
       </table>
     </div>
-    <p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Standard is the do-nothing baseline (flat/tiered, no rider) — ~$215/yr worse than CPP, driven by summer tier-2 (10.9¢). For the live decision use the interactive tool above; the "Sim" tab below has been corrected so the WHEV credit applies only to Standard/TOU (never CPP), but the new tool is the authoritative view.</p>
+    <p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Standard is the do-nothing baseline (flat/tiered) — worst in every month, driven by summer tier-2 (10.9¢). On the meter data the <b>battery saves ≈ $396/yr on TOD+WHEV</b> (the gap between TOD+WHEV here and the same plan with no battery); that same figure appears in the Battery Economics tab. Non-summer TOD off-peak assumed 3.428¢ (per parsed-bill rate history); FPPCAC held at a representative −0.8¢/kWh (plan-neutral). Calendar months, so individual months differ slightly from your mid-month bills; annual totals reconcile to the meter.</p>
   </div>
   <script>
+  const MCMP_ROWS=[["Aug '25", 1282, 165, 139, 122, 82],["Sep '25", 995, 125, 110, 96, 57],["Oct '25", 647, 65, 50, 69, 34],["Nov '25", 434, 48, 38, 38, 8],["Dec '25", 645, 65, 50, 50, 14],["Jan '26", 609, 62, 48, 48, 13],["Feb '26", 334, 40, 32, 32, 8],["Mar '26", 384, 44, 35, 35, 8],["Apr '26", 545, 57, 44, 44, 9],["May '26", 929, 88, 65, 65, 22],["Jun '26", 1345, 174, 144, 126, 77],["Jul '26", 447, 55, 58, 51, 20]];
+  const MCMP_YEAR={net:8596,std:988,cpp:813,tod:776,todw:352};
+  const BATT_VALUE={6.144:{whev:180,nowhev:73,cpp:26},12.288:{whev:314,nowhev:110,cpp:35},18.432:{whev:396,nowhev:123,cpp:34},24.576:{whev:445,nowhev:125,cpp:31},30.72:{whev:479,nowhev:122,cpp:26}};
+  const LADDER_ROWS=[["Aug '25", 165, 163, 148, 82],["Sep '25", 290, 289, 261, 139],["Oct '25", 355, 375, 337, 173],["Nov '25", 403, 411, 365, 181],["Dec '25", 468, 459, 402, 195],["Jan '26", 530, 504, 438, 208],["Feb '26", 570, 535, 459, 216],["Mar '26", 613, 568, 483, 224],["Apr '26", 670, 610, 513, 233],["May '26", 759, 673, 557, 256],["Jun '26", 933, 835, 695, 332],["Jul '26", 988, 900, 748, 352]];
+  const LADDER_TOT={std:988,tod:900,todw:748,todwb:352};
   (function(){
-    var rows=[["Apr '25","274","231",31,25,25,17],["May '25","288","387",44,33,33,20],
-      ["Jun '25 (travel)","361","0",12,12,12,12],["Jul '25","558","1,312",164,135,116,66],
-      ["Aug '25","1,271","1,657",210,173,153,99],["Sep '25","1,248","1,244",154,130,112,65],
-      ["Oct '25","968","878",84,61,61,28],["Nov '25","366","653",65,48,48,24],
-      ["Dec '25","492","953",90,65,65,30],["Jan '26","734","854",82,59,59,28],
-      ["Feb '26","487","475",51,38,38,21],["Mar '26","311","294",36,28,28,18]];
     var b=document.getElementById('monthlyCmpBody');
-    rows.forEach(function(r){
+    (typeof MCMP_ROWS!=='undefined'?MCMP_ROWS:[]).forEach(function(r){
       var tr=document.createElement('tr'); tr.style.borderBottom='1px solid #f1f5f9';
       tr.innerHTML='<td style="padding:5px 8px;font-weight:600;color:#334155">'+r[0]+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;color:#64748b">'+r[1]+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;color:#64748b">'+r[2]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;color:#64748b">'+r[1].toLocaleString()+'</td>'+
+        '<td style="text-align:right;padding:5px 8px">$'+r[2]+'</td>'+
         '<td style="text-align:right;padding:5px 8px">$'+r[3]+'</td>'+
         '<td style="text-align:right;padding:5px 8px">$'+r[4]+'</td>'+
-        '<td style="text-align:right;padding:5px 8px">$'+r[5]+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;background:#f0fdf4;color:#15803d;font-weight:700">$'+r[6]+'</td>';
+        '<td style="text-align:right;padding:5px 8px;background:#f0fdf4;color:#15803d;font-weight:700">$'+r[5]+'</td>';
       b.appendChild(tr);
     });
+    if(typeof MCMP_YEAR!=='undefined'){
+      var y=MCMP_YEAR;
+      document.getElementById('monthlyCmpFoot').innerHTML=
+        '<td style="padding:6px 8px">YEAR</td>'+
+        '<td style="text-align:right;padding:6px 8px">'+y.net.toLocaleString()+'</td>'+
+        '<td style="text-align:right;padding:6px 8px">$'+y.std.toLocaleString()+'</td>'+
+        '<td style="text-align:right;padding:6px 8px">$'+y.cpp.toLocaleString()+'</td>'+
+        '<td style="text-align:right;padding:6px 8px">$'+y.tod.toLocaleString()+'</td>'+
+        '<td style="text-align:right;padding:6px 8px;background:#f0fdf4;color:#15803d">$'+y.todw.toLocaleString()+'</td>';
+    }
   })();
   </script>
 
@@ -259,8 +261,8 @@ input[type=range]{width:200px;accent-color:#1e40af}
       </div>
       <div class="sim-row" style="margin-top:4px">
         <div class="ev-toggle">
-          <input type="checkbox" id="battR42Toggle" onchange="updateBatt()">
-          <label for="battR42Toggle"><b>WHEV Rider</b> (Whole House EV, Rate No. 01 rider, AN289 tariff) — 4.74¢/kWh credit on midnight–8AM kWh. <b style="color:#b91c1c">⚠ EPE ruled Jun 2026 this requires Standard Rate No. 01 and CANNOT be combined with CPP</b> — enabling it models the <b>Standard + WHEV</b> plan (overnight charging ~1.1¢/kWh on Standard), not a CPP add-on. Requires qualifying EV registered at service address.</label>
+          <input type="checkbox" id="battR42Toggle" onchange="updateBatt()" checked>
+          <label for="battR42Toggle"><b>WHEV Rider</b> (Whole House EV, Rate No. 01 rider, AN289 tariff) — 4.74¢/kWh credit on all midnight–8AM kWh. <b style="color:#15803d">✓ CONFIRMED ACTIVE on TOD:</b> your Jul 2026 bill shows the credit (294 kWh × 4.74¢ = −$13.94) stacked on the TOD/Power Hours rate. This is the credit that drives the battery's year-round night-shift value; turning it off models the battery without WHEV.</label>
         </div>
       </div>
       <div class="sim-row">
@@ -282,7 +284,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
           <span style="font-size:11px;color:#64748b;margin-left:8px">Estimated value added to home sale price from battery installation</span>
         </div>
       </div>
-      <p class="note" style="margin-top:8px">Anker SOLIX E10: 6.1 kWh per battery, LiFePO4, ~90% round-trip efficiency, ~2%/yr degradation, 15yr life. Battery shifts on-peak kWh to off-peak overnight charging. Value = on-peak rate minus off-peak charge cost (÷ efficiency). Standard plan has no TOU differential → $0 battery value. Federal 25D tax credit expired per OBBB Act (Jul 2025) — full cost, no credit. <b>CPP event model:</b> CPP events are called on high-demand days (hot = high household AC draw). Emporia data shows 30+ kWh in the 2–7 PM window on peak days, so battery is FULLY utilized during events (up to its capacity). Regular non-event CPP peak days use actual Emporia average daily on-peak draw. <b>Adjusted payback</b> subtracts non-arbitrage values from effective cost before computing payback years.</p>
+      <p class="note" style="margin-top:8px">Anker SOLIX: 6.1 kWh per battery, LiFePO4, ~90% round-trip, ~2%/yr degradation, 15yr life. <b>TOD+WHEV value (your plan) is now derived from your 12-month GreenButton 15-min meter data</b> — a day-by-day simulation of the battery charging overnight (midnight–8AM) and covering the highest-rate daytime import first. It has two parts: <b>(1) summer on-peak shift</b> — displace 22.1¢ on-peak kWh with overnight-charged energy; and <b>(2) year-round WHEV night-shift</b> — every daytime kWh moved to overnight charging earns the 4.74¢/kWh WHEV credit. The night-shift is the larger piece and is why the old summer-on-peak-only figure was far too low. Without WHEV the night-shift is ~$0 (off-peak day ≈ off-peak night), so the value falls back to on-peak arbitrage only. Federal 25D battery credit expired (OBBB Act, Jul 2025) — full cost. The <b>CPP</b> line is kept only as a "what if you'd stayed on CPP with events" comparison (a one-way door you've left). <b>Adjusted payback</b> subtracts the non-arbitrage (backup + home-value) sliders from cost.</p>
     </div>
     <div class="sim-cards" id="battCards"></div>
   </div>
@@ -318,6 +320,54 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
     </div>
     <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month meter totals — import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
+  </div>
+
+  <!-- Choice Ladder (hidden unless ladder tab) -->
+  <div id="decisionSection" style="display:none">
+    <!-- ═══ EX-POST: what actually happened (from the meter) ═══ -->
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#166534">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#15803d">🪜 Part 1 — What each choice actually saved (ex-post, from your 12-month meter)</div>
+      The chart above stacks the four counterfactuals; the cards below are the annual decomposition. Read it two ways. <b>Marginally</b> (each step on top of the last): switching to TOD saved only <b>$88/yr</b> alone — it barely beats Standard without help, which is exactly why the battery mattered — then WHEV added <b>$152/yr</b>, and the <b>battery is the biggest single lever at ~$396/yr</b>. <b>As a whole</b> (the way you first framed it — TOD only made sense <em>because</em> the battery was on the table): Standard vs the full stack is <b>$636/yr</b>. The battery's $396 is its value <em>given</em> you're already on TOD+WHEV — the clean "what if I'd skipped the battery" number.
+    </div>
+    <div class="sim-cards" id="ladderCards"></div>
+
+    <!-- ═══ EX-ANTE: would this pay off? (planning model, generalizable) ═══ -->
+    <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px 16px;margin:18px 0 12px;font-size:12px;color:#1e40af">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#1d4ed8">🧭 Part 2 — Would this stack pay off? (ex-ante planning model — try your own numbers)</div>
+      This is the decision your earlier self faced, as a model any homeowner can drive. Sliders start at your situation; change them to see how the ladder and the battery's payback move. The order that matters: the <b>rate switch</b> is cheap and reversible, the <b>overnight credit</b> is the multiplier (and the most revocable), and the <b>battery</b> is the big irreversible bet whose payback lives or dies on that credit — so verify the first two before committing capital.
+    </div>
+    <div class="sim-controls">
+      <div class="sim-row"><span class="sim-label">Annual usage (net kWh/yr):</span>
+        <input type="range" id="dUsage" min="2000" max="20000" value="8600" step="200" oninput="updateDecision()">
+        <span class="sim-val" id="dUsageV">8,600</span></div>
+      <div class="sim-row"><span class="sim-label">On-peak share of usage:</span>
+        <input type="range" id="dOnpk" min="0" max="40" value="10" step="1" oninput="updateDecision()">
+        <span class="sim-val" id="dOnpkV">10%</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">% of use in the summer 3–7PM window — low favours TOU/TOD</span></div>
+      <div class="sim-row"><span class="sim-label">Overnight credit (WHEV):</span>
+        <input type="range" id="dWhev" min="0" max="8" value="4.7" step="0.1" oninput="updateDecision()">
+        <span class="sim-val" id="dWhevV">4.7¢</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">¢/kWh credit on midnight–8AM draw. <b>0 = none</b> — the biggest lever on battery value</span></div>
+      <div class="sim-row"><span class="sim-label">On-peak rate:</span>
+        <input type="range" id="dOnRate" min="8" max="35" value="22" step="0.5" oninput="updateDecision()">
+        <span class="sim-val" id="dOnRateV">22.0¢</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">summer on-peak ¢/kWh — bigger spread = more battery arbitrage</span></div>
+      <div class="sim-row"><span class="sim-label">Battery usable capacity:</span>
+        <input type="range" id="dBatt" min="0" max="30" value="15" step="1" oninput="updateDecision()">
+        <span class="sim-val" id="dBattV">15 kWh</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px"><b>0 = no battery</b></span></div>
+      <div class="sim-row"><span class="sim-label">Battery cost ($):</span>
+        <input type="range" id="dCost" min="0" max="16000" value="6840" step="100" oninput="updateDecision()">
+        <span class="sim-val" id="dCostV">$6,840</span></div>
+      <div class="sim-row"><span class="sim-label">Backup / resilience value ($):</span>
+        <input type="range" id="dOutage" min="0" max="6000" value="2000" step="100" oninput="updateDecision()">
+        <span class="sim-val" id="dOutageV">$2,000</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">one-time value of outage protection + home resale, subtracted from cost</span></div>
+    </div>
+    <div id="decVerdict" style="border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;font-weight:600"></div>
+    <div class="chart-box" style="height:270px"><canvas id="decChart"></canvas></div>
+    <div class="sim-cards" id="decCards" style="margin-top:14px"></div>
+    <p class="note" style="margin-top:8px"><b>Planning model, not a bill.</b> An annual approximation calibrated so the defaults reproduce your meter-derived ladder (Standard ≈ $988 → TOD $900 → TOD+WHEV $748 → +Battery $352); your exact ex-post figures are Part 1 above. Held constant behind the sliders (EPE-style, editable in code): off-peak 5.53¢, non-summer 3.43¢, Standard tier-1/2 7.04/10.88¢, ~47% of use in summer, ~32% overnight, 90% round-trip, 15-yr battery life. Federal battery credit expired (OBBB Act, 2025). <b>Regulatory watch:</b> the overnight-credit slider is the fragile one — set it to 0 to see the battery's payback if the rider is ever revoked.</p>
   </div>
 
   <!-- Counterfactual "vs regular rate" (hidden unless cf tab) -->
@@ -391,7 +441,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <div class="ev-row" id="projWhevRow" style="opacity:0.4;pointer-events:none">
         <div class="ev-toggle">
           <input type="checkbox" id="projWhevToggle" onchange="updateProj()">
-          <label for="projWhevToggle"><b>WHEV Rider</b> — 4.74¢/kWh credit on ALL midnight–8AM kWh (EV + base load). <b style="color:#b91c1c">⚠ Requires Standard Rate No. 01 (NOT combinable with CPP per EPE Jun 2026).</b></label>
+          <label for="projWhevToggle"><b>WHEV Rider</b> — 4.74¢/kWh credit on ALL midnight–8AM kWh (EV + base load). <b style="color:#15803d">✓ Active on your TOD plan since Jul 2026</b> (this projection panel models the older CPP baseline; the TOD+WHEV case is the live tabs above).</label>
         </div>
       </div>
       <div class="sim-row">
@@ -1170,7 +1220,7 @@ const GB_ANNUAL = {imp:10276,exp:1682,net:8594,prod:5333,home:13927};
 
 let chart = null;
 let liveChart = null;
-function destroyChart(){ if(chart){ chart.destroy(); chart=null; } if(liveChart){ liveChart.destroy(); liveChart=null; } }
+function destroyChart(){ if(chart){ chart.destroy(); chart=null; } if(liveChart){ liveChart.destroy(); liveChart=null; } if(decChart){ decChart.destroy(); decChart=null; } }
 
 const VIEWS = [
   {key:'chrono',  label:'Chronological'},
@@ -1178,11 +1228,10 @@ const VIEWS = [
   {key:'tou',     label:'TOU On/Off-Peak'},
   {key:'solar',   label:'Solar Savings'},
   {key:'sim',     label:'Rate Plan Simulator'},
-  {key:'batt',    label:'Battery Economics'},
   {key:'proj',    label:'2026 Projection'},
   {key:'live',    label:'⚡ Usage & Battery (Live)'},
   {key:'gb',      label:'📊 Meter Data (15-min)'},
-  {key:'cf',      label:'⚖️ vs Regular Rate'},
+  {key:'decision',label:'🧭 Decision'},
 ];
 let activeView = 'chrono';
 
@@ -1203,9 +1252,8 @@ function setView(v){
   document.getElementById('projTableSection').style.display = v==='proj' ? 'block' : 'none';
   document.getElementById('solarSection').style.display = v==='solar' ? 'block' : 'none';
   document.getElementById('liveSection').style.display = v==='live' ? 'block' : 'none';
-  document.getElementById('cfSection').style.display = v==='cf' ? 'block' : 'none';
-  document.getElementById('cfTableSection').style.display = v==='cf' ? 'block' : 'none';
   document.getElementById('gbSection').style.display = v==='gb' ? 'block' : 'none';
+  document.getElementById('decisionSection').style.display = v==='decision' ? 'block' : 'none';
   renderChart();
 }
 window.setView = setView;
@@ -1572,11 +1620,153 @@ function renderChart(){
     renderProjection(projData);
   } else if(activeView==='live'){
     renderLive(ctx, title, note);
-  } else if(activeView==='cf'){
-    renderCounterfactual(ctx, title, note);
   } else if(activeView==='gb'){
     renderGreenButton(ctx, title, note);
+  } else if(activeView==='decision'){
+    renderLadder(ctx, title, note);   // meter-exact cumulative ladder on the main chart
+    renderDecisionTool();             // parametric ex-ante tool + battery payback (own canvas)
   }
+}
+
+// ── Choice Ladder: Standard → TOD → +WHEV → +Battery (cumulative, meter data) ──
+function renderLadder(ctx, title, note){
+  title.textContent = 'The choice ladder — cumulative cost of each incremental decision (meter data)';
+  note.textContent = 'Four counterfactuals billed from your 12-month 15-min meter data. Top line = if you\'d done nothing (Standard). Each shaded band below it is what one added choice saved, cumulatively: switching to TOD, then adding WHEV, then the battery. The bottom line is what you actually pay. The full gap top-to-bottom = total saved vs Standard.';
+  const D = LADDER_ROWS; // [label, std, tod, todw, todwb] cumulative
+  const labels = D.map(r=>r[0]);
+  const std=D.map(r=>r[1]), tod=D.map(r=>r[2]), todw=D.map(r=>r[3]), tb=D.map(r=>r[4]);
+  chart = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[
+      // order top→bottom so fill:'-1' shades the band to the line above
+      { label:'Standard (do-nothing)', data:std, borderColor:'#64748b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:.2, order:0 },
+      { label:'…switching to TOD saved', data:tod, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.18)', borderWidth:1.5, pointRadius:0, tension:.2, fill:'-1', order:1 },
+      { label:'…adding WHEV saved', data:todw, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.18)', borderWidth:1.5, pointRadius:0, tension:.2, fill:'-1', order:1 },
+      { label:'…adding the battery saved', data:tb, borderColor:'#16a34a', backgroundColor:'rgba(22,163,74,.20)', borderWidth:2.5, pointRadius:0, tension:.2, fill:'-1', order:1 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top', labels:{font:{size:10}, boxWidth:12}},
+        tooltip:{ mode:'index', callbacks:{
+          label:c=>c.dataset.label.replace('…','').replace(' saved','')+': $'+Math.round(c.raw),
+          afterBody:(items)=>{ const i=items[0].dataIndex; return 'Total saved vs Standard: $'+Math.round(std[i]-tb[i]); } } } },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:10}} },
+        y:{ grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative $ over the year'} } }
+    }
+  });
+  renderLadderCards();
+}
+
+function renderLadderCards(){
+  const el=document.getElementById('ladderCards'); if(!el) return;
+  const t=LADDER_TOT;
+  const dPlan=t.std-t.tod, dWhev=t.tod-t.todw, dBatt=t.todw-t.todwb, dTot=t.std-t.todwb;
+  const cards=[
+    {t:'Standard (do-nothing)', v:'$'+t.std, s:'baseline annual bill', c:'#64748b'},
+    {t:'→ switch to TOD', v:'−$'+dPlan, s:'TOD alone: $'+t.tod+'/yr', c:'#f59e0b'},
+    {t:'→ add WHEV rider', v:'−$'+dWhev, s:'TOD+WHEV: $'+t.todw+'/yr', c:'#3b82f6'},
+    {t:'→ add 3× battery', v:'−$'+dBatt, s:'the marginal battery value', c:'#16a34a'},
+    {t:'You pay (full stack)', v:'$'+t.todwb, s:'TOD+WHEV+Battery', c:'#0f172a'},
+    {t:'TOTAL saved vs Standard', v:'−$'+dTot, s:(dTot/t.std*100).toFixed(0)+'% lower', c:'#15803d'},
+  ];
+  el.innerHTML=cards.map(c=>`<div class="sim-card" style="border-top:4px solid ${c.c}"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:${c.c};font-size:20px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`).join('');
+}
+
+// ── Ex-ante parametric decision model (generalizable; defaults = user's meter) ──
+// Annual approximation calibrated to reproduce the meter ladder at default inputs.
+let decChart = null;
+const DEC_CONST = { summerPct:0.473, octPct:0.078, ovnPct:0.325,
+  offRate:0.05527, nsRate:0.03428, octRate:0.05816, sT1:0.07035, sT2:0.10876, sNS:0.05816,
+  eff:0.90, util:0.88, capture:0.87, homeVal:1500,
+  CUST:84, AMS:45.84, RPS:0.020215, TEP:0.001002, FPP:-0.008, EUEF:0.035, FRAN:0.020, TAX:0.084 };
+function decAllIn(energy, net){
+  const k=DEC_CONST, kwh=Math.max(net,0);
+  const subA=Math.max(energy + k.CUST + k.AMS + kwh*(k.FPP+k.RPS+k.TEP), k.CUST);
+  return subA*(1+k.EUEF)*(1+k.FRAN)*(1+k.TAX);
+}
+function decModel(inp){
+  const k=DEC_CONST, U=inp.usage, whev=inp.whev, ON=inp.onRate;
+  const U_on=U*inp.onpk, U_sum=U*k.summerPct, U_soff=Math.max(0,U_sum-U_on);
+  const U_oct=U*k.octPct, U_ns=U*(1-k.summerPct)-U_oct, ovn=U*k.ovnPct;
+  const e_std=(Math.min(U_sum,2400)*k.sT1 + Math.max(0,U_sum-2400)*k.sT2) + (U_ns+U_oct)*k.sNS;
+  const e_tod=U_on*ON + U_soff*k.offRate + U_oct*k.octRate + U_ns*k.nsRate;
+  const e_todw=e_tod - ovn*whev;
+  let e_todwb=e_todw, battSave=0;
+  if(inp.batt>0){
+    const T=Math.min(inp.batt*365*k.util, U-ovn);
+    const onpkCov=Math.min(U_on,T), offShift=(T-onpkCov)*k.capture;
+    const chgSum=(k.offRate-whev)/k.eff, chgNS=(k.nsRate-whev)/k.eff;
+    const vOn=onpkCov*(ON-chgSum);
+    const vOff=offShift*0.55*(k.offRate-chgSum)+offShift*0.45*(k.nsRate-chgNS);
+    battSave=decAllIn(e_todw,U)-decAllIn(e_todw-(vOn+vOff),U); // all-in marginal
+    e_todwb=e_todw-(vOn+vOff);
+  }
+  return { std:decAllIn(e_std,U), tod:decAllIn(e_tod,U), todw:decAllIn(e_todw,U),
+           todwb:decAllIn(e_todwb,U), battSave };
+}
+function readDec(){
+  const g=id=>+document.getElementById(id).value;
+  return { usage:g('dUsage'), onpk:g('dOnpk')/100, whev:g('dWhev')/100,
+           onRate:g('dOnRate')/100, batt:g('dBatt'), cost:g('dCost'), outage:g('dOutage') };
+}
+function updateDecision(){
+  const s=(id,t)=>{const e=document.getElementById(id); if(e)e.textContent=t;};
+  const inp=readDec();
+  s('dUsageV', inp.usage.toLocaleString()); s('dOnpkV',(inp.onpk*100).toFixed(0)+'%');
+  s('dWhevV',(inp.whev*100).toFixed(1)+'¢'); s('dOnRateV',(inp.onRate*100).toFixed(1)+'¢');
+  s('dBattV', inp.batt===0?'none':inp.batt+' kWh'); s('dCostV','$'+inp.cost.toLocaleString());
+  s('dOutageV','$'+inp.outage.toLocaleString());
+  if(activeView==='decision') renderDecisionTool();
+}
+window.updateDecision = updateDecision;
+
+function renderDecisionTool(){
+  const cv=document.getElementById('decChart'); if(!cv) return;
+  renderLadderCards();
+  const inp=readDec(), m=decModel(inp);
+  const hasBatt=inp.batt>0;
+  const bars=[m.std, m.tod, m.todw, m.todwb];
+  const labels=['Standard','TOD','TOD+WHEV','+ Battery'];
+  const cols=['#94a3b8','#f59e0b','#3b82f6','#16a34a'];
+  if(decChart) decChart.destroy();
+  decChart=new Chart(cv.getContext('2d'),{
+    type:'bar',
+    data:{ labels, datasets:[{ label:'All-in $/yr', data:bars.map(v=>Math.round(v)), backgroundColor:cols, borderRadius:4 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{callbacks:{label:c=>'$'+c.raw+'/yr'}},
+        title:{display:true, text:'Annual all-in cost by scenario (your inputs)', font:{size:12}} },
+      scales:{ x:{grid:{display:false}}, y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'$ / year'}} } }
+  });
+  // verdict
+  const battMarg=m.battSave, totVsStd=m.std-m.todwb;
+  const payArb = (hasBatt && battMarg>0) ? inp.cost/battMarg : Infinity;
+  const payAdj = (hasBatt && battMarg>0) ? Math.max(0,inp.cost-inp.outage-DEC_CONST.homeVal)/battMarg : Infinity;
+  const vd=document.getElementById('decVerdict');
+  const fmtY=p=> p===Infinity?'never':(p<1?'<1':p.toFixed(0))+' yr';
+  let bg,txt;
+  if(!hasBatt){
+    bg='#eff6ff'; txt=`<span style="color:#1d4ed8">Plan only (no battery): <b>TOD+WHEV saves $${Math.round(m.std-m.todw)}/yr vs Standard</b> — near-zero cost, fully reversible. Add a battery below to test the capital bet.</span>`;
+  } else {
+    const good = payAdj<=10, ok = payAdj<=15;
+    bg = good?'#f0fdf4':(ok?'#fffbeb':'#fef2f2');
+    const col = good?'#15803d':(ok?'#b45309':'#b91c1c');
+    const verdictWord = good?'pays off':(ok?'marginal':'slow payback');
+    txt=`<span style="color:${col}">Battery adds <b>$${Math.round(battMarg)}/yr</b> · payback <b>${fmtY(payArb)}</b> on arbitrage alone, <b>${fmtY(payAdj)}</b> counting backup/home value → <b>${verdictWord}</b>.` +
+        `  Full stack vs Standard: <b>−$${Math.round(totVsStd)}/yr</b>.` +
+        (inp.whev<=0? `  <b>⚠ With no overnight credit</b>, the battery is mostly on-peak arbitrage only — this is the rider-revoked scenario.` : ``)+`</span>`;
+  }
+  vd.style.background=bg; vd.innerHTML=txt;
+  // cards: the incremental ladder for THESE inputs
+  const el=document.getElementById('decCards');
+  const c=[
+    {t:'Standard', v:'$'+Math.round(m.std), s:'do-nothing baseline', col:'#94a3b8'},
+    {t:'→ TOD', v:'−$'+Math.round(m.std-m.tod), s:'rate switch (cheap, reversible)', col:'#f59e0b'},
+    {t:'→ + WHEV', v:'−$'+Math.round(m.tod-m.todw), s:'overnight credit (the multiplier)', col:'#3b82f6'},
+    {t:'→ + Battery', v:'−$'+Math.round(m.todw-m.todwb), s:hasBatt?('payback '+fmtY(payAdj)+' w/ backup'):'no battery', col:'#16a34a'},
+    {t:'You pay', v:'$'+Math.round(m.todwb), s:'full stack', col:'#0f172a'},
+    {t:'Total vs Standard', v:'−$'+Math.round(totVsStd), s:(totVsStd/m.std*100).toFixed(0)+'% lower', col:'#15803d'},
+  ];
+  el.innerHTML=c.map(x=>`<div class="sim-card" style="border-top:4px solid ${x.col}"><div class="plan-name">${x.t}</div><div class="plan-total" style="color:${x.col};font-size:18px">${x.v}</div><div class="plan-detail">${x.s}</div></div>`).join('');
 }
 
 // ── EPE GreenButton meter view (authoritative 15-min interval data) ──────────
@@ -1925,6 +2115,21 @@ const CPP_SUMMER_MODEL = [
   {mo:9, daily:11.64, wkdays:22},  // Sep: 2PM adds +2.60 avg (biggest impact)
 ];
 
+// ── Meter-derived battery value (one engine) ─────────────────────────────────
+// Year-1 all-in $/yr the battery saves = (bill for that plan WITHOUT battery) minus
+// (bill WITH the battery), computed by billing the 12-month GreenButton 15-min meter
+// data under each plan. Values live in BATT_VALUE (keyed by battery kWh), the SAME
+// numbers behind the monthly comparison table. Replaces the old summer-on-peak-only
+// model, which ignored the year-round WHEV night-shift and badly understated the value.
+function battAnnualTOD(cfg, useWHEV){
+  const v = BATT_VALUE[cfg.kwh] || {whev:0, nowhev:0};
+  return (useWHEV ? v.whev : v.nowhev) * (1 + getRateInc());
+}
+function battAnnualCPP(cfg){
+  const v = BATT_VALUE[cfg.kwh] || {cpp:0};
+  return (v.cpp || 0) * (1 + getRateInc());
+}
+
 function runBatteryAnalysis() {
   const cppEvents = +document.getElementById('battCppSlider').value;
   const useR42 = document.getElementById('battR42Toggle').checked;
@@ -1942,22 +2147,15 @@ function runBatteryAnalysis() {
       const effCap = cfg.kwh * (1 - BATT_DEGRAD * yr);
       let touYr = 0, cppYr = 0;
 
-      // TOU uses 3-7 PM window (Jun-Oct)
-      TOU_SUMMER_MODEL.forEach(sm => {
-        touYr += Math.min(effCap, sm.daily) * sm.wkdays * TOU_ARB;
-      });
-
-      // CPP uses 2-7 PM window (Jun-Sep) — wider window, lower rate
-      CPP_SUMMER_MODEL.forEach(sm => {
-        cppYr += Math.min(effCap, sm.daily) * sm.wkdays * CPP_ARB;
-      });
-
-      // CPP event bonus: events are called on high-demand days (hot = high AC regionally)
-      // On those days, on-peak draw is much higher than average (~25+ kWh in 2-7 PM window).
-      // Battery is fully utilized on event days up to its capacity.
-      // Using min(effCap, CPP_EVENT_KWH) rather than avgShift — captures real event-day usage.
+      // Both plans' battery value from the meter-billing engine, scaled down each year
+      // for degradation. TOD+WHEV honours the WHEV toggle; CPP excludes critical-events
+      // (assumed battery-covered), consistent with the comparison table.
+      const degr = (1 - BATT_DEGRAD * (yr - 1));
+      touYr = battAnnualTOD(cfg, useR42) * degr;
+      cppYr = battAnnualCPP(cfg) * degr;
+      // Optional CPP event bonus (kept as an add-on the slider controls):
       const eventShift = Math.min(effCap, CPP_EVENT_KWH);
-      cppYr += cppEvents * eventShift * (CPP_EV_ARB - CPP_ARB);
+      cppYr += cppEvents * eventShift * (CPP_EV_ARB - CPP_ARB) * degr;
 
       touTotal += touYr;
       cppTotal += cppYr;
@@ -2008,7 +2206,7 @@ function renderBattCards(data) {
     const adjBlock = totalAdj > 0 ? `
       <div style="background:#f0fdf4;border-radius:5px;padding:5px 8px;margin:6px 0;font-size:11px">
         <span style="color:#15803d;font-weight:700">After $${totalAdj.toLocaleString()} non-arb value → net cost $${adjCost.toLocaleString(undefined,{maximumFractionDigits:0})}</span><br>
-        <b style="color:${RATES.tou.color}">TOU adj payback:</b> ${touAdjPayback===Infinity?'never':touAdjPayback.toFixed(1)+'yr'} &nbsp;
+        <b style="color:${RATES.tou.color}">TOD+WHEV adj payback:</b> ${touAdjPayback===Infinity?'never':touAdjPayback.toFixed(1)+'yr'} &nbsp;
         <b style="color:${RATES.cpp.color}">CPP adj payback:</b> ${cppAdjPayback===Infinity?'never':cppAdjPayback.toFixed(1)+'yr'}
       </div>` : '';
     return `<div class="sim-card" style="border-top:3px solid #475569;text-align:left;padding:12px">
@@ -2016,9 +2214,9 @@ function renderBattCards(data) {
       <div style="font-size:12px;margin:4px 0">Full cost: <b>$${d.effCost.toLocaleString(undefined,{maximumFractionDigits:0})}</b></div>
       ${adjBlock}
       <div style="font-size:11px;color:#334155;line-height:1.9">
-        <b style="color:${RATES.tou.color}">TOU:</b> $${d.touYr1}/yr &nbsp; base payback ${fmtPb(d.touPayback, Infinity)}<br>
+        <b style="color:${RATES.tou.color}">TOD+WHEV (your plan):</b> $${d.touYr1}/yr &nbsp; base payback ${fmtPb(d.touPayback, Infinity)}<br>
         <span style="color:${touColor};font-weight:700">15yr net: ${touNet>=0?'+':''}$${touNet.toFixed(0)}</span><br>
-        <b style="color:${RATES.cpp.color}">CPP:</b> $${d.cppYr1}/yr &nbsp; base payback ${fmtPb(d.cppPayback, Infinity)}<br>
+        <b style="color:${RATES.cpp.color}">CPP (prior plan, w/ events):</b> $${d.cppYr1}/yr &nbsp; base payback ${fmtPb(d.cppPayback, Infinity)}<br>
         <span style="color:${cppColor};font-weight:700">15yr net: ${cppNet>=0?'+':''}$${cppNet.toFixed(0)}</span>
       </div>
     </div>`;
