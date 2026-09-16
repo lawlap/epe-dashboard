@@ -56,7 +56,10 @@ input[type=range]{width:200px;accent-color:#1e40af}
 <body>
 <div class="page">
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
-  <p class="sub">Las Cruces, NM · 27 bills · May 2024–Jul 2026 · Anker batteries live since Jul 29 2026</p>
+  <p class="sub">Las Cruces, NM · 28 bills · May 2024–Aug 2026 · Anker batteries live since Jul 29 2026</p>
+  <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:9px 14px;margin:8px 0 0;font-size:12.5px;color:#166534">
+    <b>🔋 First battery bill in (Aug 2026):</b> paid <b>$78.60</b> — on-peak crushed to <b>55 kWh</b>, WHEV credit up to <b>456 kWh</b> (−$21.61). Without the battery this bill would have been <b>≈ $106</b> (est., range $103–110), so the battery saved <b>~$28</b> — and that's only a <em>partial</em> month (battery on for ~half the billing period). September will be the first full battery month; the model expects ~$50 there.
+  </div>
 
   <!-- ====================================================================== -->
   <!-- PLAN DECISION BANNER — added Jun 17 2026 after EPE pairing ruling       -->
@@ -527,6 +530,8 @@ const BILLS = [
   {d:"2026-05-14",s:"04/15",e:"05/14/2026",del:914, rcvd:192,net:722,  sol:531, home:1253, opk:null,fpk:722,  bill:41.90,sum:false},  // TOD off-peak 3.428¢
   {d:"2026-06-15",s:"05/14",e:"06/15/2026",del:1522,rcvd:160,net:1362, sol:641, home:2003, opk:144, fpk:1219, bill:144.28,sum:true },  // still CPP: on-peak 13.689¢, off-peak 6.845¢
   {d:"2026-07-15",s:"06/15",e:"07/15/2026",del:831, rcvd:193,net:638,  sol:571, home:1209, opk:89,  fpk:549,  bill:58.28,sum:true },  // switched to TOD+WHEV: on-peak 22.108¢, off-peak 5.527¢, WHEV credit 294 kWh @ 4.74¢
+  {d:"2026-08-13",s:"07/15",e:"08/13/2026",del:1112,rcvd:138,net:974,  sol:535, home:1509, opk:55,  fpk:918,  bill:78.60,sum:true },
+  {d:"2026-09-14",s:"08/13",e:"09/14/2026",del:1812,rcvd:51, net:1761, sol:536, home:2297, opk:77,  fpk:1684, bill:131.20,sum:true },  // FIRST FULL battery-month on TOD+WHEV. On-peak just 4.4% of energy (vs 20.1% same window 2025) -- battery is doing its job. WHEV credit 880 kWh @ 4.74c = -$41.71. BUT: home consumption 2,297 kWh is an all-time high (+33% vs Sep 25, +52% vs Aug 26) and export collapsed to 51 kWh. NOTE: post-7/29 `home` (del+sol-rcvd) now also absorbs battery round-trip losses, so it overstates true household load. Decomposition pending fresh Anker + GreenButton interval data.  // FIRST battery-era bill (battery live 7/29, ~half the period): on-peak crushed to 55 kWh, WHEV credit 456 kWh @ 4.74¢ = -$21.61. No-battery est. ~$106.
 ];
 
 const MN=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -665,6 +670,7 @@ const FPPCAC = {
   '2026-05-14': -0.019725,
   '2026-06-15': -0.012249,
   '2026-07-15': -0.014824,
+  '2026-08-13': -0.004111,
 };
 
 // Rider rates by era (verified against each bill's line items)
