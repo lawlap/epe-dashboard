@@ -56,9 +56,9 @@ input[type=range]{width:200px;accent-color:#1e40af}
 <body>
 <div class="page">
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
-  <p class="sub">Las Cruces, NM · 28 bills · May 2024–Aug 2026 · Anker batteries live since Jul 29 2026</p>
+  <p class="sub">Las Cruces, NM · 29 bills · May 2024–Sep 2026 · Anker batteries live since Jul 29 2026</p>
   <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:9px 14px;margin:8px 0 0;font-size:12.5px;color:#166534">
-    <b>🔋 First battery bill in (Aug 2026):</b> paid <b>$78.60</b> — on-peak crushed to <b>55 kWh</b>, WHEV credit up to <b>456 kWh</b> (−$21.61). Without the battery this bill would have been <b>≈ $106</b> (est., range $103–110), so the battery saved <b>~$28</b> — and that's only a <em>partial</em> month (battery on for ~half the billing period). September will be the first full battery month; the model expects ~$50 there.
+    <b>🔋 First FULL battery month (Sep 2026):</b> paid <b>$131.20</b> on <b>1,761 net kWh</b> — the largest volume in the two-year record, at the <b>lowest all-in rate ever: 7.45¢/kWh</b> (vs 9.13¢ in Jul, 8.07¢ in Aug). On-peak fell to <b>4.4%</b> of energy against <b>20.1%</b> in the same window in 2025, and the WHEV credit reached <b>880 kWh (−$41.71)</b>. Metered marginal economics put the battery at <b>~$354/yr all-in</b> vs the ~$361/yr modeled — performing to spec. The volume jump is <b>61% hotter weather</b> (see the Weather-Normalized tab), not the battery. <b>One defect found &amp; fixed:</b> discharge was starting at 4 PM although TOD on-peak begins at 3 PM — that single hour was ~66% of all billed on-peak kWh (~$40/season). Corrected Sep 16 2026; next bill will confirm.
   </div>
 
   <!-- ====================================================================== -->
@@ -323,6 +323,38 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
     </div>
     <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month meter totals — import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
+  </div>
+
+  <!-- ═══ Weather-normalized load (hidden unless wx tab) ═══ -->
+  <div id="wxSection" style="display:none">
+    <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#78350f">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#92400e">🌡️ Did the battery raise our consumption? Mostly no — it got hotter.</div>
+      September 2026 metered the highest home load in the record (71.9 kWh/day over Aug 5 – Sep 11, vs 60.4 the year before, <b>+19%</b>), which looked alarming next to a battery that had just gone in. Joining <b>daily temperatures</b> (ASOS station LRU, Las Cruces Intl) to daily meter data settles it: cooling degree days rose <b>+23%</b> over the same window, and at the house's measured sensitivity of <b>2.07 kWh per CDD</b> that alone accounts for <b>+7.0 of the +11.5 kWh/day</b>. The remaining <b>+4.5</b> is the battery's own overhead — round-trip loss plus standby — and shows up as a <em>parallel shift</em> in the fit, not a steeper slope.
+    </div>
+
+    <div class="sim-cards">
+      <div class="sim-card"><div class="plan-name">Hotter weather</div><div class="plan-total" style="color:#f59e0b">+7.0</div><div class="plan-detail">kWh/day · <b>61%</b> of the rise<br>+3.40 CDD/day × 2.07</div></div>
+      <div class="sim-card"><div class="plan-name">Battery overhead</div><div class="plan-total" style="color:#3b82f6">+4.5</div><div class="plan-detail">kWh/day · <b>39%</b><br>round-trip loss + standby</div></div>
+      <div class="sim-card"><div class="plan-name">Behavior change</div><div class="plan-total" style="color:#15803d">~0</div><div class="plan-detail">no detectable effect from<br>dropping the afternoon setback</div></div>
+    </div>
+
+    <p style="margin-top:6px;margin-bottom:0;font-size:12px;line-height:1.6;color:#475569"><b style="color:#0f172a">Why the thermostat theory doesn’t hold.</b> The household used to raise the thermostat during the 3–7 PM peak and stopped once the battery was in. If that were driving the increase, the <em>slope</em> would steepen — more cooling per degree of heat. It didn’t (2.07 → 1.95, indistinguishable at n=38); only the intercept moved (30.4 → 37.0), which is the signature of a constant always-on addition. Independent check: <b>Jun 15–24 2026</b> — pre-battery, occupied, CDD 18.0 — ran <b>71.2 kWh/day</b> against <b>71.9</b> post-battery at CDD 17.9. Same house, same heat, opposite sides of the install, 0.65 kWh/day apart. The setback was a <em>load-shifting</em> tactic, not a load-<em>reduction</em> one — deferred cooling returns as evening recovery, so daily energy barely moves. What it bought was keeping kWh out of the on-peak window, which is exactly the job the battery took over.</p>
+
+    <div style="margin-top:16px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">The decomposition, day by day</div>
+      <table style="margin-top:8px">
+        <thead><tr>
+          <th style="text-align:left">Aug 5 – Sep 11 window</th><th>Avg daily max</th><th>Avg daily min</th><th>CDD/day</th><th>Home load</th><th>Fit</th><th>R²</th><th>RMSE</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="text-align:left"><b style="color:#3b82f6">●</b> 2025 — pre-battery</td><td>92.0°F</td><td>67.0°F</td><td>14.49</td><td>60.4 kWh/d</td><td>30.42 + <b>2.07</b>·CDD</td><td>0.52</td><td>7.5</td></tr>
+          <tr><td style="text-align:left"><b style="color:#f59e0b">●</b> 2026 — post-battery</td><td>97.1°F</td><td>68.7°F</td><td>17.89</td><td>71.9 kWh/d</td><td>36.97 + <b>1.95</b>·CDD</td><td>0.44</td><td>5.8</td></tr>
+          <tr class="summer"><td style="text-align:left"><b>2025 model evaluated at 2026’s weather</b></td><td>—</td><td>—</td><td>17.89</td><td><b>67.4 kWh/d</b></td><td colspan="3" style="text-align:left">→ actual 71.9, so <b>+4.5 unexplained by weather</b></td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:8px">CDD = max(0, (T<sub>max</sub>+T<sub>min</sub>)/2 − 65°F). Home load = meter import + solar production − export, so post-install it also absorbs battery round-trip losses. Daily temperatures from the Iowa Environmental Mesonet ASOS archive, station LRU. n=38 days each window.</p>
+      <p class="note" style="margin-top:6px"><b>Excluded:</b> Jun 25 – Jul 27 2026 — the annual summer travel month, 24.6 kWh/day at CDD 17.8 versus ~71 when occupied. Pooling those 33 days with occupied days collapses the CDD fit to R² = 0.00 and makes the whole comparison meaningless.</p>
+    </div>
   </div>
 
   <!-- Choice Ladder (hidden unless ladder tab) -->
@@ -1237,6 +1269,7 @@ const VIEWS = [
   {key:'proj',    label:'2026 Projection'},
   {key:'live',    label:'⚡ Usage & Battery (Live)'},
   {key:'gb',      label:'📊 Meter Data (15-min)'},
+  {key:'wx',      label:'🌡️ Weather-Normalized'},
   {key:'decision',label:'🧭 Decision'},
 ];
 let activeView = 'chrono';
@@ -1259,6 +1292,7 @@ function setView(v){
   document.getElementById('solarSection').style.display = v==='solar' ? 'block' : 'none';
   document.getElementById('liveSection').style.display = v==='live' ? 'block' : 'none';
   document.getElementById('gbSection').style.display = v==='gb' ? 'block' : 'none';
+  document.getElementById('wxSection').style.display = v==='wx' ? 'block' : 'none';
   document.getElementById('decisionSection').style.display = v==='decision' ? 'block' : 'none';
   renderChart();
 }
@@ -1628,10 +1662,92 @@ function renderChart(){
     renderLive(ctx, title, note);
   } else if(activeView==='gb'){
     renderGreenButton(ctx, title, note);
+  } else if(activeView==='wx'){
+    renderWeatherNorm(ctx, title, note);
   } else if(activeView==='decision'){
     renderLadder(ctx, title, note);   // meter-exact cumulative ladder on the main chart
     renderDecisionTool();             // parametric ex-ante tool + battery payback (own canvas)
   }
+}
+
+// ── Weather-normalized daily load ───────────────────────────────────────────
+// Daily home load (meter import + solar production - export) vs cooling degree days.
+// Temps: ASOS station LRU (Las Cruces Intl) via Iowa Environmental Mesonet.
+// CDD = max(0, (tmax+tmin)/2 - 65).  d = date, c = CDD, h = home kWh.
+const W25=[{d:'08-05',c:20.9,h:69.2},{d:'08-06',c:20.25,h:84.8},{d:'08-07',c:20.2,h:88.8},{d:'08-08',c:19.2,h:67.2},{d:'08-09',c:20.1,h:68.5},{d:'08-10',c:20.7,h:65.8},{d:'08-11',c:16.05,h:57.8},{d:'08-12',c:16.65,h:64.7},{d:'08-13',c:15.8,h:70.4},{d:'08-14',c:15.35,h:68.2},{d:'08-15',c:10.25,h:56.0},{d:'08-16',c:11.65,h:46.1},{d:'08-17',c:13.9,h:52.1},{d:'08-18',c:13.4,h:57.5},{d:'08-19',c:12.55,h:53.6},{d:'08-20',c:14.5,h:62.8},{d:'08-21',c:13.25,h:77.6},{d:'08-22',c:13.65,h:60.4},{d:'08-23',c:16.0,h:54.7},{d:'08-24',c:14.95,h:47.5},{d:'08-25',c:15.25,h:54.8},{d:'08-26',c:16.7,h:68.3},{d:'08-27',c:12.75,h:58.8},{d:'08-28',c:15.6,h:71.0},{d:'08-29',c:18.3,h:66.2},{d:'08-30',c:15.2,h:48.9},{d:'08-31',c:14.9,h:58.5},{d:'09-01',c:12.45,h:48.3},{d:'09-02',c:10.4,h:47.0},{d:'09-03',c:10.8,h:53.5},{d:'09-04',c:9.35,h:61.3},{d:'09-05',c:5.25,h:45.5},{d:'09-06',c:6.85,h:41.3},{d:'09-07',c:8.0,h:44.1},{d:'09-08',c:13.0,h:60.6},{d:'09-09',c:15.7,h:60.4},{d:'09-10',c:17.0,h:68.4},{d:'09-11',c:14.0,h:63.9}]
+W26=[{d:'08-05',c:21.0,h:81.5},{d:'08-06',c:22.0,h:75.9},{d:'08-07',c:21.0,h:78.8},{d:'08-08',c:16.5,h:61.9},{d:'08-09',c:16.0,h:71.9},{d:'08-10',c:19.0,h:80.1},{d:'08-11',c:18.5,h:66.5},{d:'08-12',c:13.5,h:59.4},{d:'08-13',c:15.5,h:66.9},{d:'08-14',c:16.0,h:61.9},{d:'08-15',c:16.0,h:65.1},{d:'08-16',c:16.5,h:60.4},{d:'08-17',c:13.5,h:59.5},{d:'08-18',c:14.5,h:68.3},{d:'08-19',c:17.17,h:67.5},{d:'08-20',c:19.83,h:76.6},{d:'08-21',c:22.5,h:74.8},{d:'08-22',c:22.0,h:68.4},{d:'08-23',c:18.5,h:70.5},{d:'08-24',c:18.5,h:74.2},{d:'08-25',c:20.0,h:86.9},{d:'08-26',c:19.5,h:86.3},{d:'08-27',c:21.0,h:81.1},{d:'08-28',c:18.5,h:74.8},{d:'08-29',c:20.5,h:87.2},{d:'08-30',c:20.0,h:81.4},{d:'08-31',c:20.0,h:69.0},{d:'09-01',c:13.5,h:69.9},{d:'09-02',c:16.5,h:68.1},{d:'09-03',c:18.0,h:70.8},{d:'09-04',c:13.0,h:62.8},{d:'09-05',c:15.0,h:75.0},{d:'09-06',c:20.0,h:78.7},{d:'09-07',c:18.5,h:77.1},{d:'09-08',c:18.0,h:72.8},{d:'09-09',c:17.5,h:63.8},{d:'09-10',c:14.5,h:70.0},{d:'09-11',c:18.0,h:64.8}]
+J26=[{d:'06-15',c:11.5,h:56.2},{d:'06-16',c:16.0,h:57.3},{d:'06-17',c:21.0,h:68.4},{d:'06-18',c:18.5,h:113.4},{d:'06-19',c:17.0,h:67.3},{d:'06-20',c:16.0,h:99.7},{d:'06-21',c:17.5,h:82.1},{d:'06-22',c:18.5,h:60.3},{d:'06-23',c:21.0,h:62.0},{d:'06-24',c:23.0,h:45.5}];
+const WX_FIT = {
+  y2025:{a:30.42,b:2.067,r2:0.519,rmse:7.51,meanC:14.49,meanH:60.4,n:38,c0:5.2, c1:20.9},
+  y2026:{a:36.97,b:1.950,r2:0.437,rmse:5.80,meanC:17.89,meanH:71.9,n:38,c0:13.0,c1:22.5}
+};
+const WX_CF = 67.41;   // 2025 model evaluated at 2026 mean CDD
+
+function wxSeg(f){ return [{x:f.c0,y:+(f.a+f.b*f.c0).toFixed(2)},{x:f.c1,y:+(f.a+f.b*f.c1).toFixed(2)}]; }
+
+function renderWeatherNorm(ctx, title, note){
+  title.textContent = 'Weather-normalized daily home load \u2014 the heat, not the battery';
+  note.textContent  = 'One dot per day, Aug 5 \u2013 Sep 11. X = cooling degree days (how hot that day was); Y = total home consumption. '
+    + 'Blue = 2025 (pre-battery), amber = 2026 (post-battery); hollow amber triangles = Jun 15\u201324 2026, still pre-battery but at 2026 heat. '
+    + 'The two fit lines are near-parallel: the house responds to heat the same way it always did, it just sits ~6.5 kWh/day higher. '
+    + 'The grey bar marks the gap between what 2025\u2019s relationship predicts at 2026\u2019s weather (67.4) and what was actually metered (71.9).';
+
+  const F = WX_FIT;
+  const pt = (rows) => rows.map(r => ({x:r.c, y:r.h, d:r.d}));
+
+  chart = new Chart(ctx, {
+    type:'scatter',
+    data:{ datasets:[
+      { label:'2025 daily (pre-battery)', data:pt(W25),
+        backgroundColor:'#3b82f6', borderColor:'#ffffff', borderWidth:1.5,
+        pointRadius:4.5, pointHoverRadius:7, order:3 },
+      { label:'2026 daily (post-battery)', data:pt(W26),
+        backgroundColor:'#f59e0b', borderColor:'#ffffff', borderWidth:1.5,
+        pointRadius:4.5, pointHoverRadius:7, order:3 },
+      { label:'Jun 15\u201324 2026 (pre-battery, occupied)', data:pt(J26),
+        backgroundColor:'transparent', borderColor:'#b45309', borderWidth:2,
+        pointStyle:'triangle', pointRadius:6, pointHoverRadius:9, order:2 },
+
+      { label:'2025 fit \u00b7 30.4 + 2.07\u00b7CDD', data:wxSeg(F.y2025), showLine:true,
+        borderColor:'#3b82f6', borderWidth:2, pointRadius:0, fill:false, order:1,
+        pointStyle:'line',
+        datalabels:{ display:c=>c.dataIndex===1, anchor:'end', align:'bottom', offset:5,
+          color:'#1d4ed8', font:{size:10,weight:700}, formatter:()=>'2025 \u00b7 slope 2.07' } },
+      { label:'2026 fit \u00b7 37.0 + 1.95\u00b7CDD', data:wxSeg(F.y2026), showLine:true,
+        borderColor:'#f59e0b', borderWidth:2, pointRadius:0, fill:false, order:1,
+        pointStyle:'line',
+        datalabels:{ display:c=>c.dataIndex===1, anchor:'end', align:'top', offset:4,
+          color:'#b45309', font:{size:10,weight:700}, formatter:()=>'2026 \u00b7 slope 1.95' } },
+
+      { label:'Unexplained by weather (+4.5 kWh/day)',
+        data:[{x:F.y2026.meanC,y:WX_CF},{x:F.y2026.meanC,y:F.y2026.meanH}], showLine:true,
+        borderColor:'#64748b', borderWidth:3, borderDash:[4,3],
+        pointBackgroundColor:'#64748b', pointBorderColor:'#ffffff', pointBorderWidth:2,
+        pointRadius:5, pointHoverRadius:8, fill:false, order:0, pointStyle:'circle',
+        datalabels:{ display:c=>c.dataIndex===1, anchor:'end', align:'right', offset:6,
+          color:'#475569', font:{size:10,weight:700}, formatter:()=>'+4.5 kWh/day' } },
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'nearest', intersect:true },
+      plugins:{
+        legend:{ position:'top', labels:{ font:{size:11}, usePointStyle:true, boxWidth:10,
+          sort:(a,b)=>a.datasetIndex-b.datasetIndex } },
+        tooltip:{ callbacks:{ label:(c)=>{
+          const r=c.raw;
+          if(r && r.d) return `${r.d}  \u00b7  ${r.x} CDD  \u00b7  ${r.y} kWh`;
+          if(c.datasetIndex===5) return c.dataIndex===0 ? `2025 model predicts ${WX_CF} kWh/day` : `2026 actual ${F.y2026.meanH} kWh/day`;
+          return `${c.parsed.x.toFixed(1)} CDD  \u00b7  ${c.parsed.y.toFixed(1)} kWh`;
+        } } }
+      },
+      scales:{
+        x:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Cooling degree days  (base 65\u00b0F)',font:{size:11}},
+            ticks:{font:{size:10}}, min:4, max:24 },
+        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Home consumption (kWh/day)',font:{size:11}},
+            ticks:{font:{size:10}}, beginAtZero:false }
+      }
+    }
+  });
 }
 
 // ── Choice Ladder: Standard → TOD → +WHEV → +Battery (cumulative, meter data) ──
