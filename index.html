@@ -56,9 +56,9 @@ input[type=range]{width:200px;accent-color:#1e40af}
 <body>
 <div class="page">
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
-  <p class="sub">Las Cruces, NM · 29 bills · May 2024–Sep 2026 · Anker batteries live since Jul 29 2026</p>
+  <p class="sub">Las Cruces, NM · 30 bills · May 2024–Oct 2026 · Anker batteries live since Jul 29 2026</p>
   <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:9px 14px;margin:8px 0 0;font-size:12.5px;color:#166534">
-    <b>🔋 First FULL battery month (Sep 2026):</b> paid <b>$131.20</b> on <b>1,761 net kWh</b> — the largest volume in the two-year record, at the <b>lowest all-in rate ever: 7.45¢/kWh</b> (vs 9.13¢ in Jul, 8.07¢ in Aug). On-peak fell to <b>4.4%</b> of energy against <b>20.1%</b> in the same window in 2025, and the WHEV credit reached <b>880 kWh (−$41.71)</b>. Metered marginal economics put the battery at <b>~$354/yr all-in</b> vs the ~$361/yr modeled — performing to spec. The volume jump is <b>61% hotter weather</b> (see the Weather-Normalized tab), not the battery. <b>One defect found &amp; fixed:</b> discharge was starting at 4 PM although TOD on-peak begins at 3 PM — that single hour was ~66% of all billed on-peak kWh (~$40/season). Corrected Sep 16 2026; next bill will confirm.
+    <b>🔋 Oct 2026 bill — the 3 PM fix is confirmed:</b> paid <b>$65.48</b> on <b>915 net kWh</b> (vs <b>$106.59</b> on 968 kWh in Oct 2025), a new <b>record-low all-in rate of 7.16¢/kWh</b> (Sep 7.45¢, Aug 8.07¢, Jul 9.13¢). Billed on-peak fell to <b>10 kWh</b> (61 a year ago). On the meter, weekday 3–4 PM import dropped from <b>2.36 → 0.06 kWh/day</b> once discharge moved to 3 PM on Sep 16, and weekday 3–7 PM import is <b>0.84 kWh/day vs 5.39</b> in the same weeks of 2025. WHEV credit: <b>681 kWh (−$32.28)</b>; <b>84%</b> of grid import now lands in the credited midnight–8 AM window (25% a year ago). <b>Battery value this bill ≈ $30</b> (no-battery estimate ≈ $96; conservative: counts only the 51 kWh drop in billed on-peak vs Oct 2025, plus WHEV on 414 kWh of grid charging, minus 15 kWh of losses). Sep was ≈ $59 (hotter, more on-peak load to cover). The battery has cycled a steady <b>~15 kWh/day</b> every month since Aug; the annual all-in estimate stays <b>~$354/yr</b>. Nov–May has no on-peak pricing, so winter value comes from the WHEV credit alone (≈ 4¢ per shifted kWh).
   </div>
 
   <!-- ====================================================================== -->
@@ -295,11 +295,11 @@ input[type=range]{width:200px;accent-color:#1e40af}
   <!-- Live Usage & Battery (hidden unless live tab) -->
   <div id="liveSection" style="display:none">
     <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">⚡ Anker SOLIX — measured operation (10-min telemetry, Jun 9 – Aug 4 2026)</div>
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">⚡ Anker SOLIX — measured operation (Jun 9 – Nov 3 2026)</div>
       Actual metered data exported from the Anker app. The batteries began <b>active daily arbitrage on July 29, 2026</b>
       (SOC cycling 20%→100% daily). Before that: solar/load monitoring only (Jun 9–18), a brief commissioning test
       (Jun 19–21), then grid-tied with the battery idle (Jun 22–Jul 28). The chart below stacks how each day's home load
-      was served; the second chart shows the average hourly dispatch during the first week of battery operation.
+      was served; the second chart shows the average hourly dispatch during the first week of battery operation. Data through Jul 31 is 10-min telemetry (with SOC); Aug 1 onward is the app's daily-summary export (no SOC, so the SOC line stops at Jul 31).
     </div>
     <div class="sim-cards" id="liveCards"></div>
     <div style="margin-top:10px">
@@ -307,22 +307,22 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <p class="note" style="margin-top:2px;margin-bottom:6px">Average power by hour (W). The battery <b>charges overnight (midnight–3AM, the WHEV credit window) and from midday solar</b>, then <b>discharges hard 3–7PM</b> — collapsing grid import to near zero during the TOD on-peak window. This is the arbitrage the whole plan is built around, now visible in real data.</p>
       <div class="chart-box" style="height:300px"><canvas id="liveProfChart"></canvas></div>
     </div>
-    <p class="note" style="margin-top:10px"><b>Caveat:</b> the battery-active window is only 7 days and coincides with unusually high load (~76 kWh/day — heavy EV charging + peak-summer AC after a low-use travel period). Self-sufficiency (share of load met by solar+battery) reads low (~22%) because the load is large, not because the battery underperforms — its job here is <em>shifting</em> the 3–7PM on-peak kWh to cheap overnight/solar, not powering the whole house. Round-trip efficiency measured ~92%, in line with the 90% modeling assumption.</p>
+    <p class="note" style="margin-top:10px"><b>Reading it:</b> throughput has been remarkably steady: <b>~15 kWh/day charged and discharged in every month</b> (Aug 15.2/14.9, Sep 15.1/14.6, Oct 15.9/15.2), about 80% of the 18.4 kWh bank daily, while home load fell from ~72 kWh/day (Aug) to ~35 (Oct) as the weather cooled. The battery's job is <em>shifting</em> on-peak kWh into the WHEV-credited overnight window, not powering the whole house, so a low solar+battery share of load is expected. The daily-summary export implies ~96–97% round-trip efficiency, above what LFP systems achieve once inverter losses are counted, so the models keep the conservative <b>90%</b> assumption.</p>
   </div>
 
   <!-- GreenButton meter data (hidden unless gb tab) -->
   <div id="gbSection" style="display:none">
     <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">📊 EPE AMI meter — 15-minute interval data (GreenButton export, Aug 4 2025 – Aug 3 2026)</div>
-      This is the <b>utility billing meter itself</b> at 15-minute resolution: separate IMPORT / EXPORT channels plus the solar-production (REC) meter. It's the authoritative measurement — more reliable than the Emporia CT export (which ran ~20% high) — and since the battery only went live Jul 29 2026, this whole year is the <b>pre-battery baseline</b>. The measured summer on-peak share (~14–20% of import) confirms the estimate the plan analysis was built on, and the July 2026 measured share (13.6%) matches that bill's billed split (13.9%) almost exactly.
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">📊 EPE AMI meter — 15-minute interval data (GreenButton exports, Aug 4 2025 – Nov 3 2026)</div>
+      This is the <b>utility billing meter itself</b> at 15-minute resolution: separate IMPORT / EXPORT channels plus the solar-production (REC) meter. It's the authoritative measurement — more reliable than the Emporia CT export (which ran ~20% high) — and Aug 2025–Jul 2026 is the <b>pre-battery baseline</b> (the battery went live Jul 29 2026). The measured summer on-peak share (~14–20% of import) confirms the estimate the plan analysis was built on, and the July 2026 measured share (13.6%) matches that bill's billed split (13.9%) almost exactly.
     </div>
     <div class="sim-cards" id="gbCards"></div>
     <div style="margin-top:10px">
       <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average weekday grid load-shape — the meter's own view</div>
-      <p class="note" style="margin-top:2px;margin-bottom:6px">Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison.</p>
+      <p class="note" style="margin-top:2px;margin-bottom:6px">Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison. <b>Purple vs dashed black = the battery's effect</b>, same weeks a year apart (Sep 16–Oct 31): grid import moves to the midnight–2 AM charging window and the 3–7 PM on-peak hours drop to <b>0.84 kWh/day vs 5.39</b>.</p>
       <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
     </div>
-    <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month meter totals — import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
+    <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month pre-battery meter totals (Aug 2025–Jul 2026): import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
   </div>
 
   <!-- ═══ Weather-normalized load (hidden unless wx tab) ═══ -->
@@ -424,7 +424,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
   <!-- Counterfactual detail table -->
   <div class="section" id="cfTableSection" style="display:none">
     <h3 style="margin-bottom:4px">Per-bill detail — actual vs. counterfactual, with running totals</h3>
-    <p class="note" style="margin-bottom:10px">⚡ = TOD/WHEV + battery era (from Jul 2026). Battery went live Jul 29 2026 — the first bill to actually reflect battery arbitrage will be the <b>August 2026</b> bill (not yet available); the Jul 2026 bill's period ended Jul 15, so it shows the TOD-plan switch but essentially no battery operation yet.</p>
+    <p class="note" style="margin-bottom:10px">⚡ = TOD/WHEV + battery era (from Jul 2026). Battery went live Jul 29 2026 — Aug 2026 is the first bill with battery operation (about half the period); Sep and Oct 2026 are full battery months. The Jul 2026 bill's period ended Jul 15, so it shows the TOD-plan switch but no battery operation yet.</p>
     <div style="overflow-x:auto"><table class="sim-table" id="cfTable"></table></div>
   </div>
 
@@ -563,7 +563,8 @@ const BILLS = [
   {d:"2026-06-15",s:"05/14",e:"06/15/2026",del:1522,rcvd:160,net:1362, sol:641, home:2003, opk:144, fpk:1219, bill:144.28,sum:true },  // still CPP: on-peak 13.689¢, off-peak 6.845¢
   {d:"2026-07-15",s:"06/15",e:"07/15/2026",del:831, rcvd:193,net:638,  sol:571, home:1209, opk:89,  fpk:549,  bill:58.28,sum:true },  // switched to TOD+WHEV: on-peak 22.108¢, off-peak 5.527¢, WHEV credit 294 kWh @ 4.74¢
   {d:"2026-08-13",s:"07/15",e:"08/13/2026",del:1112,rcvd:138,net:974,  sol:535, home:1509, opk:55,  fpk:918,  bill:78.60,sum:true },
-  {d:"2026-09-14",s:"08/13",e:"09/14/2026",del:1812,rcvd:51, net:1761, sol:536, home:2297, opk:77,  fpk:1684, bill:131.20,sum:true },  // FIRST FULL battery-month on TOD+WHEV. On-peak just 4.4% of energy (vs 20.1% same window 2025) -- battery is doing its job. WHEV credit 880 kWh @ 4.74c = -$41.71. BUT: home consumption 2,297 kWh is an all-time high (+33% vs Sep 25, +52% vs Aug 26) and export collapsed to 51 kWh. NOTE: post-7/29 `home` (del+sol-rcvd) now also absorbs battery round-trip losses, so it overstates true household load. Decomposition pending fresh Anker + GreenButton interval data.  // FIRST battery-era bill (battery live 7/29, ~half the period): on-peak crushed to 55 kWh, WHEV credit 456 kWh @ 4.74¢ = -$21.61. No-battery est. ~$106.
+  {d:"2026-09-14",s:"08/13",e:"09/14/2026",del:1812,rcvd:51, net:1761, sol:536, home:2297, opk:77,  fpk:1684, bill:131.20,sum:true },  // FIRST FULL battery month on TOD+WHEV. On-peak 4.4% of energy (vs 20.1% same window 2025); WHEV credit 880 kWh = -$41.71. Record volume = hot weather + EV (see Weather-Normalized tab). Post-7/29 `home` (del+sol-rcvd) also absorbs battery round-trip losses.
+  {d:"2026-10-14",s:"09/14",e:"10/14/2026",del:981, rcvd:66, net:915,  sol:396, home:1311, opk:10,  fpk:905,  bill:65.48, sum:true },  // first bill with the 3 PM discharge start (changed 9/16): on-peak 10 kWh (vs 61 in Oct 2025). WHEV credit 681 kWh = -$32.28. Oct off-peak billed at non-summer $0.05816. All-in 7.16c/kWh (record low).
 ];
 
 const MN=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -616,7 +617,7 @@ const RATES = {
     nonSummerOld: 0.05816,     // same value — kept for reference / downstream callers
     summerOffPeak: 0.05527,    // Jun-Sep (confirmed)
     octOffPeakOld: 0.05816,    // October off-peak under old tariff (confirmed)
-    octOffPeakNew: 0.03428,    // October off-peak under new tariff (estimated, no Oct 2026 bill yet)
+    octOffPeakNew: 0.05816,    // October off-peak under new tariff: confirmed $0.05816 by the Oct 2026 bill (earlier 0.03428 estimate was wrong)
     summerOnPeak: 0.22108,
     label: 'TOU Power Hours',
     color: '#3b82f6',
@@ -703,11 +704,13 @@ const FPPCAC = {
   '2026-06-15': -0.012249,
   '2026-07-15': -0.014824,
   '2026-08-13': -0.004111,
+  '2026-09-14': -0.001027,
+  '2026-10-14':  0.004881,
 };
 
 // Rider rates by era (verified against each bill's line items)
 // RPS changed: $0.008752 → $0.015742 (Jan 2025) → $0.020215 (Jan 2026)
-// TEP changed: $0.000095 → $0.000944 (Mar 2025) → $0.000997 (Mar 2026)
+// TEP changed: $0.000095 → $0.000944 (Mar 2025) → $0.001002 (Mar 2026; confirmed through Oct 2026 bill)
 // AMS changed: $1.60 → $2.92 (Mar 2025) → $3.82 (Mar 2026)
 // EUEF is seasonal: ~3.75% summer (Jun–Aug billing), ~3.39/3.42% non-summer
 function getRiderRates(billDate) {
@@ -732,7 +735,7 @@ function getRiderRates(billDate) {
 }
 
 // Current rates for forward-looking projections (Mar 2026 era)
-const CURRENT_RIDERS = { rps: 0.020215, tep: 0.000997, ams: 3.82, euef: 0.0342 };
+const CURRENT_RIDERS = { rps: 0.020215, tep: 0.001002, ams: 3.82, euef: 0.0342 };
 const FRANCHISE_RATE = 0.020;  // 2.0% (verified against actual bills)
 const TAX_RATE = 0.084;        // 8.4% (verified against actual bills)
 
@@ -1188,7 +1191,8 @@ YEARS.forEach(yr => {
 });
 
 // ── Chart management ──────────────────────────────────────────────────────
-// ── Anker SOLIX post-install telemetry (10-min data, Jun 9–Aug 4 2026) ──────
+// ── Anker SOLIX telemetry: Jun 9–Jul 31 from 10-min exports (with SOC); Aug 1–Nov 3 2026 from the
+//    app's daily-summary CSV (no SOC column → smin/smax null) ──────
 const ANKER_DAILY = [
 {d:'06-09',ph:'monitor',load:null,pv:0.0,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
 {d:'06-10',ph:'monitor',load:null,pv:20.4,bc:0.0,bd:0.0,gi:null,ge:null,stl:null,btl:null,gtl:null,gtb:null,smin:0,smax:0},
@@ -1243,18 +1247,112 @@ const ANKER_DAILY = [
 {d:'07-29',ph:'active',load:89.7,pv:20.4,bc:7.8,bd:13.6,gi:63.9,ge:0.4,stl:19.5,btl:13.6,gtl:56.5,gtb:7.4,smin:0,smax:100},
 {d:'07-30',ph:'active',load:93.6,pv:20.2,bc:16.3,bd:14.1,gi:76.3,ge:0.7,stl:19.3,btl:14.1,gtl:60.2,gtb:16.1,smin:20,smax:100},
 {d:'07-31',ph:'active',load:81.3,pv:16.8,bc:24.1,bd:19.6,gi:70.5,ge:1.5,stl:15.0,btl:19.6,gtl:46.6,gtb:23.9,smin:20,smax:100},
-{d:'08-01',ph:'active',load:73.3,pv:17.3,bc:16.5,bd:13.9,gi:59.5,ge:0.9,stl:16.4,btl:13.9,gtl:43.0,gtb:16.5,smin:20,smax:100},
-{d:'08-02',ph:'active',load:53.8,pv:20.4,bc:15.1,bd:12.0,gi:41.3,ge:4.8,stl:14.5,btl:12.0,gtl:27.4,gtb:13.9,smin:31,smax:100},
-{d:'08-03',ph:'active',load:72.7,pv:20.3,bc:14.1,bd:13.8,gi:55.0,ge:2.3,stl:17.8,btl:13.8,gtl:41.1,gtb:13.9,smin:20,smax:100},
-{d:'08-04',ph:'active',load:68.4,pv:19.6,bc:16.5,bd:15.0,gi:51.6,ge:1.3,stl:18.2,btl:15.0,gtl:35.3,gtb:16.3,smin:20,smax:100}
+{d:'08-01',ph:'active',load:74.9,pv:17.6,bc:15.3,bd:13.0,gi:60.7,ge:1.1,stl:16.2,btl:13.0,gtl:45.7,gtb:15.1,smin:null,smax:null},
+{d:'08-02',ph:'active',load:55.6,pv:20.6,bc:13.9,bd:13.7,gi:40.1,ge:4.8,stl:14.7,btl:13.7,gtl:27.2,gtb:12.9,smin:null,smax:null},
+{d:'08-03',ph:'active',load:74.5,pv:20.4,bc:13.3,bd:14.7,gi:54.9,ge:2.3,stl:18.0,btl:14.7,gtl:41.8,gtb:13.1,smin:null,smax:null},
+{d:'08-04',ph:'active',load:80.4,pv:20.1,bc:15.1,bd:14.8,gi:62.1,ge:1.5,stl:18.4,btl:14.8,gtl:47.2,gtb:15.0,smin:null,smax:null},
+{d:'08-05',ph:'active',load:80.8,pv:19.4,bc:15.1,bd:14.8,gi:63.6,ge:1.8,stl:17.5,btl:14.8,gtl:48.6,gtb:15.0,smin:null,smax:null},
+{d:'08-06',ph:'active',load:75.1,pv:16.4,bc:15.0,bd:14.8,gi:61.2,ge:2.3,stl:14.2,btl:14.8,gtl:46.2,gtb:15.0,smin:null,smax:null},
+{d:'08-07',ph:'active',load:72.8,pv:19.6,bc:26.9,bd:21.6,gi:61.0,ge:2.5,stl:16.9,btl:21.6,gtl:34.2,gtb:26.8,smin:null,smax:null},
+{d:'08-08',ph:'active',load:65.7,pv:19.4,bc:10.4,bd:14.9,gi:43.6,ge:1.7,stl:17.5,btl:14.9,gtl:33.3,gtb:10.2,smin:null,smax:null},
+{d:'08-09',ph:'active',load:71.0,pv:19.9,bc:15.3,bd:14.9,gi:53.5,ge:2.0,stl:17.5,btl:14.9,gtl:38.5,gtb:15.0,smin:null,smax:null},
+{d:'08-10',ph:'active',load:79.2,pv:19.8,bc:15.0,bd:14.6,gi:61.0,ge:1.1,stl:18.6,btl:14.6,gtl:46.0,gtb:15.0,smin:null,smax:null},
+{d:'08-11',ph:'active',load:65.4,pv:18.0,bc:15.2,bd:14.8,gi:50.5,ge:2.7,stl:15.2,btl:14.8,gtl:35.5,gtb:15.1,smin:null,smax:null},
+{d:'08-12',ph:'active',load:58.5,pv:16.4,bc:15.2,bd:14.9,gi:45.5,ge:3.0,stl:13.1,btl:14.9,gtl:30.5,gtb:14.9,smin:null,smax:null},
+{d:'08-13',ph:'active',load:66.0,pv:13.7,bc:15.0,bd:14.7,gi:53.7,ge:1.1,stl:12.6,btl:14.7,gtl:38.7,gtb:14.9,smin:null,smax:null},
+{d:'08-14',ph:'active',load:60.9,pv:18.6,bc:15.1,bd:14.9,gi:45.2,ge:2.8,stl:15.7,btl:14.9,gtl:30.2,gtb:15.0,smin:null,smax:null},
+{d:'08-15',ph:'active',load:64.1,pv:19.2,bc:15.2,bd:14.8,gi:47.4,ge:2.0,stl:17.0,btl:14.8,gtl:32.4,gtb:15.0,smin:null,smax:null},
+{d:'08-16',ph:'active',load:59.2,pv:11.7,bc:14.9,bd:14.6,gi:49.1,ge:1.2,stl:10.5,btl:14.6,gtl:34.2,gtb:14.9,smin:null,smax:null},
+{d:'08-17',ph:'active',load:58.5,pv:18.1,bc:15.1,bd:14.6,gi:43.9,ge:3.0,stl:15.0,btl:14.6,gtl:28.9,gtb:15.0,smin:null,smax:null},
+{d:'08-18',ph:'active',load:67.6,pv:19.9,bc:15.3,bd:15.0,gi:50.3,ge:2.3,stl:17.3,btl:15.0,gtl:35.4,gtb:14.9,smin:null,smax:null},
+{d:'08-19',ph:'active',load:66.6,pv:19.1,bc:15.0,bd:14.7,gi:50.0,ge:2.1,stl:16.9,btl:14.7,gtl:35.0,gtb:14.9,smin:null,smax:null},
+{d:'08-20',ph:'active',load:75.6,pv:16.0,bc:14.9,bd:14.8,gi:61.5,ge:1.8,stl:14.2,btl:14.8,gtl:46.6,gtb:14.9,smin:null,smax:null},
+{d:'08-21',ph:'active',load:73.5,pv:13.7,bc:15.1,bd:14.5,gi:61.5,ge:1.1,stl:12.6,btl:14.5,gtl:46.5,gtb:15.0,smin:null,smax:null},
+{d:'08-22',ph:'active',load:67.3,pv:18.1,bc:15.1,bd:14.7,gi:50.9,ge:1.3,stl:16.7,btl:14.7,gtl:36.0,gtb:14.9,smin:null,smax:null},
+{d:'08-23',ph:'active',load:69.3,pv:19.4,bc:15.1,bd:14.7,gi:51.3,ge:1.0,stl:18.2,btl:14.7,gtl:36.4,gtb:14.9,smin:null,smax:null},
+{d:'08-24',ph:'active',load:73.2,pv:19.1,bc:15.0,bd:14.6,gi:56.8,ge:2.2,stl:16.8,btl:14.6,gtl:41.8,gtb:15.0,smin:null,smax:null},
+{d:'08-25',ph:'active',load:86.2,pv:19.3,bc:14.9,bd:14.4,gi:69.4,ge:2.0,stl:17.2,btl:14.4,gtl:54.5,gtb:14.9,smin:null,smax:null},
+{d:'08-26',ph:'active',load:85.3,pv:18.3,bc:15.1,bd:14.7,gi:69.1,ge:1.8,stl:16.4,btl:14.7,gtl:54.2,gtb:14.9,smin:null,smax:null},
+{d:'08-27',ph:'active',load:80.5,pv:15.7,bc:14.9,bd:14.7,gi:66.4,ge:1.3,stl:14.3,btl:14.7,gtl:51.5,gtb:14.9,smin:null,smax:null},
+{d:'08-28',ph:'active',load:74.0,pv:17.2,bc:15.0,bd:14.7,gi:58.2,ge:1.2,stl:16.0,btl:14.7,gtl:43.2,gtb:14.9,smin:null,smax:null},
+{d:'08-29',ph:'active',load:86.0,pv:18.4,bc:14.9,bd:14.6,gi:68.9,ge:0.9,stl:17.4,btl:14.6,gtl:54.0,gtb:14.9,smin:null,smax:null},
+{d:'08-30',ph:'active',load:80.5,pv:18.4,bc:15.0,bd:14.8,gi:63.4,ge:1.0,stl:17.3,btl:14.8,gtl:48.4,gtb:14.9,smin:null,smax:null},
+{d:'08-31',ph:'active',load:67.8,pv:16.6,bc:15.0,bd:14.6,gi:53.4,ge:1.8,stl:14.8,btl:14.6,gtl:38.5,gtb:15.0,smin:null,smax:null},
+{d:'09-01',ph:'active',load:69.3,pv:16.9,bc:15.1,bd:14.8,gi:54.2,ge:1.4,stl:15.2,btl:14.8,gtl:39.4,gtb:14.9,smin:null,smax:null},
+{d:'09-02',ph:'active',load:67.1,pv:17.2,bc:15.0,bd:14.7,gi:52.2,ge:2.0,stl:15.2,btl:14.7,gtl:37.2,gtb:14.9,smin:null,smax:null},
+{d:'09-03',ph:'active',load:69.5,pv:15.0,bc:14.9,bd:14.4,gi:56.8,ge:1.7,stl:13.3,btl:14.4,gtl:41.8,gtb:14.9,smin:null,smax:null},
+{d:'09-04',ph:'active',load:62.0,pv:17.0,bc:15.0,bd:14.7,gi:47.6,ge:2.4,stl:14.5,btl:14.7,gtl:32.7,gtb:14.9,smin:null,smax:null},
+{d:'09-05',ph:'active',load:74.1,pv:16.9,bc:15.0,bd:14.7,gi:58.6,ge:1.1,stl:15.7,btl:14.7,gtl:43.7,gtb:14.9,smin:null,smax:null},
+{d:'09-06',ph:'active',load:77.9,pv:15.6,bc:15.0,bd:14.8,gi:63.3,ge:0.8,stl:14.7,btl:14.8,gtl:48.4,gtb:14.9,smin:null,smax:null},
+{d:'09-07',ph:'active',load:76.3,pv:17.7,bc:15.0,bd:14.6,gi:60.0,ge:1.0,stl:16.7,btl:14.6,gtl:45.0,gtb:14.9,smin:null,smax:null},
+{d:'09-08',ph:'active',load:71.7,pv:14.5,bc:15.1,bd:14.9,gi:58.9,ge:1.4,stl:12.8,btl:14.9,gtl:44.0,gtb:14.9,smin:null,smax:null},
+{d:'09-09',ph:'active',load:63.1,pv:12.8,bc:14.9,bd:14.6,gi:51.9,ge:1.4,stl:11.5,btl:14.6,gtl:37.0,gtb:14.9,smin:null,smax:null},
+{d:'09-10',ph:'active',load:69.0,pv:17.5,bc:14.9,bd:14.6,gi:54.1,ge:2.3,stl:15.2,btl:14.6,gtl:39.2,gtb:14.9,smin:null,smax:null},
+{d:'09-11',ph:'active',load:63.8,pv:17.0,bc:15.2,bd:14.7,gi:49.2,ge:1.9,stl:14.9,btl:14.7,gtl:34.2,gtb:15.0,smin:null,smax:null},
+{d:'09-12',ph:'active',load:69.6,pv:16.8,bc:15.0,bd:14.7,gi:53.9,ge:0.7,stl:15.9,btl:14.7,gtl:39.0,gtb:14.9,smin:null,smax:null},
+{d:'09-13',ph:'active',load:73.9,pv:17.1,bc:14.9,bd:14.4,gi:58.2,ge:0.8,stl:16.2,btl:14.4,gtl:43.3,gtb:14.9,smin:null,smax:null},
+{d:'09-14',ph:'active',load:64.7,pv:14.4,bc:14.9,bd:14.6,gi:51.4,ge:0.7,stl:13.6,btl:14.6,gtl:36.5,gtb:14.8,smin:null,smax:null},
+{d:'09-15',ph:'active',load:68.6,pv:16.1,bc:14.9,bd:14.6,gi:54.7,ge:1.9,stl:14.2,btl:14.6,gtl:39.9,gtb:14.9,smin:null,smax:null},
+{d:'09-16',ph:'active',load:45.5,pv:15.1,bc:15.3,bd:15.1,gi:33.9,ge:3.3,stl:11.3,btl:15.1,gtl:19.1,gtb:14.9,smin:null,smax:null},
+{d:'09-17',ph:'active',load:62.6,pv:15.5,bc:15.6,bd:15.3,gi:48.9,ge:1.6,stl:13.3,btl:15.3,gtl:33.9,gtb:14.9,smin:null,smax:null},
+{d:'09-18',ph:'active',load:41.3,pv:15.0,bc:15.8,bd:15.2,gi:30.2,ge:3.2,stl:10.9,btl:15.2,gtl:15.2,gtb:14.9,smin:null,smax:null},
+{d:'09-19',ph:'active',load:52.2,pv:16.8,bc:15.1,bd:14.7,gi:38.3,ge:2.5,stl:14.0,btl:14.7,gtl:23.5,gtb:14.8,smin:null,smax:null},
+{d:'09-20',ph:'active',load:50.3,pv:17.4,bc:15.7,bd:15.3,gi:35.7,ge:2.4,stl:14.2,btl:15.3,gtl:20.8,gtb:14.9,smin:null,smax:null},
+{d:'09-21',ph:'active',load:53.1,pv:16.6,bc:15.2,bd:14.8,gi:39.7,ge:2.8,stl:13.5,btl:14.8,gtl:24.8,gtb:14.8,smin:null,smax:null},
+{d:'09-22',ph:'active',load:41.8,pv:7.3,bc:15.0,bd:13.6,gi:36.3,ge:0.4,stl:6.7,btl:13.6,gtl:21.5,gtb:14.8,smin:null,smax:null},
+{d:'09-23',ph:'active',load:35.4,pv:7.7,bc:14.1,bd:14.4,gi:28.3,ge:0.9,stl:6.7,btl:14.4,gtl:14.2,gtb:14.0,smin:null,smax:null},
+{d:'09-24',ph:'active',load:45.0,pv:14.8,bc:15.3,bd:14.8,gi:34.0,ge:3.3,stl:10.9,btl:14.8,gtl:19.2,gtb:14.9,smin:null,smax:null},
+{d:'09-25',ph:'active',load:60.5,pv:13.9,bc:15.7,bd:15.1,gi:49.3,ge:2.1,stl:10.9,btl:15.1,gtl:34.5,gtb:14.8,smin:null,smax:null},
+{d:'09-26',ph:'active',load:47.9,pv:16.4,bc:15.2,bd:14.7,gi:35.9,ge:3.8,stl:12.2,btl:14.7,gtl:21.1,gtb:14.8,smin:null,smax:null},
+{d:'09-27',ph:'active',load:44.2,pv:16.1,bc:15.8,bd:15.2,gi:32.2,ge:3.5,stl:11.8,btl:15.2,gtl:17.3,gtb:14.9,smin:null,smax:null},
+{d:'09-28',ph:'active',load:40.0,pv:4.9,bc:14.9,bd:13.3,gi:36.9,ge:0.3,stl:4.7,btl:13.3,gtl:22.0,gtb:14.9,smin:null,smax:null},
+{d:'09-29',ph:'active',load:37.2,pv:4.3,bc:13.9,bd:14.2,gi:32.8,ge:0.3,stl:4.0,btl:14.2,gtl:18.9,gtb:13.9,smin:null,smax:null},
+{d:'09-30',ph:'active',load:29.3,pv:12.1,bc:14.8,bd:12.2,gi:24.5,ge:4.7,stl:7.4,btl:12.2,gtl:9.8,gtb:14.7,smin:null,smax:null},
+{d:'10-01',ph:'active',load:34.9,pv:13.1,bc:15.3,bd:17.0,gi:22.0,ge:2.0,stl:8.5,btl:17.0,gtl:9.4,gtb:12.6,smin:null,smax:null},
+{d:'10-02',ph:'active',load:26.3,pv:7.7,bc:16.2,bd:13.4,gi:23.1,ge:1.8,stl:4.7,btl:13.4,gtl:8.2,gtb:15.0,smin:null,smax:null},
+{d:'10-03',ph:'active',load:37.2,pv:14.3,bc:16.2,bd:17.6,gi:21.5,ge:0.0,stl:10.9,btl:17.6,gtl:8.7,gtb:12.8,smin:null,smax:null},
+{d:'10-04',ph:'active',load:34.6,pv:16.3,bc:19.7,bd:16.4,gi:21.6,ge:0.0,stl:11.4,btl:16.4,gtl:6.8,gtb:14.8,smin:null,smax:null},
+{d:'10-05',ph:'active',load:30.0,pv:12.9,bc:13.5,bd:14.9,gi:19.4,ge:3.7,stl:7.8,btl:14.9,gtl:7.4,gtb:12.1,smin:null,smax:null},
+{d:'10-06',ph:'active',load:41.0,pv:15.0,bc:18.3,bd:18.5,gi:26.3,ge:0.4,stl:10.3,btl:18.5,gtl:12.2,gtb:14.1,smin:null,smax:null},
+{d:'10-07',ph:'active',load:39.8,pv:15.3,bc:19.0,bd:18.6,gi:25.4,ge:0.4,stl:10.7,btl:18.6,gtl:10.6,gtb:14.8,smin:null,smax:null},
+{d:'10-08',ph:'active',load:57.4,pv:13.3,bc:17.0,bd:16.4,gi:44.6,ge:0.0,stl:11.1,btl:16.4,gtl:29.8,gtb:14.8,smin:null,smax:null},
+{d:'10-09',ph:'active',load:21.1,pv:14.8,bc:16.9,bd:5.5,gi:23.1,ge:5.4,stl:7.3,btl:5.5,gtl:8.4,gtb:14.8,smin:null,smax:null},
+{d:'10-10',ph:'active',load:13.3,pv:13.0,bc:4.3,bd:4.3,gi:8.0,ge:7.6,stl:4.8,btl:4.3,gtl:4.3,gtb:3.6,smin:null,smax:null},
+{d:'10-11',ph:'active',load:33.7,pv:11.9,bc:5.5,bd:15.7,gi:16.1,ge:4.5,stl:5.8,btl:15.7,gtl:12.2,gtb:3.9,smin:null,smax:null},
+{d:'10-12',ph:'active',load:42.8,pv:13.2,bc:17.5,bd:16.9,gi:30.2,ge:0.1,stl:10.5,btl:16.9,gtl:15.5,gtb:14.8,smin:null,smax:null},
+{d:'10-13',ph:'active',load:39.8,pv:12.5,bc:18.6,bd:18.1,gi:28.0,ge:0.1,stl:8.6,btl:18.1,gtl:13.2,gtb:14.8,smin:null,smax:null},
+{d:'10-14',ph:'active',load:39.2,pv:15.1,bc:18.4,bd:17.9,gi:25.5,ge:0.9,stl:10.6,btl:17.9,gtl:10.8,gtb:14.8,smin:null,smax:null},
+{d:'10-15',ph:'active',load:42.4,pv:15.0,bc:17.7,bd:17.2,gi:27.9,ge:0.1,stl:12.1,btl:17.2,gtl:13.1,gtb:14.8,smin:null,smax:null},
+{d:'10-16',ph:'active',load:37.2,pv:15.0,bc:17.6,bd:16.8,gi:23.1,ge:0.0,stl:12.2,btl:16.8,gtl:8.2,gtb:14.8,smin:null,smax:null},
+{d:'10-17',ph:'active',load:18.9,pv:14.7,bc:15.8,bd:5.1,gi:22.7,ge:7.8,stl:5.7,btl:5.1,gtl:8.0,gtb:14.7,smin:null,smax:null},
+{d:'10-18',ph:'active',load:34.7,pv:11.2,bc:6.1,bd:16.0,gi:13.7,ge:0.0,stl:9.4,btl:16.0,gtl:9.3,gtb:4.4,smin:null,smax:null},
+{d:'10-19',ph:'active',load:33.8,pv:11.8,bc:17.6,bd:16.6,gi:23.1,ge:0.0,stl:9.1,btl:16.6,gtl:8.2,gtb:14.9,smin:null,smax:null},
+{d:'10-20',ph:'active',load:37.5,pv:12.9,bc:17.6,bd:17.0,gi:25.3,ge:0.2,stl:9.8,btl:17.0,gtl:10.7,gtb:14.6,smin:null,smax:null},
+{d:'10-21',ph:'active',load:43.3,pv:12.5,bc:17.7,bd:17.1,gi:31.3,ge:0.0,stl:9.5,btl:17.1,gtl:16.6,gtb:14.7,smin:null,smax:null},
+{d:'10-22',ph:'active',load:42.8,pv:9.3,bc:15.6,bd:15.2,gi:33.9,ge:0.0,stl:8.2,btl:15.2,gtl:19.3,gtb:14.6,smin:null,smax:null},
+{d:'10-23',ph:'active',load:38.6,pv:9.7,bc:17.9,bd:17.2,gi:29.7,ge:0.0,stl:6.6,btl:17.2,gtl:14.8,gtb:14.9,smin:null,smax:null},
+{d:'10-24',ph:'active',load:36.3,pv:12.3,bc:17.9,bd:17.4,gi:24.5,ge:0.0,stl:9.1,btl:17.4,gtl:9.7,gtb:14.8,smin:null,smax:null},
+{d:'10-25',ph:'active',load:31.4,pv:12.1,bc:19.7,bd:15.9,gi:23.1,ge:0.1,stl:7.1,btl:15.9,gtl:8.3,gtb:14.8,smin:null,smax:null},
+{d:'10-26',ph:'active',load:39.2,pv:11.6,bc:12.9,bd:15.3,gi:25.3,ge:0.0,stl:10.3,btl:15.3,gtl:13.6,gtb:11.7,smin:null,smax:null},
+{d:'10-27',ph:'active',load:39.2,pv:11.3,bc:16.7,bd:16.2,gi:28.4,ge:0.0,stl:9.3,btl:16.2,gtl:13.7,gtb:14.7,smin:null,smax:null},
+{d:'10-28',ph:'active',load:32.8,pv:12.5,bc:16.3,bd:15.7,gi:23.6,ge:2.8,stl:8.3,btl:15.7,gtl:8.8,gtb:14.8,smin:null,smax:null},
+{d:'10-29',ph:'active',load:41.6,pv:6.1,bc:15.2,bd:14.4,gi:36.3,ge:0.1,stl:5.7,btl:14.4,gtl:21.4,gtb:14.9,smin:null,smax:null},
+{d:'10-30',ph:'active',load:31.6,pv:6.7,bc:15.4,bd:14.8,gi:25.6,ge:0.0,stl:6.0,btl:14.8,gtl:10.8,gtb:14.8,smin:null,smax:null},
+{d:'10-31',ph:'active',load:26.2,pv:11.4,bc:19.4,bd:12.5,gi:21.8,ge:0.0,stl:6.9,btl:12.5,gtl:6.8,gtb:14.9,smin:null,smax:null},
+{d:'11-01',ph:'active',load:28.3,pv:7.0,bc:9.5,bd:15.1,gi:17.4,ge:1.7,stl:4.4,btl:15.1,gtl:8.9,gtb:8.5,smin:null,smax:null},
+{d:'11-02',ph:'active',load:30.3,pv:11.7,bc:17.5,bd:14.3,gi:21.8,ge:0.0,stl:9.0,btl:14.3,gtl:7.1,gtb:14.8,smin:null,smax:null},
+{d:'11-03',ph:'active',load:26.8,pv:12.9,bc:13.1,bd:11.8,gi:19.9,ge:4.6,stl:7.3,btl:11.8,gtl:7.8,gtb:12.1,smin:null,smax:null}
 ];
 const ANKER_PROF_ACTIVE = [{h:0,load:2642,pv:0,gi:4156,ge:0,bc:1514,bd:0},{h:1,load:2184,pv:0,gi:9485,ge:0,bc:7302,bd:0},{h:2,load:1672,pv:0,gi:7450,ge:0,bc:5778,bd:0},{h:3,load:1713,pv:0,gi:2462,ge:0,bc:749,bd:0},{h:4,load:1617,pv:0,gi:1617,ge:0,bc:0,bd:0},{h:5,load:1199,pv:0,gi:1002,ge:0,bc:0,bd:196},{h:6,load:1217,pv:7,gi:887,ge:0,bc:0,bd:323},{h:7,load:745,pv:112,gi:515,ge:0,bc:0,bd:118},{h:8,load:2012,pv:261,gi:1330,ge:0,bc:0,bd:421},{h:9,load:3038,pv:812,gi:3482,ge:21,bc:1267,bd:31},{h:10,load:3702,pv:1459,gi:2570,ge:70,bc:257,bd:0},{h:11,load:4866,pv:1952,gi:3017,ge:103,bc:0,bd:0},{h:12,load:2927,pv:2255,gi:1239,ge:568,bc:0,bd:0},{h:13,load:3535,pv:2449,gi:1656,ge:570,bc:0,bd:0},{h:14,load:4088,pv:2527,gi:2045,ge:484,bc:0,bd:0},{h:15,load:5129,pv:2467,gi:204,ge:177,bc:118,bd:2753},{h:16,load:5480,pv:2306,gi:209,ge:29,bc:206,bd:3200},{h:17,load:5005,pv:1345,gi:190,ge:28,bc:22,bd:3520},{h:18,load:4675,pv:839,gi:941,ge:5,bc:18,bd:2918},{h:19,load:4309,pv:251,gi:4058,ge:0,bc:0,bd:0},{h:20,load:3746,pv:0,gi:3746,ge:0,bc:0,bd:0},{h:21,load:3373,pv:0,gi:3373,ge:0,bc:0,bd:0},{h:22,load:3368,pv:0,gi:2641,ge:5,bc:0,bd:732},{h:23,load:2823,pv:0,gi:2268,ge:3,bc:0,bd:558}];
 const ANKER_PROF_IDLE = [{h:0,load:676,pv:0,gi:676,ge:0,bc:0,bd:0},{h:1,load:518,pv:0,gi:518,ge:0,bc:0,bd:0},{h:2,load:581,pv:0,gi:581,ge:0,bc:0,bd:0},{h:3,load:547,pv:0,gi:547,ge:0,bc:0,bd:0},{h:4,load:534,pv:0,gi:534,ge:0,bc:0,bd:0},{h:5,load:491,pv:0,gi:491,ge:0,bc:0,bd:0},{h:6,load:492,pv:10,gi:482,ge:0,bc:0,bd:0},{h:7,load:508,pv:125,gi:383,ge:0,bc:0,bd:0},{h:8,load:596,pv:315,gi:285,ge:4,bc:0,bd:0},{h:9,load:1020,pv:884,gi:402,ge:267,bc:0,bd:0},{h:10,load:1452,pv:1504,gi:531,ge:583,bc:0,bd:0},{h:11,load:1241,pv:1957,gi:265,ge:981,bc:0,bd:0},{h:12,load:1627,pv:2291,gi:414,ge:1078,bc:0,bd:0},{h:13,load:1873,pv:2465,gi:497,ge:1089,bc:0,bd:0},{h:14,load:1749,pv:2551,gi:430,ge:1232,bc:0,bd:0},{h:15,load:2854,pv:2486,gi:1186,ge:818,bc:0,bd:0},{h:16,load:2146,pv:2309,gi:601,ge:765,bc:0,bd:0},{h:17,load:2045,pv:1814,gi:751,ge:520,bc:0,bd:0},{h:18,load:2355,pv:1363,gi:1116,ge:123,bc:0,bd:0},{h:19,load:1948,pv:499,gi:1497,ge:48,bc:0,bd:0},{h:20,load:1432,pv:0,gi:1432,ge:0,bc:0,bd:0},{h:21,load:1339,pv:0,gi:1339,ge:0,bc:0,bd:0},{h:22,load:1104,pv:0,gi:1104,ge:0,bc:0,bd:0},{h:23,load:782,pv:0,gi:782,ge:0,bc:0,bd:0}];
 // ── EPE GreenButton 15-min meter data (Aug 2025–Aug 2026, authoritative) ──
-const GB_MONTHLY = [{mo:'2025-08',imp:1344,exp:63,net:1282,prod:482,onpk:19.6},{mo:'2025-09',imp:1091,exp:96,net:995,prod:448,onpk:17.1},{mo:'2025-10',imp:784,exp:137,net:647,prod:406,onpk:14.7},{mo:'2025-11',imp:554,exp:119,net:434,prod:317,onpk:null},{mo:'2025-12',imp:705,exp:60,net:645,prod:262,onpk:null},{mo:'2026-01',imp:705,exp:97,net:609,prod:290,onpk:null},{mo:'2026-02',imp:496,exp:163,net:334,prod:364,onpk:null},{mo:'2026-03',imp:599,exp:215,net:384,prod:516,onpk:null},{mo:'2026-04',imp:729,exp:184,net:545,prod:488,onpk:null},{mo:'2026-05',imp:1124,exp:195,net:929,prod:614,onpk:null},{mo:'2026-06',imp:1487,exp:142,net:1345,prod:583,onpk:15.7},{mo:'2026-07',imp:658,exp:211,net:447,prod:563,onpk:13.6},{mo:'2026-08',imp:158,exp:8,net:150,prod:58,onpk:0.6}];
+const GB_MONTHLY = [{mo:'2025-08',imp:1344,exp:63,net:1282,prod:482,onpk:19.6},{mo:'2025-09',imp:1091,exp:96,net:995,prod:448,onpk:17.1},{mo:'2025-10',imp:784,exp:137,net:647,prod:406,onpk:14.7},{mo:'2025-11',imp:554,exp:119,net:434,prod:317,onpk:null},{mo:'2025-12',imp:705,exp:60,net:645,prod:262,onpk:null},{mo:'2026-01',imp:705,exp:97,net:609,prod:290,onpk:null},{mo:'2026-02',imp:496,exp:163,net:334,prod:364,onpk:null},{mo:'2026-03',imp:599,exp:215,net:384,prod:516,onpk:null},{mo:'2026-04',imp:729,exp:184,net:545,prod:488,onpk:null},{mo:'2026-05',imp:1124,exp:195,net:929,prod:614,onpk:null},{mo:'2026-06',imp:1487,exp:142,net:1345,prod:583,onpk:15.7},{mo:'2026-07',imp:658,exp:211,net:447,prod:563,onpk:13.6},{mo:'2026-08',imp:1689,exp:58,net:1632,prod:533,onpk:4.2},{mo:'2026-09',imp:1385,exp:58,net:1327,prod:433,onpk:3.5},{mo:'2026-10',imp:799,exp:40,net:758,prod:386,onpk:2.3},{mo:'2026-11',imp:59,exp:7,net:52,prod:32,onpk:null}];  // Nov 2026 = Nov 1–3 only
 const GB_PROF_SUM = [{h:0,imp:1.92,exp:0.0},{h:1,imp:1.69,exp:0.0},{h:2,imp:1.32,exp:0.0},{h:3,imp:1.19,exp:0.0},{h:4,imp:1.1,exp:0.0},{h:5,imp:1.01,exp:0.0},{h:6,imp:0.88,exp:0.0},{h:7,imp:0.96,exp:0.0},{h:8,imp:0.95,exp:0.01},{h:9,imp:0.99,exp:0.15},{h:10,imp:1.05,exp:0.37},{h:11,imp:1.32,exp:0.5},{h:12,imp:0.59,exp:0.88},{h:13,imp:1.53,exp:0.65},{h:14,imp:2.13,exp:0.4},{h:15,imp:1.3,exp:0.6},{h:16,imp:1.73,exp:0.42},{h:17,imp:2.72,exp:0.21},{h:18,imp:3.05,exp:0.07},{h:19,imp:2.62,exp:0.01},{h:20,imp:2.93,exp:0.0},{h:21,imp:2.9,exp:0.0},{h:22,imp:2.57,exp:0.0},{h:23,imp:2.13,exp:0.0}];
 const GB_PROF_WIN = [{h:0,imp:1.05,exp:0.0},{h:1,imp:0.89,exp:0.0},{h:2,imp:0.74,exp:0.0},{h:3,imp:0.71,exp:0.0},{h:4,imp:0.69,exp:0.0},{h:5,imp:0.68,exp:0.0},{h:6,imp:0.93,exp:0.0},{h:7,imp:1.09,exp:0.0},{h:8,imp:1.02,exp:0.0},{h:9,imp:0.71,exp:0.07},{h:10,imp:0.51,exp:0.32},{h:11,imp:0.43,exp:0.63},{h:12,imp:0.53,exp:0.79},{h:13,imp:0.57,exp:0.85},{h:14,imp:0.59,exp:0.8},{h:15,imp:0.56,exp:0.68},{h:16,imp:1.03,exp:0.39},{h:17,imp:1.96,exp:0.13},{h:18,imp:1.8,exp:0.03},{h:19,imp:1.53,exp:0.0},{h:20,imp:1.77,exp:0.0},{h:21,imp:1.53,exp:0.0},{h:22,imp:1.53,exp:0.0},{h:23,imp:1.31,exp:0.0}];
-const GB_ANNUAL = {imp:10276,exp:1682,net:8594,prod:5333,home:13927};
+const GB_ANNUAL = {imp:10276,exp:1682,net:8594,prod:5333,home:13927};  // Aug 2025–Jul 2026 = pre-battery baseline
+// Weekday avg grid import by hour, Sep 16–Oct 31: 2026 (battery, 3 PM start) vs same weeks 2025 (no battery)
+const GB_PROF_BATT26 = [6.26,8.45,3.96,1.15,0.83,0.78,0.81,1.04,0.6,0.55,0.31,0.61,0.21,0.33,0.26,0.06,0.09,0.24,0.45,0.32,0.76,0.86,1.12,0.96];
+const GB_PROF_SAME25 = [1.04,0.88,0.76,0.74,0.69,0.6,0.67,1.12,0.99,0.87,0.83,0.81,1.03,1.7,1.85,0.33,0.9,2.09,2.07,1.74,2.37,1.97,1.59,1.24];
 
 let chart = null;
 let liveChart = null;
@@ -1893,8 +1991,8 @@ function renderDecisionTool(){
 
 // ── EPE GreenButton meter view (authoritative 15-min interval data) ──────────
 function renderGreenButton(ctx, title, note){
-  title.textContent = 'EPE billing meter — monthly grid import / export / solar (15-min data, Aug 2025–Aug 2026)';
-  note.textContent = 'Straight from the utility AMI meter (the billing source of truth): blue = grid import, green = grid export (below 0), yellow line = solar produced (REC meter). This is the authoritative measurement — it supersedes the Emporia estimates for on-peak share. Almost the entire year is pre-battery, so it is the clean "no-battery" baseline.';
+  title.textContent = 'EPE billing meter — monthly grid import / export / solar (15-min data, Aug 2025–Nov 2026)';
+  note.textContent = 'Straight from the utility AMI meter (the billing source of truth): blue = grid import, green = grid export (below 0), yellow line = solar produced (REC meter). This is the authoritative measurement — it supersedes the Emporia estimates for on-peak share. Aug 2025–Jul 2026 is the pre-battery baseline; Aug 2026 on is battery-era (hover a month for its on-peak share). Nov 2026 is Nov 1–3 only.';
   const M = GB_MONTHLY;
   const labels = M.map(r=>r.mo);
   chart = new Chart(ctx, {
@@ -1918,14 +2016,16 @@ function renderGreenButton(ctx, title, note){
 function renderGBCards(){
   const el=document.getElementById('gbCards'); if(!el) return;
   const a=GB_ANNUAL;
-  const summers=GB_MONTHLY.filter(r=>r.onpk!=null && r.imp>250 && ['06','07','08','09'].includes(r.mo.slice(5)));
+  const summers=GB_MONTHLY.filter(r=>r.onpk!=null && r.imp>250 && r.mo<'2026-08' && ['06','07','08','09'].includes(r.mo.slice(5)));
+  const batt=GB_MONTHLY.filter(r=>r.onpk!=null && r.mo>='2026-08');
+  const battOnpk=(batt.reduce((s,r)=>s+r.onpk,0)/batt.length).toFixed(1);
   const avgOnpk=(summers.reduce((s,r)=>s+r.onpk,0)/summers.length).toFixed(1);
   const cards=[
     {t:'Grid import (12 mo)', v:a.imp.toLocaleString()+' kWh', s:'Aug 2025 – Jul 2026'},
     {t:'Solar produced', v:a.prod.toLocaleString()+' kWh', s:((a.prod-a.exp)/a.prod*100).toFixed(0)+'% self-consumed'},
     {t:'Home load (measured)', v:a.home.toLocaleString()+' kWh', s:'import + solar − export'},
     {t:'Self-sufficiency', v:((a.home-a.imp)/a.home*100).toFixed(0)+'%', s:'solar share of total load'},
-    {t:'On-peak import share', v:avgOnpk+'%', s:'summer 3–7PM M–F (measured)'},
+    {t:'On-peak import share', v:avgOnpk+'% → '+battOnpk+'%', s:'3–7PM M–F: pre-battery summers → Aug–Oct 2026'},
     {t:'Net billed', v:a.net.toLocaleString()+' kWh', s:'import − export (net metered)'},
   ];
   el.innerHTML=cards.map(c=>`<div class="sim-card" style="border-top:4px solid #0891b2"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#0e7490;font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`).join('');
@@ -1941,6 +2041,8 @@ function renderGBProfile(){
       { type:'bar', label:'Summer weekday grid import (kWh/h)', data:S.map(r=>r.imp), backgroundColor:onpkBg, order:3 },
       { type:'bar', label:'Summer weekday export (kWh/h)', data:S.map(r=>-r.exp), backgroundColor:'rgba(34,197,94,.7)', order:3 },
       { type:'line', label:'Non-summer weekday import (kWh/h)', data:W.map(r=>r.imp), borderColor:'#64748b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.3, order:0 },
+      { type:'line', label:'Sep 16–Oct 31 2025, no battery', data:GB_PROF_SAME25, borderColor:'#0f172a', borderDash:[4,3], backgroundColor:'transparent', borderWidth:1.8, pointRadius:0, tension:0.3, order:0 },
+      { type:'line', label:'Sep 16–Oct 31 2026, battery (3 PM start)', data:GB_PROF_BATT26, borderColor:'#a855f7', backgroundColor:'transparent', borderWidth:2.5, pointRadius:0, tension:0.3, order:0 },
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'top',labels:{font:{size:10},boxWidth:12}},
@@ -1980,7 +2082,7 @@ function renderLive(ctx, title, note){
       plugins:{
         legend:{position:'top', labels:{font:{size:10}, boxWidth:12}},
         tooltip:{ callbacks:{ title:items=>'2026-'+items[0].label,
-          afterBody:(items)=>{ const r=D[items[0].dataIndex]; const raw=(r.gi==null?'':`  ·  raw grid import ${r.gi} kWh`); return `phase: ${r.ph}  ·  SOC ${r.smin}–${r.smax}%${raw}`; } } },
+          afterBody:(items)=>{ const r=D[items[0].dataIndex]; const raw=(r.gi==null?'':`  ·  raw grid import ${r.gi} kWh`); return `phase: ${r.ph}${r.smax==null?'':`  ·  SOC ${r.smin}–${r.smax}%`}${raw}`; } } },
       },
       scales:{
         x:{ stacked:true, grid:{display:false}, ticks:{maxRotation:90, minRotation:90, font:{size:8}, autoSkip:true, maxTicksLimit:30} },
@@ -2006,8 +2108,8 @@ function renderLiveCards(){
   const solShare=(stl/load*100).toFixed(0);   // genuinely grid-independent (own solar)
   const battShare=(btl/load*100).toFixed(0);  // time-shifted (mostly grid-charged) — arbitrage
   const cards = [
-    {t:'Battery-active days', v:n+' days', s:'Jul 29 – Aug 4 (first week live)'},
-    {t:'Avg home load', v:perDay(load)+' kWh/day', s:'high — post-travel EV + AC'},
+    {t:'Battery-active days', v:n+' days', s:'Jul 29 – '+act[n-1].d.replace('-','/')+' 2026'},
+    {t:'Avg home load', v:perDay(load)+' kWh/day', s:'summer AC + EV; falls as it cools'},
     {t:'Battery throughput', v:perDay((bc+bd)/2)+' kWh/day', s:'~'+(bd/bc*100).toFixed(0)+'% round-trip'},
     {t:'Avg solar', v:perDay(pv)+' kWh/day', s:(( (pv-ge)/pv*100).toFixed(0))+'% self-consumed'},
     {t:'Solar share of load', v:solShare+'%', s:'+'+battShare+'% via battery (time-shifted grid, not extra supply)'},
