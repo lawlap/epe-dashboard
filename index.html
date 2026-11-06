@@ -441,7 +441,8 @@ function chart2Ctx(h){ const b = document.getElementById('chart2Box'); b.style.d
 function seg(opts, cur, fn){ return '<span class="seg">' + opts.map(([k,l]) => `<button class="${k===cur?'on':'off'}" onclick="${fn}('${k}')">${l}</button>`).join('') + '</span>'; }
 const HOUR_BANDS = [{from:-0.5, to:7.5, color:'rgba(99,102,241,.08)'}, {from:14.5, to:18.5, color:'rgba(220,38,38,.09)'}];
 function billEvents(){ const at = l => LABELS.indexOf(l);
-  return [{i:at("Jul'26")-0.5, text:'TOD + WHEV'}, {i:at("Aug'26"), text:'Battery 7/29'}, {i:at("Oct'26"), text:'3 PM fix 9/16'}]; }
+  return [{i:at("Sep'24")-0.5, text:'TOD'}, {i:at("Nov'25")-0.5, text:'CPP pilot'}, {i:at("Jul'26")-0.5, text:'TOD + WHEV'},
+          {i:at("Aug'26"), text:'Battery 7/29'}, {i:at("Oct'26"), text:'3 PM fix 9/16'}]; }
 Chart.defaults.set('plugins.datalabels', { display: false });
 
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -1073,7 +1074,7 @@ function renderChart(){
 
   if(activeView==='chrono'){
     title.textContent = 'Monthly bills: energy (top) and dollars (bottom)';
-    setNote(note, 'Bar height = home use (solar + grid). Bottom: the bill; hover for ¢/kWh.', 'Top: stacked bars = solar generated (amber) + net grid draw (blue; green when the month net-exported), so bar height = total home consumption. Bottom: the bill for the same period; the tooltip shows the all-in ¢/kWh and billed on-peak kWh. Dashed lines: TOD + WHEV switch, battery go-live (7/29/26) and the 3 PM discharge fix (9/16/26).');
+    setNote(note, 'Bar height = home use (solar + grid). Bottom: the bill; hover for ¢/kWh.', 'Top: stacked bars = solar generated (amber) + net grid draw (blue; green when the month net-exported), so bar height = total home consumption. Bottom: the bill for the same period; the tooltip shows the all-in ¢/kWh and billed on-peak kWh. Dashed lines: Standard → TOD (Sep 2024 bill), CPP pilot (Nov 2025 bill), TOD + WHEV (Jul 2026 bill), battery go-live (7/29/26) and the 3 PM discharge fix (9/16/26).');
     chart = new Chart(ctx, {
       type:'bar',
       data:{ labels:LABELS, datasets:[
@@ -1480,7 +1481,7 @@ function renderGreenButton(ctx, title, note){
         y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh / month (export below 0)'} } }
     }
   });
-  addEvents(chart, [{i:labels.indexOf('2026-08')-0.5, text:'Battery'}]);
+  addEvents(chart, [{i:labels.indexOf('2025-10')+0.5, text:'CPP pilot'}, {i:labels.indexOf('2026-06')+0.5, text:'TOD + WHEV'}, {i:labels.indexOf('2026-08')-0.5, text:'Battery'}]);
   renderGBCards();
   renderGBProfile();
 }
