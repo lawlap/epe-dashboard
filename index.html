@@ -437,6 +437,13 @@ const PAL = { grid:'#3b82f6', solar:'#fbbf24', solarLine:'#f59e0b', batt:'#f9731
   load:'#0f172a', onpk:'#dc2626', whev:'#6366f1', tod:'#8b5cf6', std:'#64748b', saved:'#16a34a', worse:'#dc2626' };
 const FIXW = { afterFit: sc => { sc.width = 64; } };   // equal y-axis width so stacked panels line up
 let chart2 = null;
+// Stacked panels share an x-axis: drop Chart.js auto-padding (it pads for point size, which differs per chart)
+// and then equalize the plot edges so dashed markers and bars line up exactly.
+function alignPanels(a, b){
+  [a, b].forEach(c => { c.options.layout = {autoPadding:false, padding:{left:0, right:10, top:0, bottom:0}}; c.update('none'); });
+  const L = Math.max(a.chartArea.left, b.chartArea.left), R = Math.min(a.chartArea.right, b.chartArea.right);
+  [a, b].forEach(c => { c.options.layout.padding = {left:L - c.chartArea.left, right:10 + c.chartArea.right - R, top:0, bottom:0}; c.update('none'); });
+}
 function chart2Ctx(h){ const b = document.getElementById('chart2Box'); b.style.display = 'block'; b.style.height = (h||200)+'px'; return document.getElementById('chart2').getContext('2d'); }
 function seg(opts, cur, fn){ return '<span class="seg">' + opts.map(([k,l]) => `<button class="${k===cur?'on':'off'}" onclick="${fn}('${k}')">${l}</button>`).join('') + '</span>'; }
 const HOUR_BANDS = [{from:-0.5, to:7.5, color:'rgba(99,102,241,.08)'}, {from:14.5, to:18.5, color:'rgba(220,38,38,.09)'}];
@@ -1097,7 +1104,7 @@ function renderChart(){
         scales:{ x:{grid:{display:false}, ticks:{maxRotation:90,minRotation:90,font:{size:9}}},
           y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Bill'}, ...FIXW} } }
     });
-    addEvents(chart2, billEvents().map(e=>({...e, text:''})));
+    alignPanels(chart, chart2); addEvents(chart2, billEvents().map(e=>({...e, text:''})));
 
   } else if(activeView==='yoy'){
     title.textContent = 'Home Consumption \u2014 Year-over-Year by Month';
@@ -1710,7 +1717,7 @@ function renderCounterfactual(ctx, title, note){
       scales:{ x:{offset:true, grid:{display:false}, ticks:{maxRotation:90,minRotation:90,font:{size:9}}},
         y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative saved'}, ...FIXW} } }
   });
-  addEvents(chart2, billEvents().map(e=>({...e, text:''})));
+  alignPanels(chart, chart2); addEvents(chart2, billEvents().map(e=>({...e, text:''})));
   addEvents(chart, billEvents());
 
   const last = rows[rows.length-1];
