@@ -51,29 +51,337 @@ input[type=range]{width:200px;accent-color:#1e40af}
 .ev-row{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
 .ev-toggle{display:flex;align-items:center;gap:6px;font-size:12px}
 .ev-toggle input{accent-color:#1e40af}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 16px}
+.kpi{background:white;border-radius:10px;padding:11px 13px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.kpi .k-t{font-size:11px;font-weight:600;color:#64748b}
+.kpi .k-v{font-size:22px;font-weight:800;color:#0f172a;margin:2px 0}
+.kpi .k-s{font-size:11px;color:#64748b}
+.kpi .up{color:#15803d;font-weight:700} .kpi .dn{color:#dc2626;font-weight:700}
+details.fold{background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:10px;padding:10px 16px}
+details.fold>summary{cursor:pointer;font-size:13px;font-weight:700;color:#334155}
+details.fold[open]>summary{margin-bottom:10px}
+.tabs .arch{font-size:11px;padding:4px 9px;font-weight:500}
+.tabs .arch.off{background:#f1f5f9;color:#64748b}
+.tab-sep{align-self:center;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-left:10px}
+/* Info tooltips: details live behind the (i) so the page reads at a glance */
+.tip{display:inline-block;width:15px;height:15px;margin-left:5px;border-radius:50%;background:#e2e8f0;color:#475569;font:italic 700 10px/15px Georgia,serif;text-align:center;cursor:help;vertical-align:1px;user-select:none}
+.tip:hover,.tip:focus{background:#1e40af;color:#fff;outline:none}
+#tipBox{position:fixed;z-index:1000;max-width:min(420px,90vw);background:#0f172a;color:#f1f5f9;font:400 12px/1.5 -apple-system,"Segoe UI",sans-serif;font-style:normal;padding:9px 12px;border-radius:7px;box-shadow:0 6px 20px rgba(0,0,0,.28);pointer-events:none;display:none}
 </style>
 </head>
 <body>
+<div id="tipBox"></div>
 <div class="page">
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
   <p class="sub">Las Cruces, NM · 30 bills · May 2024–Oct 2026 · Anker batteries live since Jul 29 2026</p>
-  <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:9px 14px;margin:8px 0 0;font-size:12.5px;color:#166534">
-    <b>🔋 Oct 2026 bill: $65.48 vs ≈ $99 on the Standard rate with no battery → saved ≈ $34</b> (≈ $48 if EPE prorates the Sep/Oct season change by days; it billed this bill's off-peak entirely at the non-summer rate, so $34 is the better estimate). <b>Battery-era bills vs Standard:</b> Aug <b>$47</b> (battery live only the last half), Sep <b>$113</b>, Oct <b>$34</b>, i.e. <b>$194 in three bills</b>; the framework estimate is ~$636/yr total vs Standard, earned mostly Jun–Sep. Oct all-in rate <b>7.16¢/kWh</b> is a record low. <b>The 3 PM fix is confirmed:</b> in Sep 16–30, the last on-peak weeks of the season, weekday 3–7 PM grid import was <b>0.83 kWh/day vs 6.19</b> in the same weeks of 2025, and the Oct bill's on-peak was <b>10 kWh</b> (61 a year ago). Per the tariff, on-peak pricing runs <b>Jun–Sep only</b>; Oct–May is a flat 5.816¢ at all hours, so winter value comes from the WHEV credit (681 kWh, −$32.28 this bill; 84% of grid import now falls midnight–8 AM vs 25% a year ago). The battery cycles a steady <b>~15 kWh/day</b>.
+  <div class="kpis" id="kpis"></div>
+
+
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- Simulator controls (hidden unless sim tab active) -->
+  <div id="simSection" style="display:none">
+    <div class="sim-controls">
+      <div class="sim-row">
+        <span class="sim-label">CPP Events / Summer:</span>
+        <input type="range" id="cppSlider" min="0" max="20" value="10" oninput="updateSim()">
+        <span class="sim-val" id="cppVal">10</span>
+      </div>
+      <div class="sim-row">
+        <span class="sim-label">Est. kWh per CPP event:</span>
+        <input type="range" id="cppKwhSlider" min="2" max="15" value="7" oninput="updateSim()">
+        <span class="sim-val" id="cppKwhVal">7 kWh</span>
+      </div>
+      <div class="ev-row">
+        <div class="ev-toggle">
+          <input type="checkbox" id="evToggle" onchange="updateSim()">
+          <label for="evToggle"><b>Add EV Charging</b> (Model Y, 12k mi/yr, overnight)</label>
+        </div>
+        <span class="sim-label" style="min-width:auto">Monthly EV kWh:</span>
+        <input type="range" id="evSlider" min="100" max="500" value="286" step="10" oninput="updateSim()">
+        <span class="sim-val" id="evVal">286</span>
+      </div>
+      <div class="ev-row" id="r42Row" style="opacity:0.4;pointer-events:none">
+        <div class="ev-toggle">
+          <input type="checkbox" id="r42Toggle" onchange="updateSim()">
+          <label for="r42Toggle"><b>Add WHEV Rider</b> (4.74¢/kWh, midnight–8 AM) <span class="tip" tabindex="0" data-tip="Add WHEV Rider (Whole House EV — Rate No. 01 rider, confirmed from 14th Rev AN289 tariff) — 4.74¢/kWh bill credit on all midnight–8AM kWh (EV + any overnight base load). ⚠ Requires switching to Standard Rate No. 01 — EPE ruled (Jun 2026) it CANNOT be combined with the CPP pilot. So this toggle now models the Standard + WHEV alternative, not an add-on to CPP. Requires qualifying EV registered at service address.">i</span></label>
+        </div>
+      </div>
+      <p class="note" style="margin-top:10px">All-in: energy + riders + taxes, verified to $0.15/bill. <span class="tip" tabindex="0" data-tip="All charges included: Energy + Customer ($7) + FPPCAC (per-bill actual) + RPS + TEP + AMS (era-matched) + EUEF (~3.4–3.75%) + Franchise Fee (2.0%) + Taxes (8.4%). Verified against all 19 TOU bills — mean error $0.15/bill. Plan history: Standard (May–Aug 2024) → TOU Power Hours (Sep 2024–Oct 2025) → TOU+CPP (Nov 2025–present, plan switch). Key rates: TOU non-summer = $0.05816 always (same as Standard). CPP non-summer = $0.03428 always (CPP plan&#x27;s 41% non-summer advantage). October is a shoulder month on TOU: on-peak $0.221 applies but off-peak = $0.058 (non-summer rate). CPP summer = Jun–Sep only. WHEV rider (AN289 tariff, $0.0474/kWh credit on midnight–8AM kWh): per EPE&#x27;s Jun 2026 ruling it attaches to Standard Rate No. 01 only and CANNOT be paired with the CPP pilot — it is the Standard-plan alternative, not a CPP add-on. On Standard the credited overnight rate is 5.8¢→1.1¢/kWh. (The CPP-stacked figures shown in older scenarios, e.g. 3.4¢→0¢, are no longer attainable and are retained only for historical reference.)">i</span></p>
+    </div>
+
+    <!-- Sim summary cards -->
+    <div class="sim-cards" id="simCards"></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="section">
+    <h3 id="chart-title"></h3>
+    <p class="note" id="chart-note"></p>
+    <div id="rateIncBanner" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:6px 12px;margin-bottom:8px;font-size:12px;font-weight:700;color:#92400e"></div>
+    <div class="chart-box"><canvas id="mainChart"></canvas></div>
+  </div>
+
+  <!-- Battery controls (hidden unless batt tab) -->
+  <div id="battSection" style="display:none">
+    <div class="sim-controls">
+      <div class="sim-row">
+        <span class="sim-label"><b>Number of batteries:</b></span>
+        <input type="range" id="battCountSlider" min="1" max="5" value="1" step="1" oninput="updateBatt()">
+        <span class="sim-val" id="battCountVal">1× (6.1 kWh · $3,543)</span>
+      </div>
+      <div class="sim-row">
+        <span class="sim-label">CPP events / summer:</span>
+        <input type="range" id="battCppSlider" min="0" max="20" value="10" oninput="updateBatt()">
+        <span class="sim-val" id="battCppVal">10</span>
+      </div>
+      <div class="sim-row" style="margin-top:4px">
+        <div class="ev-toggle">
+          <input type="checkbox" id="battR42Toggle" onchange="updateBatt()" checked>
+          <label for="battR42Toggle"><b>WHEV Rider</b> (4.74¢/kWh, midnight–8 AM), active on your bills <span class="tip" tabindex="0" data-tip="WHEV Rider (Whole House EV, Rate No. 01 rider, AN289 tariff) — 4.74¢/kWh credit on all midnight–8AM kWh. ✓ CONFIRMED ACTIVE on TOD: your Jul 2026 bill shows the credit (294 kWh × 4.74¢ = −$13.94) stacked on the TOD/Power Hours rate. This is the credit that drives the battery&#x27;s year-round night-shift value; turning it off models the battery without WHEV.">i</span></label>
+        </div>
+      </div>
+      <div class="sim-row">
+        <span class="sim-label" style="color:#dc2626">25D tax credit: EXPIRED</span>
+        <span style="font-size:11px;color:#64748b">(Terminated by OBBB Act, July 2025. No federal battery credit for 2026+ installations.)</span>
+      </div>
+      <div style="border-top:1px solid #e2e8f0;margin:10px 0 6px;padding-top:10px">
+        <div style="font-size:12px;font-weight:700;color:#475569;margin-bottom:8px">Non-Arbitrage Value Adjustments (reduce effective cost)</div>
+        <div class="sim-row">
+          <span class="sim-label">Outage insurance value ($):</span>
+          <input type="range" id="outageSlider" min="0" max="5000" value="2000" step="100" oninput="updateBatt()">
+          <span class="sim-val" id="outageVal">$2,000</span>
+          <span style="font-size:11px;color:#64748b;margin-left:8px">Backup power value — 2 outages in 6 yrs, ~$2k loss each time</span>
+        </div>
+        <div class="sim-row">
+          <span class="sim-label">Capitalized home value ($):</span>
+          <input type="range" id="homeValSlider" min="0" max="5000" value="1500" step="100" oninput="updateBatt()">
+          <span class="sim-val" id="homeValVal">$1,500</span>
+          <span style="font-size:11px;color:#64748b;margin-left:8px">Estimated value added to home sale price from battery installation</span>
+        </div>
+      </div>
+      <p class="note" style="margin-top:8px">Battery value from a day-by-day simulation on your meter data. <span class="tip" tabindex="0" data-tip="Anker SOLIX: 6.1 kWh per battery, LiFePO4, ~90% round-trip, ~2%/yr degradation, 15yr life. TOD+WHEV value (your plan) is now derived from your 12-month GreenButton 15-min meter data — a day-by-day simulation of the battery charging overnight (midnight–8AM) and covering the highest-rate daytime import first. It has two parts: (1) summer on-peak shift — displace 22.1¢ on-peak kWh with overnight-charged energy; and (2) year-round WHEV night-shift — every daytime kWh moved to overnight charging earns the 4.74¢/kWh WHEV credit. The night-shift is the larger piece and is why the old summer-on-peak-only figure was far too low. Without WHEV the night-shift is ~$0 (off-peak day ≈ off-peak night), so the value falls back to on-peak arbitrage only. Federal 25D battery credit expired (OBBB Act, Jul 2025) — full cost. The CPP line is kept only as a &quot;what if you&#x27;d stayed on CPP with events&quot; comparison (a one-way door you&#x27;ve left). Adjusted payback subtracts the non-arbitrage (backup + home-value) sliders from cost.">i</span></p>
+    </div>
+    <div class="sim-cards" id="battCards"></div>
+  </div>
+
+  <!-- Live Usage & Battery (hidden unless live tab) -->
+  <div id="liveSection" style="display:none">
+    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">⚡ Anker SOLIX — measured operation (Jun 9 – Nov 3 2026)</div>
+      Cycling daily since <b>Jul 29, 2026</b>. <span class="tip" tabindex="0" data-tip="Actual metered data exported from the Anker app. The batteries began active daily arbitrage on July 29, 2026 (SOC cycling 20%→100% daily). Before that: solar/load monitoring only (Jun 9–18), a brief commissioning test (Jun 19–21), then grid-tied with the battery idle (Jun 22–Jul 28). The chart below stacks how each day&#x27;s home load was served; the second chart shows the average hourly dispatch during the first week of battery operation. Data through Jul 31 is 10-min telemetry (with SOC); Aug 1 onward is the app&#x27;s daily-summary export (no SOC, so the SOC line stops at Jul 31).">i</span>
+    </div>
+    <div class="sim-cards" id="liveCards"></div>
+    <div style="margin-top:10px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average day — battery-active week (Jul 30–Aug 3)</div>
+      <p class="note" style="margin-top:2px;margin-bottom:6px">Charges midnight–3 AM (WHEV window), discharges 3–7 PM. <span class="tip" tabindex="0" data-tip="Average power by hour (W). The battery charges overnight (midnight–3AM, the WHEV credit window) and from midday solar, then discharges hard 3–7PM — collapsing grid import to near zero during the TOD on-peak window. This is the arbitrage the whole plan is built around, now visible in real data.">i</span></p>
+      <div class="chart-box" style="height:300px"><canvas id="liveProfChart"></canvas></div>
+    </div>
+    <p class="note" style="margin-top:10px"><b>~15 kWh/day</b> cycled every month; models assume 90% round-trip. <span class="tip" tabindex="0" data-tip="Reading it: throughput has been remarkably steady: ~15 kWh/day charged and discharged in every month (Aug 15.2/14.9, Sep 15.1/14.6, Oct 15.9/15.2), about 80% of the 18.4 kWh bank daily, while home load fell from ~72 kWh/day (Aug) to ~35 (Oct) as the weather cooled. The battery&#x27;s job is shifting on-peak kWh into the WHEV-credited overnight window, not powering the whole house, so a low solar+battery share of load is expected. The daily-summary export implies ~96–97% round-trip efficiency, above what LFP systems achieve once inverter losses are counted, so the models keep the conservative 90% assumption.">i</span></p>
+  </div>
+
+  <!-- GreenButton meter data (hidden unless gb tab) -->
+  <div id="gbSection" style="display:none">
+    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">📊 EPE AMI meter — 15-minute interval data (GreenButton exports, Aug 4 2025 – Nov 3 2026)</div>
+      Utility billing meter, 15-min data. Aug 2025–Jul 2026 = <b>pre-battery baseline</b>. <span class="tip" tabindex="0" data-tip="This is the utility billing meter itself at 15-minute resolution: separate IMPORT / EXPORT channels plus the solar-production (REC) meter. It&#x27;s the authoritative measurement — more reliable than the Emporia CT export (which ran ~20% high) — and Aug 2025–Jul 2026 is the pre-battery baseline (the battery went live Jul 29 2026). The measured summer on-peak share (~14–20% of import) confirms the estimate the plan analysis was built on, and the July 2026 measured share (13.6%) matches that bill&#x27;s billed split (13.9%) almost exactly.">i</span>
+    </div>
+    <div class="sim-cards" id="gbCards"></div>
+    <div style="margin-top:10px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average weekday grid load-shape — the meter's own view</div>
+      <p class="note" style="margin-top:2px;margin-bottom:6px"><b style="color:#a855f7">Purple</b> = 2026 with battery; dashed = same weeks 2025. Red band = on-peak hours; blue band = WHEV window. <span class="tip" tabindex="0" data-tip="Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison. Purple vs dashed black = the battery&#x27;s effect, same weeks a year apart (Sep 16–Oct 31): grid import moves to the midnight–2 AM charging window and 3–7 PM import drops to 0.84 kWh/day vs 5.39 (on-peak pricing applies only through Sep 30).">i</span></p>
+      <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
+    </div>
+    <p class="note" style="margin-top:10px">Pre-battery year: 10,276 kWh imported, 5,333 kWh solar, 13,927 kWh home load. <span class="tip" tabindex="0" data-tip="Reconciliation: 12-month pre-battery meter totals (Aug 2025–Jul 2026): import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won&#x27;t line up exactly), but the annual figures and the on-peak shares are ground truth.">i</span></p>
+  </div>
+
+  <!-- ═══ Weather-normalized load (hidden unless wx tab) ═══ -->
+  <div id="wxSection" style="display:none">
+    <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#78350f">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#92400e">🌡️ Did the battery raise our consumption? Mostly no — it got hotter.</div>
+      Hotter weather explains <b>61%</b> of the Aug–Sep 2026 rise; battery overhead the rest. <span class="tip" tabindex="0" data-tip="September 2026 metered the highest home load in the record (71.9 kWh/day over Aug 5 – Sep 11, vs 60.4 the year before, +19%), which looked alarming next to a battery that had just gone in. Joining daily temperatures (ASOS station LRU, Las Cruces Intl) to daily meter data settles it: cooling degree days rose +23% over the same window, and at the house&#x27;s measured sensitivity of 2.07 kWh per CDD that alone accounts for +7.0 of the +11.5 kWh/day. The remaining +4.5 is the battery&#x27;s own overhead — round-trip loss plus standby — and shows up as a parallel shift in the fit, not a steeper slope.">i</span>
+    </div>
+
+    <div class="sim-cards">
+      <div class="sim-card"><div class="plan-name">Hotter weather</div><div class="plan-total" style="color:#f59e0b">+7.0</div><div class="plan-detail">kWh/day · <b>61%</b> of the rise<br>+3.40 CDD/day × 2.07</div></div>
+      <div class="sim-card"><div class="plan-name">Battery overhead</div><div class="plan-total" style="color:#3b82f6">+4.5</div><div class="plan-detail">kWh/day · <b>39%</b><br>round-trip loss + standby</div></div>
+      <div class="sim-card"><div class="plan-name">Behavior change</div><div class="plan-total" style="color:#15803d">~0</div><div class="plan-detail">no detectable effect from<br>dropping the afternoon setback</div></div>
+    </div>
+
+    <p style="margin-top:6px;margin-bottom:0;font-size:12px;line-height:1.6;color:#475569"><b style="color:#0f172a">Thermostat change:</b> no measurable effect. <span class="tip" tabindex="0" data-tip="Why the thermostat theory doesn’t hold. The household used to raise the thermostat during the 3–7 PM peak and stopped once the battery was in. If that were driving the increase, the slope would steepen — more cooling per degree of heat. It didn’t (2.07 → 1.95, indistinguishable at n=38); only the intercept moved (30.4 → 37.0), which is the signature of a constant always-on addition. Independent check: Jun 15–24 2026 — pre-battery, occupied, CDD 18.0 — ran 71.2 kWh/day against 71.9 post-battery at CDD 17.9. Same house, same heat, opposite sides of the install, 0.65 kWh/day apart. The setback was a load-shifting tactic, not a load-reduction one — deferred cooling returns as evening recovery, so daily energy barely moves. What it bought was keeping kWh out of the on-peak window, which is exactly the job the battery took over.">i</span></p>
+
+    <div style="margin-top:16px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">The decomposition, day by day</div>
+      <table style="margin-top:8px">
+        <thead><tr>
+          <th style="text-align:left">Aug 5 – Sep 11 window</th><th>Avg daily max</th><th>Avg daily min</th><th>CDD/day</th><th>Home load</th><th>Fit</th><th>R²</th><th>RMSE</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="text-align:left"><b style="color:#3b82f6">●</b> 2025 — pre-battery</td><td>92.0°F</td><td>67.0°F</td><td>14.49</td><td>60.4 kWh/d</td><td>30.42 + <b>2.07</b>·CDD</td><td>0.52</td><td>7.5</td></tr>
+          <tr><td style="text-align:left"><b style="color:#f59e0b">●</b> 2026 — post-battery</td><td>97.1°F</td><td>68.7°F</td><td>17.89</td><td>71.9 kWh/d</td><td>36.97 + <b>1.95</b>·CDD</td><td>0.44</td><td>5.8</td></tr>
+          <tr class="summer"><td style="text-align:left"><b>2025 model evaluated at 2026’s weather</b></td><td>—</td><td>—</td><td>17.89</td><td><b>67.4 kWh/d</b></td><td colspan="3" style="text-align:left">→ actual 71.9, so <b>+4.5 unexplained by weather</b></td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:8px">CDD = degree-days above 65°F (station LRU), n = 38 days each. <span class="tip" tabindex="0" data-tip="CDD = max(0, (Tmax+Tmin)/2 − 65°F). Home load = meter import + solar production − export, so post-install it also absorbs battery round-trip losses. Daily temperatures from the Iowa Environmental Mesonet ASOS archive, station LRU. n=38 days each window.">i</span></p>
+      <p class="note" style="margin-top:6px">Travel month (Jun 25–Jul 27) excluded. <span class="tip" tabindex="0" data-tip="Excluded: Jun 25 – Jul 27 2026 — the annual summer travel month, 24.6 kWh/day at CDD 17.8 versus ~71 when occupied. Pooling those 33 days with occupied days collapses the CDD fit to R² = 0.00 and makes the whole comparison meaningless.">i</span></p>
+    </div>
+  </div>
+
+  <!-- Choice Ladder (hidden unless ladder tab) -->
+  <div id="decisionSection" style="display:none">
+    <!-- ═══ EX-POST: what actually happened (from the meter) ═══ -->
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#166534">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#15803d">🪜 Part 1 — What each choice actually saved (ex-post, from your 12-month meter)</div>
+      vs. Standard: TOD <b>$88</b> + WHEV <b>$152</b> + battery <b>$396</b> = <b>$636/yr</b>. <span class="tip" tabindex="0" data-tip="The chart above stacks the four counterfactuals; the cards below are the annual decomposition. Read it two ways. Marginally (each step on top of the last): switching to TOD saved only $88/yr alone — it barely beats Standard without help, which is exactly why the battery mattered — then WHEV added $152/yr, and the battery is the biggest single lever at ~$396/yr. As a whole (the way you first framed it — TOD only made sense because the battery was on the table): Standard vs the full stack is $636/yr. The battery&#x27;s $396 is its value given you&#x27;re already on TOD+WHEV — the clean &quot;what if I&#x27;d skipped the battery&quot; number.">i</span>
+    </div>
+    <div class="sim-cards" id="ladderCards"></div>
+
+    <!-- ═══ EX-ANTE: would this pay off? (planning model, generalizable) ═══ -->
+    <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px 16px;margin:18px 0 12px;font-size:12px;color:#1e40af">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#1d4ed8">🧭 Part 2 — Would this stack pay off? (ex-ante planning model — try your own numbers)</div>
+      Drag the sliders to test payback. The WHEV credit is the fragile lever. <span class="tip" tabindex="0" data-tip="This is the decision your earlier self faced, as a model any homeowner can drive. Sliders start at your situation; change them to see how the ladder and the battery&#x27;s payback move. The order that matters: the rate switch is cheap and reversible, the overnight credit is the multiplier (and the most revocable), and the battery is the big irreversible bet whose payback lives or dies on that credit — so verify the first two before committing capital.">i</span>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-row"><span class="sim-label">Annual usage (net kWh/yr):</span>
+        <input type="range" id="dUsage" min="2000" max="20000" value="8600" step="200" oninput="updateDecision()">
+        <span class="sim-val" id="dUsageV">8,600</span></div>
+      <div class="sim-row"><span class="sim-label">On-peak share of usage:</span>
+        <input type="range" id="dOnpk" min="0" max="40" value="10" step="1" oninput="updateDecision()">
+        <span class="sim-val" id="dOnpkV">10%</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">% of use in the summer 3–7PM window — low favours TOU/TOD</span></div>
+      <div class="sim-row"><span class="sim-label">Overnight credit (WHEV):</span>
+        <input type="range" id="dWhev" min="0" max="8" value="4.7" step="0.1" oninput="updateDecision()">
+        <span class="sim-val" id="dWhevV">4.7¢</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">¢/kWh credit on midnight–8AM draw. <b>0 = none</b> — the biggest lever on battery value</span></div>
+      <div class="sim-row"><span class="sim-label">On-peak rate:</span>
+        <input type="range" id="dOnRate" min="8" max="35" value="22" step="0.5" oninput="updateDecision()">
+        <span class="sim-val" id="dOnRateV">22.0¢</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">summer on-peak ¢/kWh — bigger spread = more battery arbitrage</span></div>
+      <div class="sim-row"><span class="sim-label">Battery usable capacity:</span>
+        <input type="range" id="dBatt" min="0" max="30" value="15" step="1" oninput="updateDecision()">
+        <span class="sim-val" id="dBattV">15 kWh</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px"><b>0 = no battery</b></span></div>
+      <div class="sim-row"><span class="sim-label">Battery cost ($):</span>
+        <input type="range" id="dCost" min="0" max="16000" value="6840" step="100" oninput="updateDecision()">
+        <span class="sim-val" id="dCostV">$6,840</span></div>
+      <div class="sim-row"><span class="sim-label">Backup / resilience value ($):</span>
+        <input type="range" id="dOutage" min="0" max="6000" value="2000" step="100" oninput="updateDecision()">
+        <span class="sim-val" id="dOutageV">$2,000</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">one-time value of outage protection + home resale, subtracted from cost</span></div>
+    </div>
+    <div id="decVerdict" style="border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;font-weight:600"></div>
+    <div class="chart-box" style="height:270px"><canvas id="decChart"></canvas></div>
+    <div class="sim-cards" id="decCards" style="margin-top:14px"></div>
+    <p class="note" style="margin-top:8px">Planning model calibrated to your meter data, not a bill. <span class="tip" tabindex="0" data-tip="Planning model, not a bill. An annual approximation calibrated so the defaults reproduce your meter-derived ladder (Standard ≈ $988 → TOD $900 → TOD+WHEV $748 → +Battery $352); your exact ex-post figures are Part 1 above. Held constant behind the sliders (EPE-style, editable in code): off-peak 5.53¢, non-summer 3.43¢, Standard tier-1/2 7.04/10.88¢, ~47% of use in summer, ~32% overnight, 90% round-trip, 15-yr battery life. Federal battery credit expired (OBBB Act, 2025). Regulatory watch: the overnight-credit slider is the fragile one — set it to 0 to see the battery&#x27;s payback if the rider is ever revoked.">i</span></p>
+  </div>
+
+  <!-- Counterfactual "vs regular rate" (hidden unless cf tab) -->
+  <div id="cfSection" style="display:none">
+    <div class="sim-controls" style="margin-bottom:12px">
+      <div class="sim-row" style="align-items:center">
+        <span class="sim-label"><b>Compare against:</b></span>
+        <span id="cfBaselineBtns">
+          <button type="button" class="on" onclick="setCfBaseline('std')">Standard Rate No. 01</button>
+          <button type="button" class="off" onclick="setCfBaseline('cpp')">CPP (prior plan)</button>
+          <button type="button" class="off" onclick="setCfBaseline('tou')">TOD / Power Hours</button>
+        </span>
+      </div>
+      <p class="note" style="margin-top:8px">Each bill repriced on the chosen plan, all-in. Gap = savings. <span class="tip" tabindex="0" data-tip="&quot;What would the same usage have cost on the regular rate?&quot; Each bill&#x27;s actual net kWh is repriced on the chosen plan, all-in, with that month&#x27;s real riders/taxes. The running total is cumulative; running savings = the gap. Standard = the do-nothing baseline (the return on the whole TOU/CPP/TOD+battery strategy). CPP = your prior plan (closest to the marginal &quot;return on switching to TOD, which the battery enables&quot;). Note this is a joint plan+battery return — the two weren&#x27;t separate choices.">i</span></p>
+    </div>
+    <div class="sim-cards" id="cfCards"></div>
+  </div>
+
+  <!-- Counterfactual detail table -->
+  <div class="section" id="cfTableSection" style="display:none">
+    <h3 style="margin-bottom:4px">Per-bill detail — actual vs. counterfactual, with running totals</h3>
+    <p class="note" style="margin-bottom:10px">⚡ = TOD + WHEV era. Battery live Jul 29, 2026. <span class="tip" tabindex="0" data-tip="⚡ = TOD/WHEV + battery era (from Jul 2026). Battery went live Jul 29 2026 — Aug 2026 is the first bill with battery operation (about half the period); Sep and Oct 2026 are full battery months. The Jul 2026 bill&#x27;s period ended Jul 15, so it shows the TOD-plan switch but no battery operation yet.">i</span></p>
+    <div style="overflow-x:auto"><table class="sim-table" id="cfTable"></table></div>
+  </div>
+
+  <!-- Solar Savings controls (hidden unless solar tab) -->
+  <div id="solarSection" style="display:none">
+    <div class="sim-controls">
+      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">4.6 kW Solar Array — Installed Dec 2019, energized mid-2020 · Net Metering (full retail credit)</div>
+      <div class="sim-row">
+        <span class="sim-label">System cost (before ITC, $):</span>
+        <input type="range" id="solarCostSlider" min="0" max="30000" value="5000" step="500" oninput="updateSolar()">
+        <span class="sim-val" id="solarCostVal">$5,000</span>
+      </div>
+      <div class="sim-row">
+        <div class="ev-toggle">
+          <input type="checkbox" id="solarItcToggle" onchange="updateSolar()" checked>
+          <label for="solarItcToggle"><b>30% Federal ITC applied</b> (installed Dec 2019 — full 30% rate, credited on 2019 return). Reduces net system cost.</label>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:#0f172a;margin-left:12px">Net cost: <span id="solarNetCost">$3,500</span></span>
+      </div>
+      <p class="note" style="margin-top:8px">Savings = bill without solar − actual bill. <span class="tip" tabindex="0" data-tip="Monthly savings = estimated bill without solar (using actual home consumption kWh on the plan you were on) minus actual bill paid. Net metering is full retail in NM — solar export earns the same rate as import. Data available May 2024 – present (~27 months). Pre-2024 savings estimated from annual run rate. Payback line shows when cumulative savings crosses system net cost.">i</span></p>
+    </div>
+    <div class="sim-cards" id="solarCards"></div>
+
+    <!-- Solar production trend note -->
+    <div style="background:#f0f9ff;border:1px solid #7dd3fc;border-radius:8px;padding:14px 16px;margin-top:4px;margin-bottom:4px;font-size:12px;color:#0c4a6e">
+      <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#0369a1">📊 Solar Production Trend — 2024 vs 2025 Analysis (Apr 2026)</div>
+      <div>2025 summer output −22% vs. 2024: 2024 was unusually sunny, not panel loss. <span class="tip" tabindex="0" data-tip="Observation: Summer solar generation fell ~22% year-over-year (May−Oct), while winter/spring months are essentially flat (+4%). The biggest drops were May (−32%), Jun (−27%), Jul (−25%), narrowing to Sep (−8%) and Nov (+5%). Root cause — 2024 was anomalously high, not 2025 low: May 2024 recorded 924 kWh, which is 103% of the theoretical maximum for a 4.6 kW system at Las Cruces peak sun hours. New Mexico was in a significant drought in 2024 with well below-normal cloud cover. 2025 summer production (~70% of theoretical max) reflects more typical conditions. Why not dirty panels: Soiling in desert environments typically causes 5–7% uniform losses across all months. The seasonal concentration of losses here (32% in summer, near-zero in winter) is inconsistent with soiling or panel degradation, which would affect all months proportionally. The system&#x27;s strong March 2026 performance (+16% vs prior year) further confirms normal operation. Recommendation: Annual spring wash (April) is good practice in a dusty desert environment but will not recover the summer gap — that&#x27;s weather variability. If summer 2026 production tracks 2024 levels, that would further confirm 2025 was the outlier. Monitor inverter logs for fault/clipping events if the trend continues. System notes: Panels installed December 2019 (30% federal ITC, credited on 2019 return); energized mid-2020 after permitting. Installation was bundled with a new AC system — incremental solar cost was roughly ~$10k out of pocket after credits and other incentives, making standalone payback analysis somewhat notional.">i</span></div>
+    </div>
+  </div>
+
+  <!-- Projection controls (hidden unless proj tab) -->
+  <div id="projSection" style="display:none">
+    <div class="sim-controls">
+      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">2026–2027 Forward Projection — Current CPP Plan + Optional EV</div>
+      <div class="ev-row">
+        <div class="ev-toggle">
+          <input type="checkbox" id="projEvToggle" onchange="updateProj()">
+          <label for="projEvToggle"><b>Add Tesla Model Y EV</b> (charged overnight, midnight–8AM window)</label>
+        </div>
+        <span class="sim-label" style="min-width:auto">Monthly EV kWh:</span>
+        <input type="range" id="projEvSlider" min="50" max="500" value="286" step="10" oninput="updateProj()">
+        <span class="sim-val" id="projEvVal">286</span>
+        <span style="font-size:11px;color:#64748b;margin-left:8px">kWh/mo (~12k mi/yr @ 3.5 mi/kWh × 1.15 AC loss)</span>
+      </div>
+      <div class="ev-row" id="projWhevRow" style="opacity:0.4;pointer-events:none">
+        <div class="ev-toggle">
+          <input type="checkbox" id="projWhevToggle" onchange="updateProj()">
+          <label for="projWhevToggle"><b>WHEV Rider</b> (4.74¢/kWh, midnight–8 AM) <span class="tip" tabindex="0" data-tip="WHEV Rider — 4.74¢/kWh credit on ALL midnight–8AM kWh (EV + base load). ✓ Active on your TOD plan since Jul 2026 (this projection panel models the older CPP baseline; the TOD+WHEV case is the live tabs above).">i</span></label>
+        </div>
+      </div>
+      <div class="sim-row">
+        <span class="sim-label">CPP events / summer:</span>
+        <input type="range" id="projCppSlider" min="0" max="20" value="10" oninput="updateProj()">
+        <span class="sim-val" id="projCppVal">10</span>
+      </div>
+      <p class="note" style="margin-top:8px">Old CPP-baseline projection; the live tabs show TOD + WHEV. <span class="tip" tabindex="0" data-tip="Projects Apr 2026 – Mar 2027 using prior-year same-month net kWh as baseline (from Emporia Vue data for on-peak ratios). EV kWh added as overnight load — shifts into WHEV credit window. Overnight hours (midnight–8AM) include base load (Emporia actual) plus EV. All-in cost uses CURRENT_RIDERS (no historical FPPCAC — uses 2026 forward estimate). Rate case increase not included here.">i</span></p>
+    </div>
+    <div class="sim-cards" id="projCards"></div>
+  </div>
+
+  <!-- Projection detail table -->
+  <div class="section" id="projTableSection" style="display:none">
+    <h3 style="margin-bottom:12px">Monthly Projection — Apr 2026 to Mar 2027</h3>
+    <div style="overflow-x:auto">
+      <table class="sim-table" id="projTable"></table>
+    </div>
+  </div>
+
+  <!-- Sim detail table (hidden unless sim tab) -->
+  <div class="section" id="simTableSection" style="display:none">
+    <h3 style="margin-bottom:12px">Monthly Cost Breakdown by Plan</h3>
+    <div style="overflow-x:auto">
+      <table class="sim-table" id="simTable"></table>
+    </div>
   </div>
 
   <!-- ====================================================================== -->
   <!-- PLAN DECISION BANNER — added Jun 17 2026 after EPE pairing ruling       -->
   <!-- ====================================================================== -->
-  <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:12px;padding:18px 20px;margin-bottom:18px">
-    <div style="font-size:17px;font-weight:800;color:#9a3412;margin-bottom:6px">⚖️ Plan Decision: CPP vs. TOD (Power Hours), with/without WHEV</div>
+  <details class="fold">
+  <summary>⚖️ Rate plan: TOD + WHEV since Jul 2026 · beats CPP even without WHEV</summary>
+  <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:14px 16px">
     <a href="Rate_Plan_Decision_Tool.html" style="display:inline-block;background:#ea580c;color:#fff;font-size:12px;font-weight:700;text-decoration:none;padding:7px 14px;border-radius:7px;margin-bottom:10px">🎛️ Open interactive decision tool — stress-test rates, usage &amp; battery →</a>
     <p style="font-size:12.5px;color:#7c2d12;line-height:1.55;margin:0 0 12px">
-      <b style="color:#15803d">DONE — switched to TOD + WHEV (July 2026).</b> CPP couldn't be paired with the WHEV rider, but TOD/Power Hours is part of Rate No. 01, so WHEV attaches to it —
-      and your <b>Jul 2026 bill confirms it</b>: the WHEV credit (294 kWh × 4.74¢ = −$13.94) is stacked on the TOD rate. WHEV is <b>active, not pending</b>.
-      Figures are <b>annual all-in</b>, built on your <b>actual billed usage</b> (incl. the summer travel month),
-      monthly net-metered, with the <b>18 kWh battery</b> doing daily arbitrage and CPP critical-events assumed battery-covered (excluded).
-      Model reconciles to your real bills: CPP ≈ $822 vs ~$802 actual. <b>Riders &amp; taxes are broken out separately</b> (RPS/TEP/FPPCAC per-kWh,
-      EUEF, AMS, customer charge, franchise 2.0% + tax 8.56%) — they're nearly plan-neutral, so the <em>differences</em> are what matter.
+      <b style="color:#15803d">Done: on TOD + WHEV since Jul 2026</b>; the credit shows on every bill. <span class="tip" tabindex="0" data-tip="DONE — switched to TOD + WHEV (July 2026). CPP couldn&#x27;t be paired with the WHEV rider, but TOD/Power Hours is part of Rate No. 01, so WHEV attaches to it — and your Jul 2026 bill confirms it: the WHEV credit (294 kWh × 4.74¢ = −$13.94) is stacked on the TOD rate. WHEV is active, not pending. Figures are annual all-in, built on your actual billed usage (incl. the summer travel month), monthly net-metered, with the 18 kWh battery doing daily arbitrage and CPP critical-events assumed battery-covered (excluded). Model reconciles to your real bills: CPP ≈ $822 vs ~$802 actual. Riders &amp; taxes are broken out separately (RPS/TEP/FPPCAC per-kWh, EUEF, AMS, customer charge, franchise 2.0% + tax 8.56%) — they&#x27;re nearly plan-neutral, so the differences are what matter.">i</span>
     </p>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12.5px;background:white;border-radius:8px;overflow:hidden">
@@ -127,27 +435,21 @@ input[type=range]{width:200px;accent-color:#1e40af}
       </table>
     </div>
     <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:12px 0 0">
-      <b>TOD wins because:</b> your usage is overnight/evening-heavy with midday solar export, and on-peak is only ~11% of summer use (your Jun bill: 144 of 1,363 kWh),
-      which the battery easily covers. TOD's off-peak (5.5¢) beats CPP's (6.8¢) and crushes Standard's tier-2 (10.9¢); WHEV then adds a 4.74¢/kWh credit on all
-      midnight–8AM kWh, a year-round night→day arbitrage on top of the summer on-peak shifting.
+      <b>Why TOD wins:</b> low on-peak share, cheap off-peak, plus the WHEV credit. <span class="tip" tabindex="0" data-tip="TOD wins because: your usage is overnight/evening-heavy with midday solar export, and on-peak is only ~11% of summer use (your Jun bill: 144 of 1,363 kWh), which the battery easily covers. TOD&#x27;s off-peak (5.5¢) beats CPP&#x27;s (6.8¢) and crushes Standard&#x27;s tier-2 (10.9¢); WHEV then adds a 4.74¢/kWh credit on all midnight–8AM kWh, a year-round night→day arbitrage on top of the summer on-peak shifting.">i</span>
     </p>
     <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:10px 0 0">
-      <b>Done: on TOD (Power Hours) + WHEV since July 2026.</b> Leaving the CPP <em>pilot</em> was a one-way door, but <b>TOD beats CPP in every rate scenario even with no WHEV at all</b>
-      (−$57 to −$85/yr), so that was covered regardless — and WHEV did stack, so you're on the best case. Remaining watch-items, all modest: (1) WHEV "outlier" review risk from battery
-      arbitrage — but the TOD-no-WHEV fallback still beats CPP; (2) TOD's 22¢ on-peak makes you battery-dependent on summer afternoons — only a problem if the battery is down a whole
-      summer <em>and</em> WHEV is revoked (≈$15/yr worse than CPP). FPPCAC is variable (±~1¢/kWh, plan-neutral); minimum-bill floor caps the WHEV credit in low-usage months.
+      <b>Watch:</b> WHEV could be revoked; summer battery downtime costs 22¢/kWh. <span class="tip" tabindex="0" data-tip="Done: on TOD (Power Hours) + WHEV since July 2026. Leaving the CPP pilot was a one-way door, but TOD beats CPP in every rate scenario even with no WHEV at all (−$57 to −$85/yr), so that was covered regardless — and WHEV did stack, so you&#x27;re on the best case. Remaining watch-items, all modest: (1) WHEV &quot;outlier&quot; review risk from battery arbitrage — but the TOD-no-WHEV fallback still beats CPP; (2) TOD&#x27;s 22¢ on-peak makes you battery-dependent on summer afternoons — only a problem if the battery is down a whole summer and WHEV is revoked (≈$15/yr worse than CPP). FPPCAC is variable (±~1¢/kWh, plan-neutral); minimum-bill floor caps the WHEV credit in low-usage months.">i</span>
     </p>
   </div>
-
+  </details>
   <!-- ====================================================================== -->
   <!-- MONTHLY ALL-PLAN COMPARISON (static, bill-anchored) — added Jun 17 2026 -->
   <!-- ====================================================================== -->
-  <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:4px">📅 Monthly all-plan comparison (with your 3× battery, all-in $)</div>
+  <details class="fold">
+  <summary>📅 Modeled plan comparison by month (pre-battery year, battery simulated)</summary>
+  <div>
     <p style="font-size:11.5px;color:#64748b;margin:0 0 12px;line-height:1.5">
-      Worst→best: <b>Standard → CPP → TOD → TOD+WHEV</b>. Each column is the all-in bill (energy + riders + taxes + customer charge) computed <b>directly from your 12-month GreenButton
-      15-min meter data</b> (Aug 2025–Jul 2026), with your <b>3× battery simulated</b> the same way as the Battery Economics tab — one engine. CPP/TOD/TOD+WHEV are billed with the battery
-      covering the highest-rate load; Standard has no time-of-use so the battery adds ~nothing there. CPP critical-events excluded (battery-covered). Net kWh = meter import − export.
+      Modeled on your meter data with the battery. Standard is the do-nothing baseline. <span class="tip" tabindex="0" data-tip="Worst→best: Standard → CPP → TOD → TOD+WHEV. Each column is the all-in bill (energy + riders + taxes + customer charge) computed directly from your 12-month GreenButton 15-min meter data (Aug 2025–Jul 2026), with your 3× battery simulated the same way as the Battery Economics tab — one engine. CPP/TOD/TOD+WHEV are billed with the battery covering the highest-rate load; Standard has no time-of-use so the battery adds ~nothing there. CPP critical-events excluded (battery-covered). Net kWh = meter import − export.">i</span>
     </p>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
@@ -167,8 +469,9 @@ input[type=range]{width:200px;accent-color:#1e40af}
         </tfoot>
       </table>
     </div>
-    <p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Standard is the do-nothing baseline (flat/tiered) — worst in every month, driven by summer tier-2 (10.9¢). On the meter data the <b>battery saves ≈ $396/yr on TOD+WHEV</b> (the gap between TOD+WHEV here and the same plan with no battery); that same figure appears in the Battery Economics tab. Non-summer TOD off-peak assumed 3.428¢ (per parsed-bill rate history); FPPCAC held at a representative −0.8¢/kWh (plan-neutral). Calendar months, so individual months differ slightly from your mid-month bills; annual totals reconcile to the meter.</p>
+    <p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Battery alone ≈ <b>$396/yr</b> of the gap. <span class="tip" tabindex="0" data-tip="Standard is the do-nothing baseline (flat/tiered) — worst in every month, driven by summer tier-2 (10.9¢). On the meter data the battery saves ≈ $396/yr on TOD+WHEV (the gap between TOD+WHEV here and the same plan with no battery); that same figure appears in the Battery Economics tab. Non-summer TOD off-peak assumed 3.428¢ (per parsed-bill rate history); FPPCAC held at a representative −0.8¢/kWh (plan-neutral). Calendar months, so individual months differ slightly from your mid-month bills; annual totals reconcile to the meter.">i</span></p>
   </div>
+  </details>
   <script>
   const MCMP_ROWS=[["Aug '25", 1282, 165, 139, 122, 82],["Sep '25", 995, 125, 110, 96, 57],["Oct '25", 647, 65, 50, 69, 34],["Nov '25", 434, 48, 38, 38, 8],["Dec '25", 645, 65, 50, 50, 14],["Jan '26", 609, 62, 48, 48, 13],["Feb '26", 334, 40, 32, 32, 8],["Mar '26", 384, 44, 35, 35, 8],["Apr '26", 545, 57, 44, 44, 9],["May '26", 929, 88, 65, 65, 22],["Jun '26", 1345, 174, 144, 126, 77],["Jul '26", 447, 55, 58, 51, 20]];
   const MCMP_YEAR={net:8596,std:988,cpp:813,tod:776,todw:352};
@@ -199,323 +502,21 @@ input[type=range]{width:200px;accent-color:#1e40af}
     }
   })();
   </script>
-
-  <!-- Summary cards -->
-  <div class="cards" id="cards"></div>
-
-  <!-- Tabs -->
-  <div class="tabs" id="tabs"></div>
-
-  <!-- Simulator controls (hidden unless sim tab active) -->
-  <div id="simSection" style="display:none">
-    <div class="sim-controls">
-      <div class="sim-row">
-        <span class="sim-label">CPP Events / Summer:</span>
-        <input type="range" id="cppSlider" min="0" max="20" value="10" oninput="updateSim()">
-        <span class="sim-val" id="cppVal">10</span>
-      </div>
-      <div class="sim-row">
-        <span class="sim-label">Est. kWh per CPP event:</span>
-        <input type="range" id="cppKwhSlider" min="2" max="15" value="7" oninput="updateSim()">
-        <span class="sim-val" id="cppKwhVal">7 kWh</span>
-      </div>
-      <div class="ev-row">
-        <div class="ev-toggle">
-          <input type="checkbox" id="evToggle" onchange="updateSim()">
-          <label for="evToggle"><b>Add EV Charging</b> (Model Y, 12k mi/yr, overnight)</label>
-        </div>
-        <span class="sim-label" style="min-width:auto">Monthly EV kWh:</span>
-        <input type="range" id="evSlider" min="100" max="500" value="286" step="10" oninput="updateSim()">
-        <span class="sim-val" id="evVal">286</span>
-      </div>
-      <div class="ev-row" id="r42Row" style="opacity:0.4;pointer-events:none">
-        <div class="ev-toggle">
-          <input type="checkbox" id="r42Toggle" onchange="updateSim()">
-          <label for="r42Toggle"><b>Add WHEV Rider</b> (Whole House EV — Rate No. 01 rider, confirmed from 14th Rev AN289 tariff) — <b>4.74¢/kWh</b> bill credit on <em>all</em> midnight–8AM kWh (EV + any overnight base load). <b style="color:#b91c1c">⚠ Requires switching to Standard Rate No. 01 — EPE ruled (Jun 2026) it CANNOT be combined with the CPP pilot.</b> So this toggle now models the <b>Standard + WHEV</b> alternative, not an add-on to CPP. Requires qualifying EV registered at service address.</label>
-        </div>
-      </div>
-      <p class="note" style="margin-top:10px"><b>All charges included:</b> Energy + Customer ($7) + FPPCAC (per-bill actual) + RPS + TEP + AMS (era-matched) + EUEF (~3.4–3.75%) + Franchise Fee (2.0%) + Taxes (8.4%). Verified against all 19 TOU bills — mean error $0.15/bill. <b>Plan history:</b> Standard (May–Aug 2024) → TOU Power Hours (Sep 2024–Oct 2025) → TOU+CPP (Nov 2025–present, plan switch). <b>Key rates:</b> TOU non-summer = $0.05816 always (same as Standard). CPP non-summer = $0.03428 always (CPP plan's 41% non-summer advantage). October is a shoulder month on TOU: on-peak $0.221 applies but off-peak = $0.058 (non-summer rate). CPP summer = Jun–Sep only. <b>WHEV rider</b> (AN289 tariff, $0.0474/kWh credit on midnight–8AM kWh): <b style="color:#b91c1c">per EPE's Jun 2026 ruling it attaches to Standard Rate No. 01 only and CANNOT be paired with the CPP pilot</b> — it is the Standard-plan alternative, not a CPP add-on. On Standard the credited overnight rate is 5.8¢→1.1¢/kWh. (The CPP-stacked figures shown in older scenarios, e.g. 3.4¢→0¢, are no longer attainable and are retained only for historical reference.)</p>
-    </div>
-
-    <!-- Sim summary cards -->
-    <div class="sim-cards" id="simCards"></div>
-  </div>
-
-  <!-- Chart -->
-  <div class="section">
-    <h3 id="chart-title"></h3>
-    <p class="note" id="chart-note"></p>
-    <div id="rateIncBanner" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:6px 12px;margin-bottom:8px;font-size:12px;font-weight:700;color:#92400e"></div>
-    <div class="chart-box"><canvas id="mainChart"></canvas></div>
-  </div>
-
-  <!-- Battery controls (hidden unless batt tab) -->
-  <div id="battSection" style="display:none">
-    <div class="sim-controls">
-      <div class="sim-row">
-        <span class="sim-label"><b>Number of batteries:</b></span>
-        <input type="range" id="battCountSlider" min="1" max="5" value="1" step="1" oninput="updateBatt()">
-        <span class="sim-val" id="battCountVal">1× (6.1 kWh · $3,543)</span>
-      </div>
-      <div class="sim-row">
-        <span class="sim-label">CPP events / summer:</span>
-        <input type="range" id="battCppSlider" min="0" max="20" value="10" oninput="updateBatt()">
-        <span class="sim-val" id="battCppVal">10</span>
-      </div>
-      <div class="sim-row" style="margin-top:4px">
-        <div class="ev-toggle">
-          <input type="checkbox" id="battR42Toggle" onchange="updateBatt()" checked>
-          <label for="battR42Toggle"><b>WHEV Rider</b> (Whole House EV, Rate No. 01 rider, AN289 tariff) — 4.74¢/kWh credit on all midnight–8AM kWh. <b style="color:#15803d">✓ CONFIRMED ACTIVE on TOD:</b> your Jul 2026 bill shows the credit (294 kWh × 4.74¢ = −$13.94) stacked on the TOD/Power Hours rate. This is the credit that drives the battery's year-round night-shift value; turning it off models the battery without WHEV.</label>
-        </div>
-      </div>
-      <div class="sim-row">
-        <span class="sim-label" style="color:#dc2626">25D tax credit: EXPIRED</span>
-        <span style="font-size:11px;color:#64748b">(Terminated by OBBB Act, July 2025. No federal battery credit for 2026+ installations.)</span>
-      </div>
-      <div style="border-top:1px solid #e2e8f0;margin:10px 0 6px;padding-top:10px">
-        <div style="font-size:12px;font-weight:700;color:#475569;margin-bottom:8px">Non-Arbitrage Value Adjustments (reduce effective cost)</div>
-        <div class="sim-row">
-          <span class="sim-label">Outage insurance value ($):</span>
-          <input type="range" id="outageSlider" min="0" max="5000" value="2000" step="100" oninput="updateBatt()">
-          <span class="sim-val" id="outageVal">$2,000</span>
-          <span style="font-size:11px;color:#64748b;margin-left:8px">Backup power value — 2 outages in 6 yrs, ~$2k loss each time</span>
-        </div>
-        <div class="sim-row">
-          <span class="sim-label">Capitalized home value ($):</span>
-          <input type="range" id="homeValSlider" min="0" max="5000" value="1500" step="100" oninput="updateBatt()">
-          <span class="sim-val" id="homeValVal">$1,500</span>
-          <span style="font-size:11px;color:#64748b;margin-left:8px">Estimated value added to home sale price from battery installation</span>
-        </div>
-      </div>
-      <p class="note" style="margin-top:8px">Anker SOLIX: 6.1 kWh per battery, LiFePO4, ~90% round-trip, ~2%/yr degradation, 15yr life. <b>TOD+WHEV value (your plan) is now derived from your 12-month GreenButton 15-min meter data</b> — a day-by-day simulation of the battery charging overnight (midnight–8AM) and covering the highest-rate daytime import first. It has two parts: <b>(1) summer on-peak shift</b> — displace 22.1¢ on-peak kWh with overnight-charged energy; and <b>(2) year-round WHEV night-shift</b> — every daytime kWh moved to overnight charging earns the 4.74¢/kWh WHEV credit. The night-shift is the larger piece and is why the old summer-on-peak-only figure was far too low. Without WHEV the night-shift is ~$0 (off-peak day ≈ off-peak night), so the value falls back to on-peak arbitrage only. Federal 25D battery credit expired (OBBB Act, Jul 2025) — full cost. The <b>CPP</b> line is kept only as a "what if you'd stayed on CPP with events" comparison (a one-way door you've left). <b>Adjusted payback</b> subtracts the non-arbitrage (backup + home-value) sliders from cost.</p>
-    </div>
-    <div class="sim-cards" id="battCards"></div>
-  </div>
-
-  <!-- Live Usage & Battery (hidden unless live tab) -->
-  <div id="liveSection" style="display:none">
-    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">⚡ Anker SOLIX — measured operation (Jun 9 – Nov 3 2026)</div>
-      Actual metered data exported from the Anker app. The batteries began <b>active daily arbitrage on July 29, 2026</b>
-      (SOC cycling 20%→100% daily). Before that: solar/load monitoring only (Jun 9–18), a brief commissioning test
-      (Jun 19–21), then grid-tied with the battery idle (Jun 22–Jul 28). The chart below stacks how each day's home load
-      was served; the second chart shows the average hourly dispatch during the first week of battery operation. Data through Jul 31 is 10-min telemetry (with SOC); Aug 1 onward is the app's daily-summary export (no SOC, so the SOC line stops at Jul 31).
-    </div>
-    <div class="sim-cards" id="liveCards"></div>
-    <div style="margin-top:10px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average day — battery-active week (Jul 30–Aug 3)</div>
-      <p class="note" style="margin-top:2px;margin-bottom:6px">Average power by hour (W). The battery <b>charges overnight (midnight–3AM, the WHEV credit window) and from midday solar</b>, then <b>discharges hard 3–7PM</b> — collapsing grid import to near zero during the TOD on-peak window. This is the arbitrage the whole plan is built around, now visible in real data.</p>
-      <div class="chart-box" style="height:300px"><canvas id="liveProfChart"></canvas></div>
-    </div>
-    <p class="note" style="margin-top:10px"><b>Reading it:</b> throughput has been remarkably steady: <b>~15 kWh/day charged and discharged in every month</b> (Aug 15.2/14.9, Sep 15.1/14.6, Oct 15.9/15.2), about 80% of the 18.4 kWh bank daily, while home load fell from ~72 kWh/day (Aug) to ~35 (Oct) as the weather cooled. The battery's job is <em>shifting</em> on-peak kWh into the WHEV-credited overnight window, not powering the whole house, so a low solar+battery share of load is expected. The daily-summary export implies ~96–97% round-trip efficiency, above what LFP systems achieve once inverter losses are counted, so the models keep the conservative <b>90%</b> assumption.</p>
-  </div>
-
-  <!-- GreenButton meter data (hidden unless gb tab) -->
-  <div id="gbSection" style="display:none">
-    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">📊 EPE AMI meter — 15-minute interval data (GreenButton exports, Aug 4 2025 – Nov 3 2026)</div>
-      This is the <b>utility billing meter itself</b> at 15-minute resolution: separate IMPORT / EXPORT channels plus the solar-production (REC) meter. It's the authoritative measurement — more reliable than the Emporia CT export (which ran ~20% high) — and Aug 2025–Jul 2026 is the <b>pre-battery baseline</b> (the battery went live Jul 29 2026). The measured summer on-peak share (~14–20% of import) confirms the estimate the plan analysis was built on, and the July 2026 measured share (13.6%) matches that bill's billed split (13.9%) almost exactly.
-    </div>
-    <div class="sim-cards" id="gbCards"></div>
-    <div style="margin-top:10px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average weekday grid load-shape — the meter's own view</div>
-      <p class="note" style="margin-top:2px;margin-bottom:6px">Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison. <b>Purple vs dashed black = the battery's effect</b>, same weeks a year apart (Sep 16–Oct 31): grid import moves to the midnight–2 AM charging window and 3–7 PM import drops to <b>0.84 kWh/day vs 5.39</b> (on-peak pricing applies only through Sep 30).</p>
-      <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
-    </div>
-    <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month pre-battery meter totals (Aug 2025–Jul 2026): import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
-  </div>
-
-  <!-- ═══ Weather-normalized load (hidden unless wx tab) ═══ -->
-  <div id="wxSection" style="display:none">
-    <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#78350f">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#92400e">🌡️ Did the battery raise our consumption? Mostly no — it got hotter.</div>
-      September 2026 metered the highest home load in the record (71.9 kWh/day over Aug 5 – Sep 11, vs 60.4 the year before, <b>+19%</b>), which looked alarming next to a battery that had just gone in. Joining <b>daily temperatures</b> (ASOS station LRU, Las Cruces Intl) to daily meter data settles it: cooling degree days rose <b>+23%</b> over the same window, and at the house's measured sensitivity of <b>2.07 kWh per CDD</b> that alone accounts for <b>+7.0 of the +11.5 kWh/day</b>. The remaining <b>+4.5</b> is the battery's own overhead — round-trip loss plus standby — and shows up as a <em>parallel shift</em> in the fit, not a steeper slope.
-    </div>
-
-    <div class="sim-cards">
-      <div class="sim-card"><div class="plan-name">Hotter weather</div><div class="plan-total" style="color:#f59e0b">+7.0</div><div class="plan-detail">kWh/day · <b>61%</b> of the rise<br>+3.40 CDD/day × 2.07</div></div>
-      <div class="sim-card"><div class="plan-name">Battery overhead</div><div class="plan-total" style="color:#3b82f6">+4.5</div><div class="plan-detail">kWh/day · <b>39%</b><br>round-trip loss + standby</div></div>
-      <div class="sim-card"><div class="plan-name">Behavior change</div><div class="plan-total" style="color:#15803d">~0</div><div class="plan-detail">no detectable effect from<br>dropping the afternoon setback</div></div>
-    </div>
-
-    <p style="margin-top:6px;margin-bottom:0;font-size:12px;line-height:1.6;color:#475569"><b style="color:#0f172a">Why the thermostat theory doesn’t hold.</b> The household used to raise the thermostat during the 3–7 PM peak and stopped once the battery was in. If that were driving the increase, the <em>slope</em> would steepen — more cooling per degree of heat. It didn’t (2.07 → 1.95, indistinguishable at n=38); only the intercept moved (30.4 → 37.0), which is the signature of a constant always-on addition. Independent check: <b>Jun 15–24 2026</b> — pre-battery, occupied, CDD 18.0 — ran <b>71.2 kWh/day</b> against <b>71.9</b> post-battery at CDD 17.9. Same house, same heat, opposite sides of the install, 0.65 kWh/day apart. The setback was a <em>load-shifting</em> tactic, not a load-<em>reduction</em> one — deferred cooling returns as evening recovery, so daily energy barely moves. What it bought was keeping kWh out of the on-peak window, which is exactly the job the battery took over.</p>
-
-    <div style="margin-top:16px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">The decomposition, day by day</div>
-      <table style="margin-top:8px">
-        <thead><tr>
-          <th style="text-align:left">Aug 5 – Sep 11 window</th><th>Avg daily max</th><th>Avg daily min</th><th>CDD/day</th><th>Home load</th><th>Fit</th><th>R²</th><th>RMSE</th>
-        </tr></thead>
-        <tbody>
-          <tr><td style="text-align:left"><b style="color:#3b82f6">●</b> 2025 — pre-battery</td><td>92.0°F</td><td>67.0°F</td><td>14.49</td><td>60.4 kWh/d</td><td>30.42 + <b>2.07</b>·CDD</td><td>0.52</td><td>7.5</td></tr>
-          <tr><td style="text-align:left"><b style="color:#f59e0b">●</b> 2026 — post-battery</td><td>97.1°F</td><td>68.7°F</td><td>17.89</td><td>71.9 kWh/d</td><td>36.97 + <b>1.95</b>·CDD</td><td>0.44</td><td>5.8</td></tr>
-          <tr class="summer"><td style="text-align:left"><b>2025 model evaluated at 2026’s weather</b></td><td>—</td><td>—</td><td>17.89</td><td><b>67.4 kWh/d</b></td><td colspan="3" style="text-align:left">→ actual 71.9, so <b>+4.5 unexplained by weather</b></td></tr>
-        </tbody>
-      </table>
-      <p class="note" style="margin-top:8px">CDD = max(0, (T<sub>max</sub>+T<sub>min</sub>)/2 − 65°F). Home load = meter import + solar production − export, so post-install it also absorbs battery round-trip losses. Daily temperatures from the Iowa Environmental Mesonet ASOS archive, station LRU. n=38 days each window.</p>
-      <p class="note" style="margin-top:6px"><b>Excluded:</b> Jun 25 – Jul 27 2026 — the annual summer travel month, 24.6 kWh/day at CDD 17.8 versus ~71 when occupied. Pooling those 33 days with occupied days collapses the CDD fit to R² = 0.00 and makes the whole comparison meaningless.</p>
-    </div>
-  </div>
-
-  <!-- Choice Ladder (hidden unless ladder tab) -->
-  <div id="decisionSection" style="display:none">
-    <!-- ═══ EX-POST: what actually happened (from the meter) ═══ -->
-    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#166534">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#15803d">🪜 Part 1 — What each choice actually saved (ex-post, from your 12-month meter)</div>
-      The chart above stacks the four counterfactuals; the cards below are the annual decomposition. Read it two ways. <b>Marginally</b> (each step on top of the last): switching to TOD saved only <b>$88/yr</b> alone — it barely beats Standard without help, which is exactly why the battery mattered — then WHEV added <b>$152/yr</b>, and the <b>battery is the biggest single lever at ~$396/yr</b>. <b>As a whole</b> (the way you first framed it — TOD only made sense <em>because</em> the battery was on the table): Standard vs the full stack is <b>$636/yr</b>. The battery's $396 is its value <em>given</em> you're already on TOD+WHEV — the clean "what if I'd skipped the battery" number.
-    </div>
-    <div class="sim-cards" id="ladderCards"></div>
-
-    <!-- ═══ EX-ANTE: would this pay off? (planning model, generalizable) ═══ -->
-    <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px 16px;margin:18px 0 12px;font-size:12px;color:#1e40af">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#1d4ed8">🧭 Part 2 — Would this stack pay off? (ex-ante planning model — try your own numbers)</div>
-      This is the decision your earlier self faced, as a model any homeowner can drive. Sliders start at your situation; change them to see how the ladder and the battery's payback move. The order that matters: the <b>rate switch</b> is cheap and reversible, the <b>overnight credit</b> is the multiplier (and the most revocable), and the <b>battery</b> is the big irreversible bet whose payback lives or dies on that credit — so verify the first two before committing capital.
-    </div>
-    <div class="sim-controls">
-      <div class="sim-row"><span class="sim-label">Annual usage (net kWh/yr):</span>
-        <input type="range" id="dUsage" min="2000" max="20000" value="8600" step="200" oninput="updateDecision()">
-        <span class="sim-val" id="dUsageV">8,600</span></div>
-      <div class="sim-row"><span class="sim-label">On-peak share of usage:</span>
-        <input type="range" id="dOnpk" min="0" max="40" value="10" step="1" oninput="updateDecision()">
-        <span class="sim-val" id="dOnpkV">10%</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">% of use in the summer 3–7PM window — low favours TOU/TOD</span></div>
-      <div class="sim-row"><span class="sim-label">Overnight credit (WHEV):</span>
-        <input type="range" id="dWhev" min="0" max="8" value="4.7" step="0.1" oninput="updateDecision()">
-        <span class="sim-val" id="dWhevV">4.7¢</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">¢/kWh credit on midnight–8AM draw. <b>0 = none</b> — the biggest lever on battery value</span></div>
-      <div class="sim-row"><span class="sim-label">On-peak rate:</span>
-        <input type="range" id="dOnRate" min="8" max="35" value="22" step="0.5" oninput="updateDecision()">
-        <span class="sim-val" id="dOnRateV">22.0¢</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">summer on-peak ¢/kWh — bigger spread = more battery arbitrage</span></div>
-      <div class="sim-row"><span class="sim-label">Battery usable capacity:</span>
-        <input type="range" id="dBatt" min="0" max="30" value="15" step="1" oninput="updateDecision()">
-        <span class="sim-val" id="dBattV">15 kWh</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px"><b>0 = no battery</b></span></div>
-      <div class="sim-row"><span class="sim-label">Battery cost ($):</span>
-        <input type="range" id="dCost" min="0" max="16000" value="6840" step="100" oninput="updateDecision()">
-        <span class="sim-val" id="dCostV">$6,840</span></div>
-      <div class="sim-row"><span class="sim-label">Backup / resilience value ($):</span>
-        <input type="range" id="dOutage" min="0" max="6000" value="2000" step="100" oninput="updateDecision()">
-        <span class="sim-val" id="dOutageV">$2,000</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">one-time value of outage protection + home resale, subtracted from cost</span></div>
-    </div>
-    <div id="decVerdict" style="border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;font-weight:600"></div>
-    <div class="chart-box" style="height:270px"><canvas id="decChart"></canvas></div>
-    <div class="sim-cards" id="decCards" style="margin-top:14px"></div>
-    <p class="note" style="margin-top:8px"><b>Planning model, not a bill.</b> An annual approximation calibrated so the defaults reproduce your meter-derived ladder (Standard ≈ $988 → TOD $900 → TOD+WHEV $748 → +Battery $352); your exact ex-post figures are Part 1 above. Held constant behind the sliders (EPE-style, editable in code): off-peak 5.53¢, non-summer 3.43¢, Standard tier-1/2 7.04/10.88¢, ~47% of use in summer, ~32% overnight, 90% round-trip, 15-yr battery life. Federal battery credit expired (OBBB Act, 2025). <b>Regulatory watch:</b> the overnight-credit slider is the fragile one — set it to 0 to see the battery's payback if the rider is ever revoked.</p>
-  </div>
-
-  <!-- Counterfactual "vs regular rate" (hidden unless cf tab) -->
-  <div id="cfSection" style="display:none">
-    <div class="sim-controls" style="margin-bottom:12px">
-      <div class="sim-row" style="align-items:center">
-        <span class="sim-label"><b>Compare against:</b></span>
-        <span id="cfBaselineBtns">
-          <button type="button" class="on" onclick="setCfBaseline('std')">Standard Rate No. 01</button>
-          <button type="button" class="off" onclick="setCfBaseline('cpp')">CPP (prior plan)</button>
-          <button type="button" class="off" onclick="setCfBaseline('tou')">TOD / Power Hours</button>
-        </span>
-      </div>
-      <p class="note" style="margin-top:8px">"What would the same usage have cost on the <b>regular rate</b>?" Each bill's actual net kWh is repriced on the chosen plan, all-in, with that month's real riders/taxes. The running total is cumulative; running savings = the gap. <b>Standard</b> = the do-nothing baseline (the return on the whole TOU/CPP/TOD+battery strategy). <b>CPP</b> = your prior plan (closest to the marginal "return on switching to TOD, which the battery enables"). Note this is a <em>joint</em> plan+battery return — the two weren't separate choices.</p>
-    </div>
-    <div class="sim-cards" id="cfCards"></div>
-  </div>
-
-  <!-- Counterfactual detail table -->
-  <div class="section" id="cfTableSection" style="display:none">
-    <h3 style="margin-bottom:4px">Per-bill detail — actual vs. counterfactual, with running totals</h3>
-    <p class="note" style="margin-bottom:10px">⚡ = TOD/WHEV + battery era (from Jul 2026). Battery went live Jul 29 2026 — Aug 2026 is the first bill with battery operation (about half the period); Sep and Oct 2026 are full battery months. The Jul 2026 bill's period ended Jul 15, so it shows the TOD-plan switch but no battery operation yet.</p>
-    <div style="overflow-x:auto"><table class="sim-table" id="cfTable"></table></div>
-  </div>
-
-  <!-- Solar Savings controls (hidden unless solar tab) -->
-  <div id="solarSection" style="display:none">
-    <div class="sim-controls">
-      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">4.6 kW Solar Array — Installed Dec 2019, energized mid-2020 · Net Metering (full retail credit)</div>
-      <div class="sim-row">
-        <span class="sim-label">System cost (before ITC, $):</span>
-        <input type="range" id="solarCostSlider" min="0" max="30000" value="5000" step="500" oninput="updateSolar()">
-        <span class="sim-val" id="solarCostVal">$5,000</span>
-      </div>
-      <div class="sim-row">
-        <div class="ev-toggle">
-          <input type="checkbox" id="solarItcToggle" onchange="updateSolar()" checked>
-          <label for="solarItcToggle"><b>30% Federal ITC applied</b> (installed Dec 2019 — full 30% rate, credited on 2019 return). Reduces net system cost.</label>
-        </div>
-        <span style="font-size:12px;font-weight:700;color:#0f172a;margin-left:12px">Net cost: <span id="solarNetCost">$3,500</span></span>
-      </div>
-      <p class="note" style="margin-top:8px">Monthly savings = estimated bill <em>without</em> solar (using actual home consumption kWh on the plan you were on) minus actual bill paid. Net metering is full retail in NM — solar export earns the same rate as import. Data available May 2024 – present (~27 months). Pre-2024 savings estimated from annual run rate. Payback line shows when cumulative savings crosses system net cost.</p>
-    </div>
-    <div class="sim-cards" id="solarCards"></div>
-
-    <!-- Solar production trend note -->
-    <div style="background:#f0f9ff;border:1px solid #7dd3fc;border-radius:8px;padding:14px 16px;margin-top:4px;margin-bottom:4px;font-size:12px;color:#0c4a6e">
-      <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#0369a1">📊 Solar Production Trend — 2024 vs 2025 Analysis (Apr 2026)</div>
-      <div style="margin-bottom:6px"><b>Observation:</b> Summer solar generation fell ~22% year-over-year (May−Oct), while winter/spring months are essentially flat (+4%). The biggest drops were May (−32%), Jun (−27%), Jul (−25%), narrowing to Sep (−8%) and Nov (+5%).</div>
-      <div style="margin-bottom:6px"><b>Root cause — 2024 was anomalously high, not 2025 low:</b> May 2024 recorded 924 kWh, which is 103% of the theoretical maximum for a 4.6 kW system at Las Cruces peak sun hours. New Mexico was in a significant drought in 2024 with well below-normal cloud cover. 2025 summer production (~70% of theoretical max) reflects more typical conditions.</div>
-      <div style="margin-bottom:6px"><b>Why not dirty panels:</b> Soiling in desert environments typically causes 5–7% uniform losses across all months. The seasonal concentration of losses here (32% in summer, near-zero in winter) is inconsistent with soiling or panel degradation, which would affect all months proportionally. The system's strong March 2026 performance (+16% vs prior year) further confirms normal operation.</div>
-      <div><b>Recommendation:</b> Annual spring wash (April) is good practice in a dusty desert environment but will not recover the summer gap — that's weather variability. If summer 2026 production tracks 2024 levels, that would further confirm 2025 was the outlier. Monitor inverter logs for fault/clipping events if the trend continues.</div>
-      <div style="margin-top:8px;padding-top:8px;border-top:1px solid #bae6fd;color:#0c4a6e"><b>System notes:</b> Panels installed December 2019 (30% federal ITC, credited on 2019 return); energized mid-2020 after permitting. Installation was bundled with a new AC system — incremental solar cost was roughly ~$10k out of pocket after credits and other incentives, making standalone payback analysis somewhat notional.</div>
-    </div>
-  </div>
-
-  <!-- Projection controls (hidden unless proj tab) -->
-  <div id="projSection" style="display:none">
-    <div class="sim-controls">
-      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">2026–2027 Forward Projection — Current CPP Plan + Optional EV</div>
-      <div class="ev-row">
-        <div class="ev-toggle">
-          <input type="checkbox" id="projEvToggle" onchange="updateProj()">
-          <label for="projEvToggle"><b>Add Tesla Model Y EV</b> (charged overnight, midnight–8AM window)</label>
-        </div>
-        <span class="sim-label" style="min-width:auto">Monthly EV kWh:</span>
-        <input type="range" id="projEvSlider" min="50" max="500" value="286" step="10" oninput="updateProj()">
-        <span class="sim-val" id="projEvVal">286</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">kWh/mo (~12k mi/yr @ 3.5 mi/kWh × 1.15 AC loss)</span>
-      </div>
-      <div class="ev-row" id="projWhevRow" style="opacity:0.4;pointer-events:none">
-        <div class="ev-toggle">
-          <input type="checkbox" id="projWhevToggle" onchange="updateProj()">
-          <label for="projWhevToggle"><b>WHEV Rider</b> — 4.74¢/kWh credit on ALL midnight–8AM kWh (EV + base load). <b style="color:#15803d">✓ Active on your TOD plan since Jul 2026</b> (this projection panel models the older CPP baseline; the TOD+WHEV case is the live tabs above).</label>
-        </div>
-      </div>
-      <div class="sim-row">
-        <span class="sim-label">CPP events / summer:</span>
-        <input type="range" id="projCppSlider" min="0" max="20" value="10" oninput="updateProj()">
-        <span class="sim-val" id="projCppVal">10</span>
-      </div>
-      <p class="note" style="margin-top:8px">Projects Apr 2026 – Mar 2027 using prior-year same-month net kWh as baseline (from Emporia Vue data for on-peak ratios). EV kWh added as overnight load — shifts into WHEV credit window. Overnight hours (midnight–8AM) include base load (Emporia actual) plus EV. All-in cost uses CURRENT_RIDERS (no historical FPPCAC — uses 2026 forward estimate). Rate case increase not included here.</p>
-    </div>
-    <div class="sim-cards" id="projCards"></div>
-  </div>
-
-  <!-- Projection detail table -->
-  <div class="section" id="projTableSection" style="display:none">
-    <h3 style="margin-bottom:12px">Monthly Projection — Apr 2026 to Mar 2027</h3>
-    <div style="overflow-x:auto">
-      <table class="sim-table" id="projTable"></table>
-    </div>
-  </div>
-
-  <!-- Sim detail table (hidden unless sim tab) -->
-  <div class="section" id="simTableSection" style="display:none">
-    <h3 style="margin-bottom:12px">Monthly Cost Breakdown by Plan</h3>
-    <div style="overflow-x:auto">
-      <table class="sim-table" id="simTable"></table>
-    </div>
-  </div>
-
+  <details class="fold">
+  <summary>📆 Calendar-year totals</summary>
+  <div class="cards" id="cards" style="margin-bottom:0"></div>
+  </details>
   <!-- Bill data table -->
-  <div class="section">
-    <h3 style="margin-bottom:12px">All Bills</h3>
+  <details class="fold">
+  <summary>🧾 All bills</summary>
     <div style="overflow-x:auto">
       <table id="billTable"></table>
     </div>
-  </div>
+  </details>
 
   <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:11px;color:#78350f">
     <div style="font-weight:800;font-size:12px;margin-bottom:8px">⚠️ Pending EPE Rate Case — NMPRC Docket (filed Mar 27, 2026)</div>
-    <div style="margin-bottom:10px">EPE seeking ~$70M additional NM base revenue. Average residential impact: <b>~$30/month</b>. Decision expected end of 2026. Current simulator uses approved 14th Revised Rate No. 01 tariff. A higher base rate widens TOU/CPP advantage over Standard and improves battery arbitrage spreads.</div>
+    <div style="margin-bottom:10px">~$30/mo residential impact; decision expected end of 2026. <span class="tip" tabindex="0" data-tip="EPE seeking ~$70M additional NM base revenue. Average residential impact: ~$30/month. Decision expected end of 2026. Current simulator uses approved 14th Revised Rate No. 01 tariff. A higher base rate widens TOU/CPP advantage over Standard and improves battery arbitrage spreads.">i</span></div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <span style="font-weight:700">What-if rate increase:</span>
       <input type="range" id="rateIncSlider" min="0" max="40" value="0" step="1" oninput="updateRateInc()" style="width:160px;accent-color:#d97706">
@@ -523,14 +524,45 @@ input[type=range]{width:200px;accent-color:#1e40af}
       <span id="rateIncImpact" style="color:#92400e;font-style:italic"></span>
     </div>
   </div>
-  <p class="footer">Data: El Paso Electric bills parsed from PDF · Solar &amp; grid meters · Apr 2026<br>
-  Simulator: All-in costs include Energy + Customer + FPPCAC + RPS + TEP + AMS + EUEF + Franchise Fee + Taxes · Rider rates era-matched to each bill period · FPPCAC extracted per-bill from PDFs<br>
-  Updated Apr 2026: isSummer corrected (TOU/Standard Jun–Oct, CPP Jun–Sep) · Plan history corrected (Nov 2025 rate drop = plan switch TOU→CPP, not tariff revision) · WHEV rider confirmed as Rate No. 01 rider ($0.0474/kWh, AN289) · CPP event model updated (full battery utilization on high-demand event days) · Battery non-arbitrage value adjustments added · Rate case what-if tracker added · Emporia Vue hourly data integrated (actual on-peak ratios replace estimates) · 2026 forward projection tab added with EV + WHEV scenario modeling</p>
+  <p class="footer">Data: EPE bills, EPE 15-min meter, Anker app · updated Nov 2026 <span class="tip" tabindex="0" data-tip="Data: El Paso Electric bills parsed from PDF · Solar &amp; grid meters · Apr 2026 Simulator: All-in costs include Energy + Customer + FPPCAC + RPS + TEP + AMS + EUEF + Franchise Fee + Taxes · Rider rates era-matched to each bill period · FPPCAC extracted per-bill from PDFs Updated Apr 2026: isSummer corrected (TOU/Standard Jun–Oct, CPP Jun–Sep) · Plan history corrected (Nov 2025 rate drop = plan switch TOU→CPP, not tariff revision) · WHEV rider confirmed as Rate No. 01 rider ($0.0474/kWh, AN289) · CPP event model updated (full battery utilization on high-demand event days) · Battery non-arbitrage value adjustments added · Rate case what-if tracker added · Emporia Vue hourly data integrated (actual on-peak ratios replace estimates) · 2026 forward projection tab added with EV + WHEV scenario modeling">i</span></p>
 </div>
 
 <script>
+// ── Tooltips: one floating box, positioned to stay on screen ──
+(function(){
+  const box = document.getElementById('tipBox');
+  function show(el){ box.textContent = el.dataset.tip; box.style.display = 'block';
+    const r = el.getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
+    let x = Math.min(Math.max(8, r.left + r.width/2 - w/2), innerWidth - w - 8);
+    let y = r.bottom + 6; if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 6);
+    box.style.left = x + 'px'; box.style.top = y + 'px'; }
+  function hide(){ box.style.display = 'none'; }
+  document.addEventListener('mouseover', e => { const t = e.target.closest('.tip'); t ? show(t) : hide(); });
+  document.addEventListener('focusin', e => { const t = e.target.closest('.tip'); if (t) show(t); });
+  document.addEventListener('focusout', hide);
+  addEventListener('scroll', hide, {passive:true});
+})();
+function tipHTML(detail){ const d = document.createElement('span'); d.className = 'tip'; d.tabIndex = 0; d.dataset.tip = detail; d.textContent = 'i'; return d.outerHTML; }
+function setNote(el, short, detail){ el.textContent = short; if (detail) el.insertAdjacentHTML('beforeend', tipHTML(detail)); }
 // Register datalabels plugin but default to off — enable only per-dataset
 Chart.register(ChartDataLabels);
+// Event markers & shaded hour bands: options.plugins.eventLines = {lines:[{i,text}], bands:[{from,to,color}]}
+Chart.register({ id:'eventLines',
+  beforeDatasetsDraw(c){ const o=c.options.plugins.eventLines; if(!o||!o.bands) return;
+    const x=c.scales.x, a=c.chartArea, g=c.ctx; g.save();
+    o.bands.forEach(b=>{ const x0=x.getPixelForValue(b.from), x1=x.getPixelForValue(b.to); g.fillStyle=b.color; g.fillRect(x0,a.top,x1-x0,a.bottom-a.top); });
+    g.restore(); },
+  afterDatasetsDraw(c){ const o=c.options.plugins.eventLines; if(!o||!o.lines) return;
+    const x=c.scales.x, a=c.chartArea, g=c.ctx; g.save(); g.setLineDash([4,3]); g.strokeStyle='#64748b'; g.fillStyle='#334155';
+    g.font='600 10px -apple-system,"Segoe UI",sans-serif';
+    o.lines.forEach((l,k)=>{ if(l.i==null||l.i<0) return; const px=x.getPixelForValue(l.i);
+      g.beginPath(); g.moveTo(px,a.top); g.lineTo(px,a.bottom); g.stroke(); g.fillText(l.text, px+4, a.top+11+k*12); });
+    g.restore(); }
+});
+function addEvents(ch, lines, bands){ ch.options.plugins.eventLines = {lines, bands}; ch.update('none'); }
+const HOUR_BANDS = [{from:-0.5, to:7.5, color:'rgba(99,102,241,.08)'}, {from:14.5, to:18.5, color:'rgba(220,38,38,.09)'}];
+function billEvents(){ const at = l => LABELS.indexOf(l);
+  return [{i:at("Jul'26")-0.5, text:'TOD + WHEV'}, {i:at("Aug'26"), text:'Battery 7/29'}, {i:at("Oct'26"), text:'3 PM fix 9/16'}]; }
 Chart.defaults.set('plugins.datalabels', { display: false });
 
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -561,10 +593,10 @@ const BILLS = [
   {d:"2026-04-15",s:"03/16",e:"04/15/2026",del:651, rcvd:174,net:477,  sol:485, home:962,  opk:null,fpk:477,  bill:42.50,sum:false},  // TOD off-peak 3.428¢
   {d:"2026-05-14",s:"04/15",e:"05/14/2026",del:914, rcvd:192,net:722,  sol:531, home:1253, opk:null,fpk:722,  bill:41.90,sum:false},  // TOD off-peak 3.428¢
   {d:"2026-06-15",s:"05/14",e:"06/15/2026",del:1522,rcvd:160,net:1362, sol:641, home:2003, opk:144, fpk:1219, bill:144.28,sum:true },  // still CPP: on-peak 13.689¢, off-peak 6.845¢
-  {d:"2026-07-15",s:"06/15",e:"07/15/2026",del:831, rcvd:193,net:638,  sol:571, home:1209, opk:89,  fpk:549,  bill:58.28,sum:true },  // switched to TOD+WHEV: on-peak 22.108¢, off-peak 5.527¢, WHEV credit 294 kWh @ 4.74¢
-  {d:"2026-08-13",s:"07/15",e:"08/13/2026",del:1112,rcvd:138,net:974,  sol:535, home:1509, opk:55,  fpk:918,  bill:78.60,sum:true },
-  {d:"2026-09-14",s:"08/13",e:"09/14/2026",del:1812,rcvd:51, net:1761, sol:536, home:2297, opk:77,  fpk:1684, bill:131.20,sum:true },  // FIRST FULL battery month on TOD+WHEV. On-peak 4.4% of energy (vs 20.1% same window 2025); WHEV credit 880 kWh = -$41.71. Record volume = hot weather + EV (see Weather-Normalized tab). Post-7/29 `home` (del+sol-rcvd) also absorbs battery round-trip losses.
-  {d:"2026-10-14",s:"09/14",e:"10/14/2026",del:981, rcvd:66, net:915,  sol:396, home:1311, opk:10,  fpk:905,  bill:65.48, sum:true },  // first bill with the 3 PM discharge start (changed 9/16): on-peak 10 kWh (vs 61 in Oct 2025). WHEV credit 681 kWh = -$32.28. Oct off-peak billed at non-summer $0.05816. All-in 7.16c/kWh (record low).
+  {d:"2026-07-15",s:"06/15",e:"07/15/2026",del:831, rcvd:193,net:638,  sol:571, home:1209, opk:89,  fpk:549,  bill:58.28,whev:294, sum:true },  // switched to TOD+WHEV: on-peak 22.108¢, off-peak 5.527¢, WHEV credit 294 kWh @ 4.74¢
+  {d:"2026-08-13",s:"07/15",e:"08/13/2026",del:1112,rcvd:138,net:974,  sol:535, home:1509, opk:55,  fpk:918,  bill:78.60,whev:456, sum:true },
+  {d:"2026-09-14",s:"08/13",e:"09/14/2026",del:1812,rcvd:51, net:1761, sol:536, home:2297, opk:77,  fpk:1684, bill:131.20,whev:880, sum:true },  // FIRST FULL battery month on TOD+WHEV. On-peak 4.4% of energy (vs 20.1% same window 2025); WHEV credit 880 kWh = -$41.71. Record volume = hot weather + EV (see Weather-Normalized tab). Post-7/29 `home` (del+sol-rcvd) also absorbs battery round-trip losses.
+  {d:"2026-10-14",s:"09/14",e:"10/14/2026",del:981, rcvd:66, net:915,  sol:396, home:1311, opk:10,  fpk:905,  bill:65.48, whev:681, sum:true },  // first bill with the 3 PM discharge start (changed 9/16): on-peak 10 kWh (vs 61 in Oct 2025). WHEV credit 681 kWh = -$32.28. Oct off-peak billed at non-summer $0.05816. All-in 7.16c/kWh (record low).
 ];
 
 const MN=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1362,24 +1394,25 @@ let liveChart = null;
 function destroyChart(){ if(chart){ chart.destroy(); chart=null; } if(liveChart){ liveChart.destroy(); liveChart=null; } if(decChart){ decChart.destroy(); decChart=null; } }
 
 const VIEWS = [
-  {key:'chrono',  label:'Chronological'},
-  {key:'yoy',     label:'Month YoY'},
-  {key:'tou',     label:'TOU On/Off-Peak'},
-  {key:'solar',   label:'Solar Savings'},
-  {key:'sim',     label:'Rate Plan Simulator'},
-  {key:'proj',    label:'2026 Projection'},
-  {key:'live',    label:'⚡ Usage & Battery (Live)'},
-  {key:'gb',      label:'📊 Meter Data (15-min)'},
-  {key:'wx',      label:'🌡️ Weather-Normalized'},
+  {key:'cf',      label:'💵 Savings vs Standard'},
+  {key:'chrono',  label:'Monthly bills'},
+  {key:'live',    label:'🔋 Battery'},
+  {key:'gb',      label:'📊 Meter (15-min)'},
   {key:'decision',label:'🧭 Decision'},
+  {key:'yoy',     label:'Month YoY',            arch:true},
+  {key:'tou',     label:'On/Off-peak',          arch:true},
+  {key:'wx',      label:'Weather',              arch:true},
+  {key:'solar',   label:'Solar payback',        arch:true},
+  {key:'sim',     label:'Simulator (CPP era)',  arch:true},
+  {key:'proj',    label:'Projection (CPP era)', arch:true},
 ];
-let activeView = 'chrono';
+let activeView = 'cf';
 
 function renderTabs(){
   const el = document.getElementById('tabs');
-  el.innerHTML = VIEWS.map(v =>
-    `<button class="${v.key===activeView?'on':'off'}" onclick="setView('${v.key}')">${v.label}</button>`
-  ).join('');
+  const btn = v => `<button class="${v.key===activeView?'on':'off'}${v.arch?' arch':''}" onclick="setView('${v.key}')">${v.label}</button>`;
+  el.innerHTML = VIEWS.filter(v=>!v.arch).map(btn).join('') +
+    '<span class="tab-sep">Archive</span>' + VIEWS.filter(v=>v.arch).map(btn).join('');
 }
 
 function setView(v){
@@ -1395,6 +1428,8 @@ function setView(v){
   document.getElementById('gbSection').style.display = v==='gb' ? 'block' : 'none';
   document.getElementById('wxSection').style.display = v==='wx' ? 'block' : 'none';
   document.getElementById('decisionSection').style.display = v==='decision' ? 'block' : 'none';
+  document.getElementById('cfSection').style.display = v==='cf' ? 'block' : 'none';
+  document.getElementById('cfTableSection').style.display = v==='cf' ? 'block' : 'none';
   renderChart();
 }
 window.setView = setView;
@@ -1421,7 +1456,7 @@ function renderChart(){
 
   if(activeView==='chrono'){
     title.textContent = 'Total Home Consumption = Solar Generated + Net Grid Draw';
-    note.textContent  = 'Stacked bars: yellow = total solar generated, blue = net grid draw (green = net export month). Bar height = actual total home consumption that month. Red line = bill $ (right axis).';
+    setNote(note, 'Bar height = home use (yellow solar + blue grid). Red line = bill.', 'Stacked bars: yellow = total solar generated, blue = net grid draw (green = net export month). Bar height = actual total home consumption that month. Red line = bill $ (right axis).');
     chart = new Chart(ctx, {
       data: {
         labels: LABELS,
@@ -1449,6 +1484,7 @@ function renderChart(){
         return o;
       })()
     });
+    addEvents(chart, billEvents());
 
   } else if(activeView==='yoy'){
     title.textContent = 'Home Consumption \u2014 Year-over-Year by Month';
@@ -1479,7 +1515,7 @@ function renderChart(){
 
   } else if(activeView==='tou'){
     title.textContent = 'TOU On-Peak vs Off-Peak kWh (bills with TOU data)';
-    note.textContent  = 'On-peak = 3\u20137 PM Mon\u2013Fri, Jun\u2013Oct (TOU) / 2\u20137 PM Mon\u2013Fri, Jun\u2013Sep (CPP). TOU rates: $0.221/kWh on-peak vs $0.055/kWh off-peak. Orange line = bill $ (right axis).';
+    setNote(note, 'On-peak vs off-peak kWh by bill. On-peak = 3–7 PM weekdays, Jun–Sep.', 'On-peak = 3\u20137 PM Mon\u2013Fri, Jun\u2013Sep (TOD; October bills carry late-September on-peak kWh) / 2\u20137 PM Mon\u2013Fri, Jun\u2013Sep (CPP). TOU rates: $0.221/kWh on-peak vs $0.055/kWh off-peak. Orange line = bill $ (right axis).');
     const touBills = BILLS.filter(b=>b.fpk!=null);
     const touLabels = touBills.map(b=>{ const [m,,y]=b.e.split('/'); return MN[+m]+"'"+y.slice(2); });
     chart = new Chart(ctx, {
@@ -1516,7 +1552,7 @@ function renderChart(){
 
   } else if(activeView==='sim'){
     title.textContent = 'Rate Plan Comparison \u2014 Estimated Monthly All-In Cost';
-    note.textContent  = 'Grouped bars show estimated total monthly bill (energy + riders + fixed + tax) under each rate plan using your actual historical NET kWh. Dashed line = actual bill paid.';
+    setNote(note, 'Each plan\'s estimated bill for your actual usage. Dashed = what you paid.', 'Grouped bars show estimated total monthly bill (energy + riders + fixed + tax) under each rate plan using your actual historical NET kWh. Dashed line = actual bill paid.');
 
     const simData = runSimulation();
 
@@ -1600,9 +1636,9 @@ function renderChart(){
     const alreadyPaid = (preDataSavings + totalSavings) >= netCost;
 
     title.textContent = '4.6 kW Solar — Monthly Savings & Cumulative Payback';
-    note.textContent  = `Bars = estimated monthly savings (counterfactual bill minus actual). ` +
+    setNote(note, 'Bars = monthly solar savings. Line = cumulative vs. system cost.', `Bars = estimated monthly savings (counterfactual bill minus actual). ` +
       `Line = cumulative savings since install (Aug 2020). Dashed line = net system cost ($${netCost.toLocaleString()}). ` +
-      `Pre-2024 savings estimated at $${(annualRate/12).toFixed(0)}/mo run rate.`;
+      `Pre-2024 savings estimated at $${(annualRate/12).toFixed(0)}/mo run rate.`);
 
     // Summary cards
     const solarCards = document.getElementById('solarCards');
@@ -1667,10 +1703,10 @@ function renderChart(){
     const arbVals = getArb(r42On);
     const touArbStr = (arbVals.tou * 100).toFixed(1);
     const cppArbStr = (arbVals.cpp * 100).toFixed(1);
-    note.textContent  = `Annual savings from shifting on-peak kWh to off-peak via battery. ` +
+    setNote(note, 'Battery value from shifting on-peak kWh.', `Annual savings from shifting on-peak kWh to off-peak via battery. ` +
       `TOU arbitrage spread: ${touArbStr}¢/kWh, CPP spread: ${cppArbStr}¢/kWh` +
       (r42On ? ' (Rate 42 credit applied — charging cost ~0.9¢/kWh vs 6.1¢ base).' : ' (no Rate 42 credit).') +
-      ' Standard plan has $0 battery value (no TOU differential). Based on actual Emporia Vue hourly data.';
+      ' Standard plan has $0 battery value (no TOU differential). Based on actual Emporia Vue hourly data.');
 
     const battData = runBatteryAnalysis();
     renderBattCards(battData);
@@ -1727,10 +1763,10 @@ function renderChart(){
     const addEV = document.getElementById('projEvToggle').checked;
     const useWhev = addEV && document.getElementById('projWhevToggle').checked;
     const cppEvents = +document.getElementById('projCppSlider').value;
-    note.textContent = `Projected monthly costs Apr 2026 – Mar 2027 using 2025 same-month net kWh as baseline.` +
+    setNote(note, 'Projection on the old CPP baseline (before the TOD switch).', `Projected monthly costs Apr 2026 – Mar 2027 using 2025 same-month net kWh as baseline.` +
       (addEV ? ` EV: +${document.getElementById('projEvSlider').value} kWh/mo overnight.` : ' No EV added.') +
       (useWhev ? ' WHEV rider applied (4.74¢/kWh overnight credit).' : '') +
-      ` ${cppEvents} CPP events/summer. Bars = TOU vs CPP cost; line = CPP (current plan).`;
+      ` ${cppEvents} CPP events/summer. Bars = TOU vs CPP cost; line = CPP (current plan).`);
 
     const cppData = projData.map(r => r.cpp.allIn);
     const touData = projData.map(r => r.tou.allIn);
@@ -1765,6 +1801,8 @@ function renderChart(){
     renderGreenButton(ctx, title, note);
   } else if(activeView==='wx'){
     renderWeatherNorm(ctx, title, note);
+  } else if(activeView==='cf'){
+    renderCounterfactual(ctx, title, note);
   } else if(activeView==='decision'){
     renderLadder(ctx, title, note);   // meter-exact cumulative ladder on the main chart
     renderDecisionTool();             // parametric ex-ante tool + battery payback (own canvas)
@@ -1788,10 +1826,10 @@ function wxSeg(f){ return [{x:f.c0,y:+(f.a+f.b*f.c0).toFixed(2)},{x:f.c1,y:+(f.a
 
 function renderWeatherNorm(ctx, title, note){
   title.textContent = 'Weather-normalized daily home load \u2014 the heat, not the battery';
-  note.textContent  = 'One dot per day, Aug 5 \u2013 Sep 11. X = cooling degree days (how hot that day was); Y = total home consumption. '
+  setNote(note, 'One dot per day: home use vs. heat. Parallel lines = same heat response, higher baseline.', 'One dot per day, Aug 5 \u2013 Sep 11. X = cooling degree days (how hot that day was); Y = total home consumption. '
     + 'Blue = 2025 (pre-battery), amber = 2026 (post-battery); hollow amber triangles = Jun 15\u201324 2026, still pre-battery but at 2026 heat. '
     + 'The two fit lines are near-parallel: the house responds to heat the same way it always did, it just sits ~6.5 kWh/day higher. '
-    + 'The grey bar marks the gap between what 2025\u2019s relationship predicts at 2026\u2019s weather (67.4) and what was actually metered (71.9).';
+    + 'The grey bar marks the gap between what 2025\u2019s relationship predicts at 2026\u2019s weather (67.4) and what was actually metered (71.9).');
 
   const F = WX_FIT;
   const pt = (rows) => rows.map(r => ({x:r.c, y:r.h, d:r.d}));
@@ -1854,7 +1892,7 @@ function renderWeatherNorm(ctx, title, note){
 // ── Choice Ladder: Standard → TOD → +WHEV → +Battery (cumulative, meter data) ──
 function renderLadder(ctx, title, note){
   title.textContent = 'The choice ladder — cumulative cost of each incremental decision (meter data)';
-  note.textContent = 'Four counterfactuals billed from your 12-month 15-min meter data. Top line = if you\'d done nothing (Standard). Each shaded band below it is what one added choice saved, cumulatively: switching to TOD, then adding WHEV, then the battery. The bottom line is what you actually pay. The full gap top-to-bottom = total saved vs Standard.';
+  setNote(note, 'Top = Standard (do nothing). Bottom = what you pay. Bands = what each choice saved.', 'Four counterfactuals billed from your 12-month 15-min meter data. Top line = if you\'d done nothing (Standard). Each shaded band below it is what one added choice saved, cumulatively: switching to TOD, then adding WHEV, then the battery. The bottom line is what you actually pay. The full gap top-to-bottom = total saved vs Standard.');
   const D = LADDER_ROWS; // [label, std, tod, todw, todwb] cumulative
   const labels = D.map(r=>r[0]);
   const std=D.map(r=>r[1]), tod=D.map(r=>r[2]), todw=D.map(r=>r[3]), tb=D.map(r=>r[4]);
@@ -1995,7 +2033,7 @@ function renderDecisionTool(){
 // ── EPE GreenButton meter view (authoritative 15-min interval data) ──────────
 function renderGreenButton(ctx, title, note){
   title.textContent = 'EPE billing meter — monthly grid import / export / solar (15-min data, Aug 2025–Nov 2026)';
-  note.textContent = 'Straight from the utility AMI meter (the billing source of truth): blue = grid import, green = grid export (below 0), yellow line = solar produced (REC meter). This is the authoritative measurement — it supersedes the Emporia estimates for on-peak share. Aug 2025–Jul 2026 is the pre-battery baseline; Aug 2026 on is battery-era (hover a month for its on-peak share). Nov 2026 is Nov 1–3 only.';
+  setNote(note, 'Utility meter by month. Pre-battery through Jul 2026; hover a month for its on-peak share.', 'Straight from the utility AMI meter (the billing source of truth): blue = grid import, green = grid export (below 0), yellow line = solar produced (REC meter). This is the authoritative measurement — it supersedes the Emporia estimates for on-peak share. Aug 2025–Jul 2026 is the pre-battery baseline; Aug 2026 on is battery-era (hover a month for its on-peak share). Nov 2026 is Nov 1–3 only.');
   const M = GB_MONTHLY;
   const labels = M.map(r=>r.mo);
   chart = new Chart(ctx, {
@@ -2012,6 +2050,7 @@ function renderGreenButton(ctx, title, note){
         y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh / month (export below 0)'} } }
     }
   });
+  addEvents(chart, [{i:labels.indexOf('2026-08')-0.5, text:'Battery'}]);
   renderGBCards();
   renderGBProfile();
 }
@@ -2041,9 +2080,9 @@ function renderGBProfile(){
   const onpkBg = S.map(r=> (r.h>=15&&r.h<19) ? 'rgba(249,115,22,.85)' : 'rgba(59,130,246,.8)');
   liveChart = new Chart(cv.getContext('2d'), {
     data:{ labels, datasets:[
-      { type:'bar', label:'Summer weekday grid import (kWh/h)', data:S.map(r=>r.imp), backgroundColor:onpkBg, order:3 },
-      { type:'bar', label:'Summer weekday export (kWh/h)', data:S.map(r=>-r.exp), backgroundColor:'rgba(34,197,94,.7)', order:3 },
-      { type:'line', label:'Non-summer weekday import (kWh/h)', data:W.map(r=>r.imp), borderColor:'#64748b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.3, order:0 },
+      { hidden:true, type:'bar', label:'Summer weekday grid import (kWh/h)', data:S.map(r=>r.imp), backgroundColor:onpkBg, order:3 },
+      { hidden:true, type:'bar', label:'Summer weekday export (kWh/h)', data:S.map(r=>-r.exp), backgroundColor:'rgba(34,197,94,.7)', order:3 },
+      { hidden:true, type:'line', label:'Non-summer weekday import (kWh/h)', data:W.map(r=>r.imp), borderColor:'#64748b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.3, order:0 },
       { type:'line', label:'Sep 16–Oct 31 2025, no battery', data:GB_PROF_SAME25, borderColor:'#0f172a', borderDash:[4,3], backgroundColor:'transparent', borderWidth:1.8, pointRadius:0, tension:0.3, order:0 },
       { type:'line', label:'Sep 16–Oct 31 2026, battery (3 PM start)', data:GB_PROF_BATT26, borderColor:'#a855f7', backgroundColor:'transparent', borderWidth:2.5, pointRadius:0, tension:0.3, order:0 },
     ]},
@@ -2051,16 +2090,17 @@ function renderGBProfile(){
       plugins:{ legend:{position:'top',labels:{font:{size:10},boxWidth:12}},
         tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+Math.abs(c.raw).toFixed(2)+' kWh' } } },
       scales:{ x:{ grid:{display:false}, ticks:{font:{size:9}} },
-        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Avg kWh per hour (orange = 3–7PM on-peak; export below 0)'} } }
+        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Avg kWh per hour'} } }
     }
   });
+  addEvents(liveChart, [], HOUR_BANDS);
 }
 
 // ── Live Usage & Battery (Anker measured data) ───────────────────────────
 function renderLive(ctx, title, note){
   title.textContent = 'Daily Energy Flow — how each day’s home load was served (measured)';
-  note.textContent = 'Bars stack to the black load line = solar-to-load + battery-to-load + grid-to-load. '+
-    'Grid draw is split so battery charging is NOT double-counted: the light-red "grid → battery charging" bar (below zero) is the extra overnight grid import that only refills the battery — it is not shown as serving load. Green (below zero) = grid export. Dashed line = daily peak SOC. Jun 9–18 = solar-only monitoring (grid/load not yet live).';
+  setNote(note, 'How each day\'s home load was served. Below zero = battery charging and export.', 'Bars stack to the black load line = solar-to-load + battery-to-load + grid-to-load. '+
+    'Grid draw is split so battery charging is NOT double-counted: the light-red "grid → battery charging" bar (below zero) is the extra overnight grid import that only refills the battery — it is not shown as serving load. Green (below zero) = grid export. Dashed line = daily peak SOC. Jun 9–18 = solar-only monitoring (grid/load not yet live).');
 
   const D = ANKER_DAILY;
   const labels = D.map(r=>r.d);
@@ -2077,7 +2117,7 @@ function renderLive(ctx, title, note){
         { type:'bar', label:'Grid → battery charging (kWh)', data:D.map(r=>r.gtb==null?null:-r.gtb), backgroundColor:'#fecaca', stack:'e', yAxisID:'y', order:3 },
         { type:'bar', label:'Grid export (kWh)', data:D.map(r=>r.ge==null?null:-r.ge), backgroundColor:'#22c55e', stack:'e', yAxisID:'y', order:3 },
         { type:'line', label:'Home load (kWh)', data:D.map(r=>r.load), borderColor:'#0f172a', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.25, yAxisID:'y', order:0 },
-        { type:'line', label:'Battery SOC max %', data:D.map(r=>r.smax), borderColor:'#a855f7', borderDash:[3,3], backgroundColor:'transparent', borderWidth:1.2, pointRadius:0, yAxisID:'y2', order:1 },
+        { hidden:true, type:'line', label:'Battery SOC max %', data:D.map(r=>r.smax), borderColor:'#a855f7', borderDash:[3,3], backgroundColor:'transparent', borderWidth:1.2, pointRadius:0, yAxisID:'y2', order:1 },
       ]
     },
     options: {
@@ -2095,6 +2135,7 @@ function renderLive(ctx, title, note){
     }
   });
 
+  addEvents(chart, [{i:labels.indexOf('07-29'), text:'Battery live'}, {i:labels.indexOf('09-16'), text:'3 PM fix'}]);
   renderLiveCards();
   renderLiveProfile();
 }
@@ -2151,6 +2192,7 @@ function renderLiveProfile(){
       }
     }
   });
+  addEvents(liveChart, [], HOUR_BANDS);
 }
 
 // ── Counterfactual: "what if I'd stayed on the regular (Standard) rate?" ─────
@@ -2204,9 +2246,9 @@ function renderCounterfactual(ctx, title, note){
   const rows = runCounterfactual();
   const base = CF_LABELS[cfBaseline];
   title.textContent = `Counterfactual: same usage on ${base} — running total & savings`;
-  note.textContent = `For every bill, your ACTUAL net kWh is repriced on ${base} (all-in, using that month's actual riders). ` +
+  setNote(note, `Each bill repriced on ${base}, all-in. Gap between the lines = cumulative savings.`, `For every bill, your ACTUAL net kWh is repriced on ${base} (all-in, using that month's actual riders). ` +
     `Gap between the two cumulative lines = money saved by your rate-plan choices vs. ${cfBaseline==='std'?'staying on the default rate':base}. ` +
-    `Bars = each month's difference (right axis). Solar is held constant on both sides, so this isolates the rate-plan/battery strategy, not solar.`;
+    `Bars = each month's difference (right axis). Solar is held constant on both sides, so this isolates the rate-plan/battery strategy, not solar.`);
 
   const labels = rows.map(r=>r.label);
   chart = new Chart(ctx, {
@@ -2238,13 +2280,15 @@ function renderCounterfactual(ctx, title, note){
     }
   });
 
+  addEvents(chart, billEvents());
+
   const last = rows[rows.length-1];
   const nMonths = rows.length;
   const todRows = rows.filter(r=>r.era==='tod');
   const todSaved = todRows.reduce((a,r)=>a+r.delta,0);
   const pct = last.cumC>0 ? (last.cumDelta/last.cumC*100) : 0;
   const cards = [
-    {t:'Actually paid (27 bills)', v:'$'+last.cumA.toLocaleString(undefined,{maximumFractionDigits:0}), s:'May 2024 – Jul 2026'},
+    {t:'Actually paid ('+rows.length+' bills)', v:'$'+last.cumA.toLocaleString(undefined,{maximumFractionDigits:0}), s:rows[0].label+' – '+last.label},
     {t:'If on '+base, v:'$'+last.cumC.toLocaleString(undefined,{maximumFractionDigits:0}), s:'same usage, all-in'},
     {t:'Total saved', v:'$'+last.cumDelta.toLocaleString(undefined,{maximumFractionDigits:0}), s:pct.toFixed(0)+'% lower · $'+(last.cumDelta/nMonths).toFixed(0)+'/mo avg'},
     {t:'Since TOD switch (Jul 26)', v:(todSaved>=0?'+':'')+'$'+todSaved.toFixed(0), s:todRows.length+' bill(s) · battery live Jul 29'},
@@ -2618,7 +2662,7 @@ tbl.innerHTML = `<thead><tr>
   <th>Date</th><th>Period</th>
   <th>Grid DEL</th><th>Grid RCVD</th><th>Net</th>
   <th>Solar Gen</th><th>Solar Self-Used</th><th>Home Total</th>
-  <th>On-Peak</th><th>Off-Peak</th><th>Bill $</th><th></th>
+  <th>On-Peak</th><th>Off-Peak</th><th>Bill $</th><th>¢/kWh</th><th></th>
 </tr></thead>`;
 const tbody = document.createElement('tbody');
 BILLS.forEach(b => {
@@ -2637,15 +2681,41 @@ BILLS.forEach(b => {
     <td style="color:#dc2626">${b.opk??'\u2013'}</td>
     <td style="color:#6366f1">${b.fpk??'\u2013'}</td>
     <td style="font-weight:600">$${b.bill.toFixed(2)}</td>
+    <td style="color:#64748b">${b.net>0?(b.bill/b.net*100).toFixed(2):'\u2013'}</td>
     <td>${b.sum?'\u2600\uFE0F':''}</td>
   `;
   tbody.appendChild(tr);
 });
 tbl.appendChild(tbody);
 
+// ── KPI strip: latest bill at a glance, computed from the data ──────────────
+const LATEST_NOTE = "🔋 Oct 2026 bill: $65.48 vs ≈ $99 on the Standard rate with no battery → saved ≈ $34 (≈ $48 if EPE prorates the Sep/Oct season change by days; it billed this bill's off-peak entirely at the non-summer rate, so $34 is the better estimate). Battery-era bills vs Standard: Aug $47 (battery live only the last half), Sep $113, Oct $34, i.e. $194 in three bills; the framework estimate is ~$636/yr total vs Standard, earned mostly Jun–Sep. Oct all-in rate 7.16¢/kWh is a record low. The 3 PM fix is confirmed: in Sep 16–30, the last on-peak weeks of the season, weekday 3–7 PM grid import was 0.83 kWh/day vs 6.19 in the same weeks of 2025, and the Oct bill's on-peak was 10 kWh (61 a year ago). Per the tariff, on-peak pricing runs Jun–Sep only; Oct–May is a flat 5.816¢ at all hours, so winter value comes from the WHEV credit (681 kWh, −$32.28 this bill; 84% of grid import now falls midnight–8 AM vs 25% a year ago). The battery cycles a steady ~15 kWh/day.";
+function renderKPIs(){
+  const el = document.getElementById('kpis'); if (!el) return;
+  const n = BILLS.length, b = BILLS[n-1];
+  const pi = BILLS.findIndex(x => billMonth(x)===billMonth(b) && billYear(x)===billYear(b)-1), prev = BILLS[pi];
+  const keep = cfBaseline; cfBaseline = 'std'; const rows = runCounterfactual(); cfBaseline = keep;
+  const saved = rows[n-1].delta, battSaved = rows.filter(r => r.b.d >= '2026-08-01').reduce((a,r) => a + r.delta, 0);
+  const cents = x => x.bill / x.net * 100;
+  const act = ANKER_DAILY.filter(r => r.ph==='active').slice(-30), cyc = act.reduce((a,r) => a + (r.bc+r.bd)/2, 0) / act.length;
+  const cmp = (now, then, lowerIsBetter=true) => then==null ? '' :
+    `<span class="${(now<then)===lowerIsBetter?'up':'dn'}">${now<then?'▼':'▲'}</span> `;
+  const tiles = [
+    {t:'Latest bill · '+LABELS[n-1], v:'$'+b.bill.toFixed(2), s: prev ? cmp(b.bill,prev.bill)+LABELS[pi]+': $'+prev.bill.toFixed(2) : '', tip:LATEST_NOTE},
+    {t:'All-in rate', v:cents(b).toFixed(2)+'¢', s: prev ? cmp(cents(b),cents(prev))+LABELS[pi]+': '+cents(prev).toFixed(2)+'¢' : '', tip:'Bill ÷ net kWh, every charge included.'},
+    {t:'Saved vs Standard', v:'$'+saved.toFixed(0), s:'since battery: <b>$'+battSaved.toFixed(0)+'</b>',
+     tip:'Same usage repriced on Standard Rate No. 01 (no battery, no TOD, no WHEV), all-in with that bill\'s riders. Battery-era net kWh includes battery round-trip losses that would not exist without the battery, so this overstates savings by about $1 per bill. Details: Savings vs Standard tab.'},
+    {t:'On-peak kWh', v:(b.opk ?? 0).toLocaleString(), s: prev && prev.opk!=null ? cmp(b.opk??0,prev.opk)+LABELS[pi]+': '+prev.opk : '',
+     tip:'Billed on-peak = 3–7 PM weekdays, Jun–Sep (NM Rate 01 TOD). October bills carry late-September on-peak kWh; Oct–May has no on-peak period.'},
+    {t:'WHEV credit', v: b.whev ? '−$'+(b.whev*0.0474).toFixed(2) : '–', s: b.whev ? b.whev+' kWh' : '', tip:'4.74¢/kWh credit on all grid use midnight–8 AM, year-round (Rate 01 WHEV rider). Cannot push a bill below the monthly minimum.'},
+    {t:'Battery cycled / day', v:cyc.toFixed(1)+' kWh', s:'avg, last '+act.length+' days', tip:'Average of energy charged and discharged per day, from the Anker app export. Bank = 18.4 kWh.'},
+  ];
+  el.innerHTML = tiles.map(k => `<div class="kpi"><div class="k-t">${k.t}${k.tip?tipHTML(k.tip):''}</div><div class="k-v">${k.v}</div><div class="k-s">${k.s}</div></div>`).join('');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
-renderTabs();
-renderChart();
+renderKPIs();
+setView(activeView);
 </script>
 </body>
 </html>
