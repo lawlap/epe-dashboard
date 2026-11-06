@@ -58,7 +58,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
   <h1>⚡ EPE Usage & Solar Dashboard</h1>
   <p class="sub">Las Cruces, NM · 30 bills · May 2024–Oct 2026 · Anker batteries live since Jul 29 2026</p>
   <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:9px 14px;margin:8px 0 0;font-size:12.5px;color:#166534">
-    <b>🔋 Oct 2026 bill — the 3 PM fix is confirmed:</b> paid <b>$65.48</b> on <b>915 net kWh</b> (vs <b>$106.59</b> on 968 kWh in Oct 2025), a new <b>record-low all-in rate of 7.16¢/kWh</b> (Sep 7.45¢, Aug 8.07¢, Jul 9.13¢). Billed on-peak fell to <b>10 kWh</b> (61 a year ago). On the meter, weekday 3–4 PM import dropped from <b>2.36 → 0.06 kWh/day</b> once discharge moved to 3 PM on Sep 16, and weekday 3–7 PM import is <b>0.84 kWh/day vs 5.39</b> in the same weeks of 2025. WHEV credit: <b>681 kWh (−$32.28)</b>; <b>84%</b> of grid import now lands in the credited midnight–8 AM window (25% a year ago). <b>Battery value this bill ≈ $30</b> (no-battery estimate ≈ $96; conservative: counts only the 51 kWh drop in billed on-peak vs Oct 2025, plus WHEV on 414 kWh of grid charging, minus 15 kWh of losses). Sep was ≈ $59 (hotter, more on-peak load to cover). The battery has cycled a steady <b>~15 kWh/day</b> every month since Aug; the annual all-in estimate stays <b>~$354/yr</b>. Nov–May has no on-peak pricing, so winter value comes from the WHEV credit alone (≈ 4¢ per shifted kWh).
+    <b>🔋 Oct 2026 bill: $65.48 vs ≈ $99 on the Standard rate with no battery → saved ≈ $34</b> (≈ $48 if EPE prorates the Sep/Oct season change by days; it billed this bill's off-peak entirely at the non-summer rate, so $34 is the better estimate). <b>Battery-era bills vs Standard:</b> Aug <b>$47</b> (battery live only the last half), Sep <b>$113</b>, Oct <b>$34</b>, i.e. <b>$194 in three bills</b>; the framework estimate is ~$636/yr total vs Standard, earned mostly Jun–Sep. Oct all-in rate <b>7.16¢/kWh</b> is a record low. <b>The 3 PM fix is confirmed:</b> in Sep 16–30, the last on-peak weeks of the season, weekday 3–7 PM grid import was <b>0.83 kWh/day vs 6.19</b> in the same weeks of 2025, and the Oct bill's on-peak was <b>10 kWh</b> (61 a year ago). Per the tariff, on-peak pricing runs <b>Jun–Sep only</b>; Oct–May is a flat 5.816¢ at all hours, so winter value comes from the WHEV credit (681 kWh, −$32.28 this bill; 84% of grid import now falls midnight–8 AM vs 25% a year ago). The battery cycles a steady <b>~15 kWh/day</b>.
   </div>
 
   <!-- ====================================================================== -->
@@ -319,7 +319,7 @@ input[type=range]{width:200px;accent-color:#1e40af}
     <div class="sim-cards" id="gbCards"></div>
     <div style="margin-top:10px">
       <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average weekday grid load-shape — the meter's own view</div>
-      <p class="note" style="margin-top:2px;margin-bottom:6px">Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison. <b>Purple vs dashed black = the battery's effect</b>, same weeks a year apart (Sep 16–Oct 31): grid import moves to the midnight–2 AM charging window and the 3–7 PM on-peak hours drop to <b>0.84 kWh/day vs 5.39</b>.</p>
+      <p class="note" style="margin-top:2px;margin-bottom:6px">Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison. <b>Purple vs dashed black = the battery's effect</b>, same weeks a year apart (Sep 16–Oct 31): grid import moves to the midnight–2 AM charging window and 3–7 PM import drops to <b>0.84 kWh/day vs 5.39</b> (on-peak pricing applies only through Sep 30).</p>
       <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
     </div>
     <p class="note" style="margin-top:10px"><b>Reconciliation:</b> 12-month pre-battery meter totals (Aug 2025–Jul 2026): import 10,276 kWh, export 1,682 kWh, net 8,594 kWh, solar 5,333 kWh → measured home load ≈ 13,927 kWh/yr. These are calendar months (the bills run mid-month to mid-month, so individual months won't line up exactly), but the annual figures and the on-peak shares are ground truth.</p>
@@ -574,7 +574,10 @@ const YC = {2024:'#94a3b8',2025:'#3b82f6',2026:'#f59e0b'};
 
 function billYear(b){ return +b.e.split('/')[2]; }
 function billMonth(b){ return +b.e.split('/')[0]; }
-// TOU / Standard: on-peak season is Jun–Oct (months 6–10) per EPE Rate 01 tariff
+// Tariff (NM Rate 01, 14th Rev., AN 289): summer = June–September, non-summer = October–May,
+// no TOD on-peak period Oct–May. Bills are labeled by read month, and an October bill (mid-Sep → mid-Oct)
+// still carries on-peak kWh metered in late September, so TOD on-peak uses bill months 6–10. EPE bills
+// October's off-peak entirely at the non-summer rate, so Standard uses the summer tiers for bill months 6–9.
 // CPP: on-peak season is Jun–Sep (months 6–9) per CPP tariff
 function isSummerTOU(b){ const m=billMonth(b); return m>=6 && m<=10; }
 function isSummerCPP(b){ const m=billMonth(b); return m>=6 && m<=9; }
@@ -807,7 +810,7 @@ function estimateCPPOnPeakRatio(b) {
 
 function calcStandard(netKwh, b) {
   if (netKwh <= 0) return { energy: 0, detail: 'Net credit' };
-  if (isSummer(b)) {
+  if (isSummerCPP(b)) {  // Standard summer tiers: bill months Jun–Sep (see season note above)
     if (netKwh <= RATES.std.tier1Limit) {
       return { energy: netKwh * RATES.std.summer1st, detail: `${netKwh} kWh × $0.07035` };
     } else {
