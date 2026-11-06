@@ -1,74 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* theme before first paint: saved choice, else the OS setting (shared by every page of the site) */
+(function(){var t=null;try{t=localStorage.getItem('epeTheme');}catch(e){}if(t!=='dark'&&t!=='light')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.dataset.theme=t;})();</script>
+
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>EPE Usage & Solar Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
-<style>
+<style>/* ── Theme: light by default, dark via [data-theme=dark] (set before paint from saved choice or OS setting) ── */
+:root{--bg:#f8fafc;--card:#ffffff;--text:#0f172a;--text-2:#334155;--muted:#64748b;--faint:#94a3b8;--border:#e2e8f0;--border-2:#f1f5f9;
+  --surface-2:#f1f5f9;--surface-3:#e2e8f0;--tint-green:#f0fdf4;--tint-cyan:#ecfeff;--tint-amber:#fef3c7;--tint-orange:#fff7ed;
+  --tint-blue:#eff6ff;--tint-sky:#f0f9ff;--tint-orange-2:#fed7aa;--tint-amber-2:#fde68a;--tint-red:#fef2f2;
+  --ink-green:#15803d;--ink-green-2:#166534;--ink-orange:#7c2d12;--ink-cyan:#0e7490;--ink-cyan-2:#0891b2;--ink-blue:#1d4ed8;
+  --ink-blue-2:#1e40af;--ink-amber:#92400e;--ink-amber-2:#78350f;--ink-sky:#0c4a6e;--ink-sky-2:#0369a1;--ink-brown:#b45309;--ink-red:#b91c1c}
+html[data-theme=dark]{color-scheme:dark;--bg:#0b1120;--card:#131c2e;--text:#e2e8f0;--text-2:#cbd5e1;--muted:#94a3b8;--faint:#7c8aa3;
+  --border:#2a3650;--border-2:#1e293b;--surface-2:#1a2438;--surface-3:#243049;--tint-green:#0f2a1c;--tint-cyan:#0c2730;
+  --tint-amber:#2e2410;--tint-orange:#2e1d10;--tint-blue:#111f3d;--tint-sky:#0e2333;--tint-orange-2:#4a2c14;--tint-amber-2:#463812;
+  --tint-red:#2e1414;--ink-green:#4ade80;--ink-green-2:#86efac;--ink-orange:#fdba74;--ink-cyan:#67e8f9;--ink-cyan-2:#22d3ee;
+  --ink-blue:#93c5fd;--ink-blue-2:#93c5fd;--ink-amber:#fcd34d;--ink-amber-2:#fde68a;--ink-sky:#7dd3fc;--ink-sky-2:#38bdf8;
+  --ink-brown:#fbbf24;--ink-red:#fca5a5}
+html[data-theme=dark] .card,html[data-theme=dark] .section,html[data-theme=dark] .sim-card,html[data-theme=dark] .kpi,
+html[data-theme=dark] details.fold,html[data-theme=dark] .pcard{box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.theme-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:12px;font-weight:600;cursor:pointer}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8fafc;color:#0f172a;padding:20px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);padding:20px}
 .page{max-width:1100px;margin:0 auto}
 h1{font-size:22px;font-weight:800;margin-bottom:4px}
-.sub{color:#64748b;font-size:13px;margin-bottom:20px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.card{background:white;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card{background:var(--card);border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .card-title{font-size:13px;font-weight:700;margin-bottom:8px}
-.card-row{font-size:12px;color:#334155;line-height:2}
-.card-row b{color:#0f172a}
-.section{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px}
+.card-row{font-size:12px;color:var(--text-2);line-height:2}
+.card-row b{color:var(--text)}
+.section{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px}
 .section h3{font-size:14px;font-weight:700;margin-bottom:4px}
-.note{font-size:11px;color:#94a3b8;font-style:italic;margin-top:8px}
+.note{font-size:11px;color:var(--faint);font-style:italic;margin-top:8px}
 .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 button{padding:6px 13px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:.15s}
 .on{background:#1e40af;color:white}
-.off{background:#e2e8f0;color:#475569}
+.off{background:var(--surface-3);color:var(--text-2)}
 .chart-box{position:relative;height:380px}
 table{width:100%;border-collapse:collapse;font-size:11px}
-th{padding:6px 8px;text-align:right;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0;white-space:nowrap}
+th{padding:6px 8px;text-align:right;color:var(--muted);font-weight:600;border-bottom:2px solid var(--border);white-space:nowrap}
 th:nth-child(1),th:nth-child(2){text-align:left}
-td{padding:5px 8px;text-align:right;border-bottom:1px solid #f1f5f9}
+td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--border-2)}
 td:nth-child(1),td:nth-child(2){text-align:left;white-space:nowrap}
-tr.summer{background:#fff7ed}
-.footer{font-size:10px;color:#94a3b8;text-align:center;margin-top:12px}
+tr.summer{background:var(--tint-orange)}
+.footer{font-size:10px;color:var(--faint);text-align:center;margin-top:12px}
 /* Sim controls */
-.sim-controls{background:#f1f5f9;border-radius:10px;padding:16px;margin-bottom:16px}
+.sim-controls{background:var(--surface-2);border-radius:10px;padding:16px;margin-bottom:16px}
 .sim-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
 .sim-label{font-size:12px;font-weight:600;min-width:160px}
-.sim-val{font-size:12px;font-weight:700;color:#1e40af;min-width:40px}
+.sim-val{font-size:12px;font-weight:700;color:var(--ink-blue-2);min-width:40px}
 input[type=range]{width:200px;accent-color:#1e40af}
 .sim-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.sim-card{background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.07);text-align:center}
+.sim-card{background:var(--card);border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.07);text-align:center}
 .sim-card .plan-name{font-size:13px;font-weight:700;margin-bottom:6px}
 .sim-card .plan-total{font-size:22px;font-weight:800}
-.sim-card .plan-detail{font-size:11px;color:#64748b;margin-top:4px}
-.winner{border:2px solid #22c55e;background:#f0fdf4}
+.sim-card .plan-detail{font-size:11px;color:var(--muted);margin-top:4px}
+.winner{border:2px solid #22c55e;background:var(--tint-green)}
 .sim-table{margin-top:16px}
 .sim-table th{font-size:11px}
 .sim-table td{font-size:11px}
-.sim-table .best{background:#f0fdf4;font-weight:700}
+.sim-table .best{background:var(--tint-green);font-weight:700}
 .ev-row{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
 .ev-toggle{display:flex;align-items:center;gap:6px;font-size:12px}
 .ev-toggle input{accent-color:#1e40af}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 16px}
-.kpi{background:white;border-radius:10px;padding:11px 13px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
-.kpi .k-t{font-size:11px;font-weight:600;color:#64748b}
-.kpi .k-v{font-size:22px;font-weight:800;color:#0f172a;margin:2px 0}
-.kpi .k-s{font-size:11px;color:#64748b}
-.kpi .up{color:#15803d;font-weight:700} .kpi .dn{color:#dc2626;font-weight:700}
-details.fold{background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:10px;padding:10px 16px}
-details.fold>summary{cursor:pointer;font-size:13px;font-weight:700;color:#334155}
+.kpi{background:var(--card);border-radius:10px;padding:11px 13px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.kpi .k-t{font-size:11px;font-weight:600;color:var(--muted)}
+.kpi .k-v{font-size:22px;font-weight:800;color:var(--text);margin:2px 0}
+.kpi .k-s{font-size:11px;color:var(--muted)}
+.kpi .up{color:var(--ink-green);font-weight:700} .kpi .dn{color:#dc2626;font-weight:700}
+details.fold{background:var(--card);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:10px;padding:10px 16px}
+details.fold>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--text-2)}
 details.fold[open]>summary{margin-bottom:10px}
 .tabs .arch{font-size:11px;padding:4px 9px;font-weight:500}
-.tabs .arch.off{background:#f1f5f9;color:#64748b}
-.tab-sep{align-self:center;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;margin-left:10px}
+.tabs .arch.off{background:var(--surface-2);color:var(--muted)}
+.tab-sep{align-self:center;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-left:10px}
 .chart-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.seg{display:inline-flex;gap:2px;background:#e2e8f0;border-radius:7px;padding:2px;margin-left:6px}
+.seg{display:inline-flex;gap:2px;background:var(--surface-3);border-radius:7px;padding:2px;margin-left:6px}
 .seg button{padding:4px 10px;font-size:11px;border-radius:5px}
 .seg button.off{background:transparent}
 /* Info tooltips: details live behind the (i) so the page reads at a glance */
-.tip{display:inline-block;width:15px;height:15px;margin-left:5px;border-radius:50%;background:#e2e8f0;color:#475569;font:italic 700 10px/15px Georgia,serif;text-align:center;cursor:help;vertical-align:1px;user-select:none}
+.tip{display:inline-block;width:15px;height:15px;margin-left:5px;border-radius:50%;background:var(--surface-3);color:var(--text-2);font:italic 700 10px/15px Georgia,serif;text-align:center;cursor:help;vertical-align:1px;user-select:none}
 .tip:hover,.tip:focus{background:#1e40af;color:#fff;outline:none}
 #tipBox{position:fixed;z-index:1000;max-width:min(420px,90vw);background:#0f172a;color:#f1f5f9;font:400 12px/1.5 -apple-system,"Segoe UI",sans-serif;font-style:normal;padding:9px 12px;border-radius:7px;box-shadow:0 6px 20px rgba(0,0,0,.28);pointer-events:none;display:none}
 </style>
@@ -76,7 +94,10 @@ details.fold[open]>summary{margin-bottom:10px}
 <body>
 <div id="tipBox"></div>
 <div class="page">
-  <h1>⚡ EPE Usage & Solar Dashboard</h1>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <h1>⚡ EPE Usage & Solar Dashboard</h1>
+    <button id="themeBtn" class="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
+  </div>
   <p class="sub">Las Cruces, NM · 30 bills · May 2024–Oct 2026 · Anker batteries live since Jul 29 2026</p>
   <div class="kpis" id="kpis"></div>
 
@@ -95,13 +116,13 @@ details.fold[open]>summary{margin-bottom:10px}
 
   <!-- Live Usage & Battery (hidden unless live tab) -->
   <div id="liveSection" style="display:none">
-    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">⚡ Anker SOLIX — measured operation (Jun 9 – Nov 3 2026)</div>
+    <div style="background:var(--tint-cyan);border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--ink-cyan)">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink-cyan-2)">⚡ Anker SOLIX — measured operation (Jun 9 – Nov 3 2026)</div>
       Cycling daily since <b>Jul 29, 2026</b>. <span class="tip" tabindex="0" data-tip="Actual metered data exported from the Anker app. The batteries began active daily arbitrage on July 29, 2026 (SOC cycling 20%→100% daily). Before that: solar/load monitoring only (Jun 9–18), a brief commissioning test (Jun 19–21), then grid-tied with the battery idle (Jun 22–Jul 28). The chart below stacks how each day&#x27;s home load was served; the second chart shows the average hourly dispatch during the first week of battery operation. Data through Jul 31 is 10-min telemetry (with SOC); Aug 1 onward is the app&#x27;s daily-summary export (no SOC, so the SOC line stops at Jul 31).">i</span>
     </div>
     <div class="sim-cards" id="liveCards"></div>
     <div style="margin-top:10px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Average day — battery-active week (Jul 30–Aug 3)</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px">Average day — battery-active week (Jul 30–Aug 3)</div>
       <p class="note" style="margin-top:2px;margin-bottom:6px">Charges midnight–3 AM (WHEV window), discharges 3–7 PM. <span class="tip" tabindex="0" data-tip="Average power by hour (W). The battery charges overnight (midnight–3AM, the WHEV credit window) and from midday solar, then discharges hard 3–7PM — collapsing grid import to near zero during the TOD on-peak window. This is the arbitrage the whole plan is built around, now visible in real data.">i</span></p>
       <div class="chart-box" style="height:300px"><canvas id="liveProfChart"></canvas></div>
     </div>
@@ -110,13 +131,13 @@ details.fold[open]>summary{margin-bottom:10px}
 
   <!-- GreenButton meter data (hidden unless gb tab) -->
   <div id="gbSection" style="display:none">
-    <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#0e7490">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#0891b2">📊 EPE AMI meter — 15-minute interval data (GreenButton exports, Aug 4 2025 – Nov 3 2026)</div>
+    <div style="background:var(--tint-cyan);border:1px solid #67e8f9;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--ink-cyan)">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink-cyan-2)">📊 EPE AMI meter — 15-minute interval data (GreenButton exports, Aug 4 2025 – Nov 3 2026)</div>
       Utility billing meter, 15-min data. Aug 2025–Jul 2026 = <b>pre-battery baseline</b>. <span class="tip" tabindex="0" data-tip="This is the utility billing meter itself at 15-minute resolution: separate IMPORT / EXPORT channels plus the solar-production (REC) meter. It&#x27;s the authoritative measurement — more reliable than the Emporia CT export (which ran ~20% high) — and Aug 2025–Jul 2026 is the pre-battery baseline (the battery went live Jul 29 2026). The measured summer on-peak share (~14–20% of import) confirms the estimate the plan analysis was built on, and the July 2026 measured share (13.6%) matches that bill&#x27;s billed split (13.9%) almost exactly.">i</span>
     </div>
     <div class="sim-cards" id="gbCards"></div>
     <div style="margin-top:10px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">Weekday grid use by hour, Sep 16–Oct 31: 3–7 PM fell from 5.4 to 0.8 kWh/day</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px">Weekday grid use by hour, Sep 16–Oct 31: 3–7 PM fell from 5.4 to 0.8 kWh/day</div>
       <p class="note" style="margin-top:2px;margin-bottom:6px"><b style="color:#3b82f6">Solid blue</b> = 2026 with battery; dashed grey = same weeks 2025. Red band = on-peak hours; blue band = WHEV window. <span class="tip" tabindex="0" data-tip="Summer weekday grid import by hour (orange bars = the 3–7PM on-peak window). Midday import collapses (even exports, green below 0) as solar covers the house, then grid draw ramps hard into the on-peak window as solar fades — which is exactly the load the battery now discharges against. Grey line = non-summer weekday for comparison. Solid blue vs dashed grey = the battery&#x27;s effect, same weeks a year apart (Sep 16–Oct 31): grid import moves to the midnight–2 AM charging window and 3–7 PM import drops to 0.84 kWh/day vs 5.39 (on-peak pricing applies only through Sep 30).">i</span></p>
       <div class="chart-box" style="height:300px"><canvas id="gbProfChart"></canvas></div>
     </div>
@@ -125,21 +146,21 @@ details.fold[open]>summary{margin-bottom:10px}
 
   <!-- ═══ Weather-normalized load (hidden unless wx tab) ═══ -->
   <div id="wxSection" style="display:none">
-    <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#78350f">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#92400e">🌡️ Did the battery raise our consumption? Mostly no — it got hotter.</div>
+    <div style="background:var(--tint-amber);border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--ink-amber-2)">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink-amber)">🌡️ Did the battery raise our consumption? Mostly no — it got hotter.</div>
       Hotter weather explains <b>61%</b> of the Aug–Sep 2026 rise; battery overhead the rest. <span class="tip" tabindex="0" data-tip="September 2026 metered the highest home load in the record (71.9 kWh/day over Aug 5 – Sep 11, vs 60.4 the year before, +19%), which looked alarming next to a battery that had just gone in. Joining daily temperatures (ASOS station LRU, Las Cruces Intl) to daily meter data settles it: cooling degree days rose +23% over the same window, and at the house&#x27;s measured sensitivity of 2.07 kWh per CDD that alone accounts for +7.0 of the +11.5 kWh/day. The remaining +4.5 is the battery&#x27;s own overhead — round-trip loss plus standby — and shows up as a parallel shift in the fit, not a steeper slope.">i</span>
     </div>
 
     <div class="sim-cards">
       <div class="sim-card"><div class="plan-name">Hotter weather</div><div class="plan-total" style="color:#f59e0b">+7.0</div><div class="plan-detail">kWh/day · <b>61%</b> of the rise<br>+3.40 CDD/day × 2.07</div></div>
       <div class="sim-card"><div class="plan-name">Battery overhead</div><div class="plan-total" style="color:#3b82f6">+4.5</div><div class="plan-detail">kWh/day · <b>39%</b><br>round-trip loss + standby</div></div>
-      <div class="sim-card"><div class="plan-name">Behavior change</div><div class="plan-total" style="color:#15803d">~0</div><div class="plan-detail">no detectable effect from<br>dropping the afternoon setback</div></div>
+      <div class="sim-card"><div class="plan-name">Behavior change</div><div class="plan-total" style="color:var(--ink-green)">~0</div><div class="plan-detail">no detectable effect from<br>dropping the afternoon setback</div></div>
     </div>
 
-    <p style="margin-top:6px;margin-bottom:0;font-size:12px;line-height:1.6;color:#475569"><b style="color:#0f172a">Thermostat change:</b> no measurable effect. <span class="tip" tabindex="0" data-tip="Why the thermostat theory doesn’t hold. The household used to raise the thermostat during the 3–7 PM peak and stopped once the battery was in. If that were driving the increase, the slope would steepen — more cooling per degree of heat. It didn’t (2.07 → 1.95, indistinguishable at n=38); only the intercept moved (30.4 → 37.0), which is the signature of a constant always-on addition. Independent check: Jun 15–24 2026 — pre-battery, occupied, CDD 18.0 — ran 71.2 kWh/day against 71.9 post-battery at CDD 17.9. Same house, same heat, opposite sides of the install, 0.65 kWh/day apart. The setback was a load-shifting tactic, not a load-reduction one — deferred cooling returns as evening recovery, so daily energy barely moves. What it bought was keeping kWh out of the on-peak window, which is exactly the job the battery took over.">i</span></p>
+    <p style="margin-top:6px;margin-bottom:0;font-size:12px;line-height:1.6;color:var(--text-2)"><b style="color:var(--text)">Thermostat change:</b> no measurable effect. <span class="tip" tabindex="0" data-tip="Why the thermostat theory doesn’t hold. The household used to raise the thermostat during the 3–7 PM peak and stopped once the battery was in. If that were driving the increase, the slope would steepen — more cooling per degree of heat. It didn’t (2.07 → 1.95, indistinguishable at n=38); only the intercept moved (30.4 → 37.0), which is the signature of a constant always-on addition. Independent check: Jun 15–24 2026 — pre-battery, occupied, CDD 18.0 — ran 71.2 kWh/day against 71.9 post-battery at CDD 17.9. Same house, same heat, opposite sides of the install, 0.65 kWh/day apart. The setback was a load-shifting tactic, not a load-reduction one — deferred cooling returns as evening recovery, so daily energy barely moves. What it bought was keeping kWh out of the on-peak window, which is exactly the job the battery took over.">i</span></p>
 
     <div style="margin-top:16px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:2px">The decomposition, day by day</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px">The decomposition, day by day</div>
       <table style="margin-top:8px">
         <thead><tr>
           <th style="text-align:left">Aug 5 – Sep 11 window</th><th>Avg daily max</th><th>Avg daily min</th><th>CDD/day</th><th>Home load</th><th>Fit</th><th>R²</th><th>RMSE</th>
@@ -158,15 +179,15 @@ details.fold[open]>summary{margin-bottom:10px}
   <!-- Choice Ladder (hidden unless ladder tab) -->
   <div id="decisionSection" style="display:none">
     <!-- ═══ EX-POST: what actually happened (from the meter) ═══ -->
-    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#166534">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#15803d">🪜 Part 1 — What each choice actually saved (ex-post, from your 12-month meter)</div>
+    <div style="background:var(--tint-green);border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--ink-green-2)">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink-green)">🪜 Part 1 — What each choice actually saved (ex-post, from your 12-month meter)</div>
       vs. Standard: TOD <b>$88</b> + WHEV <b>$152</b> + battery <b>$396</b> = <b>$636/yr</b>. <span class="tip" tabindex="0" data-tip="The chart above stacks the four counterfactuals; the cards below are the annual decomposition. Read it two ways. Marginally (each step on top of the last): switching to TOD saved only $88/yr alone — it barely beats Standard without help, which is exactly why the battery mattered — then WHEV added $152/yr, and the battery is the biggest single lever at ~$396/yr. As a whole (the way you first framed it — TOD only made sense because the battery was on the table): Standard vs the full stack is $636/yr. The battery&#x27;s $396 is its value given you&#x27;re already on TOD+WHEV — the clean &quot;what if I&#x27;d skipped the battery&quot; number.">i</span>
     </div>
     <div class="sim-cards" id="ladderCards"></div>
 
     <!-- ═══ EX-ANTE: would this pay off? (planning model, generalizable) ═══ -->
-    <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px 16px;margin:18px 0 12px;font-size:12px;color:#1e40af">
-      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:#1d4ed8">🧭 Part 2 — Would this stack pay off? (ex-ante planning model — try your own numbers)</div>
+    <div style="background:var(--tint-blue);border:1px solid #93c5fd;border-radius:8px;padding:12px 16px;margin:18px 0 12px;font-size:12px;color:var(--ink-blue-2)">
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink-blue)">🧭 Part 2 — Would this stack pay off? (ex-ante planning model — try your own numbers)</div>
       Drag the sliders to test payback. The WHEV credit is the fragile lever. <span class="tip" tabindex="0" data-tip="This is the decision your earlier self faced, as a model any homeowner can drive. Sliders start at your situation; change them to see how the ladder and the battery&#x27;s payback move. The order that matters: the rate switch is cheap and reversible, the overnight credit is the multiplier (and the most revocable), and the battery is the big irreversible bet whose payback lives or dies on that credit — so verify the first two before committing capital.">i</span>
     </div>
     <div class="sim-controls">
@@ -176,26 +197,26 @@ details.fold[open]>summary{margin-bottom:10px}
       <div class="sim-row"><span class="sim-label">On-peak share of usage:</span>
         <input type="range" id="dOnpk" min="0" max="40" value="10" step="1" oninput="updateDecision()">
         <span class="sim-val" id="dOnpkV">10%</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">% of use in the summer 3–7PM window — low favours TOU/TOD</span></div>
+        <span style="font-size:11px;color:var(--muted);margin-left:8px">% of use in the summer 3–7PM window — low favours TOU/TOD</span></div>
       <div class="sim-row"><span class="sim-label">Overnight credit (WHEV):</span>
         <input type="range" id="dWhev" min="0" max="8" value="4.7" step="0.1" oninput="updateDecision()">
         <span class="sim-val" id="dWhevV">4.7¢</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">¢/kWh credit on midnight–8AM draw. <b>0 = none</b> — the biggest lever on battery value</span></div>
+        <span style="font-size:11px;color:var(--muted);margin-left:8px">¢/kWh credit on midnight–8AM draw. <b>0 = none</b> — the biggest lever on battery value</span></div>
       <div class="sim-row"><span class="sim-label">On-peak rate:</span>
         <input type="range" id="dOnRate" min="8" max="35" value="22" step="0.5" oninput="updateDecision()">
         <span class="sim-val" id="dOnRateV">22.0¢</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">summer on-peak ¢/kWh — bigger spread = more battery arbitrage</span></div>
+        <span style="font-size:11px;color:var(--muted);margin-left:8px">summer on-peak ¢/kWh — bigger spread = more battery arbitrage</span></div>
       <div class="sim-row"><span class="sim-label">Battery usable capacity:</span>
         <input type="range" id="dBatt" min="0" max="30" value="15" step="1" oninput="updateDecision()">
         <span class="sim-val" id="dBattV">15 kWh</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px"><b>0 = no battery</b></span></div>
+        <span style="font-size:11px;color:var(--muted);margin-left:8px"><b>0 = no battery</b></span></div>
       <div class="sim-row"><span class="sim-label">Battery cost ($):</span>
         <input type="range" id="dCost" min="0" max="16000" value="6840" step="100" oninput="updateDecision()">
         <span class="sim-val" id="dCostV">$6,840</span></div>
       <div class="sim-row"><span class="sim-label">Backup / resilience value ($):</span>
         <input type="range" id="dOutage" min="0" max="6000" value="2000" step="100" oninput="updateDecision()">
         <span class="sim-val" id="dOutageV">$2,000</span>
-        <span style="font-size:11px;color:#64748b;margin-left:8px">one-time value of outage protection + home resale, subtracted from cost</span></div>
+        <span style="font-size:11px;color:var(--muted);margin-left:8px">one-time value of outage protection; a $1,500 home-resale value is added on top</span></div>
     </div>
     <div id="decVerdict" style="border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;font-weight:600"></div>
     <div class="chart-box" style="height:270px"><canvas id="decChart"></canvas></div>
@@ -229,7 +250,7 @@ details.fold[open]>summary{margin-bottom:10px}
   <!-- Solar Savings controls (hidden unless solar tab) -->
   <div id="solarSection" style="display:none">
     <div class="sim-controls">
-      <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">4.6 kW Solar Array — Installed Dec 2019, energized mid-2020 · Net Metering (full retail credit)</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">4.6 kW Solar Array — Installed Dec 2019, energized mid-2020 · Net Metering (full retail credit)</div>
       <div class="sim-row">
         <span class="sim-label">System cost (before ITC, $):</span>
         <input type="range" id="solarCostSlider" min="0" max="30000" value="5000" step="500" oninput="updateSolar()">
@@ -240,15 +261,15 @@ details.fold[open]>summary{margin-bottom:10px}
           <input type="checkbox" id="solarItcToggle" onchange="updateSolar()" checked>
           <label for="solarItcToggle"><b>30% Federal ITC applied</b> (installed Dec 2019 — full 30% rate, credited on 2019 return). Reduces net system cost.</label>
         </div>
-        <span style="font-size:12px;font-weight:700;color:#0f172a;margin-left:12px">Net cost: <span id="solarNetCost">$3,500</span></span>
+        <span style="font-size:12px;font-weight:700;color:var(--text);margin-left:12px">Net cost: <span id="solarNetCost">$3,500</span></span>
       </div>
       <p class="note" style="margin-top:8px">Savings = bill without solar − actual bill. <span class="tip" tabindex="0" data-tip="Monthly savings = estimated bill without solar (using actual home consumption kWh on the plan you were on) minus actual bill paid. Net metering is full retail in NM — solar export earns the same rate as import. Data available May 2024 – present (~27 months). Pre-2024 savings estimated from annual run rate. Payback line shows when cumulative savings crosses system net cost.">i</span></p>
     </div>
     <div class="sim-cards" id="solarCards"></div>
 
     <!-- Solar production trend note -->
-    <div style="background:#f0f9ff;border:1px solid #7dd3fc;border-radius:8px;padding:14px 16px;margin-top:4px;margin-bottom:4px;font-size:12px;color:#0c4a6e">
-      <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#0369a1">📊 Solar Production Trend — 2024 vs 2025 Analysis (Apr 2026)</div>
+    <div style="background:var(--tint-sky);border:1px solid #7dd3fc;border-radius:8px;padding:14px 16px;margin-top:4px;margin-bottom:4px;font-size:12px;color:var(--ink-sky)">
+      <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--ink-sky-2)">📊 Solar Production Trend — 2024 vs 2025 Analysis (Apr 2026)</div>
       <div>2025 summer output −22% vs. 2024: 2024 was unusually sunny, not panel loss. <span class="tip" tabindex="0" data-tip="Observation: Summer solar generation fell ~22% year-over-year (May−Oct), while winter/spring months are essentially flat (+4%). The biggest drops were May (−32%), Jun (−27%), Jul (−25%), narrowing to Sep (−8%) and Nov (+5%). Root cause — 2024 was anomalously high, not 2025 low: May 2024 recorded 924 kWh, which is 103% of the theoretical maximum for a 4.6 kW system at Las Cruces peak sun hours. New Mexico was in a significant drought in 2024 with well below-normal cloud cover. 2025 summer production (~70% of theoretical max) reflects more typical conditions. Why not dirty panels: Soiling in desert environments typically causes 5–7% uniform losses across all months. The seasonal concentration of losses here (32% in summer, near-zero in winter) is inconsistent with soiling or panel degradation, which would affect all months proportionally. The system&#x27;s strong March 2026 performance (+16% vs prior year) further confirms normal operation. Recommendation: Annual spring wash (April) is good practice in a dusty desert environment but will not recover the summer gap — that&#x27;s weather variability. If summer 2026 production tracks 2024 levels, that would further confirm 2025 was the outlier. Monitor inverter logs for fault/clipping events if the trend continues. System notes: Panels installed December 2019 (30% federal ITC, credited on 2019 return); energized mid-2020 after permitting. Installation was bundled with a new AC system — incremental solar cost was roughly ~$10k out of pocket after credits and other incentives, making standalone payback analysis somewhat notional.">i</span></div>
     </div>
   </div>
@@ -258,15 +279,15 @@ details.fold[open]>summary{margin-bottom:10px}
   <!-- ====================================================================== -->
   <details class="fold">
   <summary>⚖️ Rate plan: TOD + WHEV since Jul 2026 · beats CPP even without WHEV</summary>
-  <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:14px 16px">
+  <div style="background:var(--tint-orange);border:1px solid #fdba74;border-radius:10px;padding:14px 16px">
     <a href="Rate_Plan_Decision_Tool.html" style="display:inline-block;background:#ea580c;color:#fff;font-size:12px;font-weight:700;text-decoration:none;padding:7px 14px;border-radius:7px;margin-bottom:10px">🎛️ Open interactive decision tool — stress-test rates, usage &amp; battery →</a>
-    <p style="font-size:12.5px;color:#7c2d12;line-height:1.55;margin:0 0 12px">
-      <b style="color:#15803d">Done: on TOD + WHEV since Jul 2026</b>; the credit shows on every bill. <span class="tip" tabindex="0" data-tip="DONE — switched to TOD + WHEV (July 2026). CPP couldn&#x27;t be paired with the WHEV rider, but TOD/Power Hours is part of Rate No. 01, so WHEV attaches to it — and your Jul 2026 bill confirms it: the WHEV credit (294 kWh × 4.74¢ = −$13.94) is stacked on the TOD rate. WHEV is active, not pending. Figures are annual all-in, built on your actual billed usage (incl. the summer travel month), monthly net-metered, with the 18 kWh battery doing daily arbitrage and CPP critical-events assumed battery-covered (excluded). Model reconciles to your real bills: CPP ≈ $822 vs ~$802 actual. Riders &amp; taxes are broken out separately (RPS/TEP/FPPCAC per-kWh, EUEF, AMS, customer charge, franchise 2.0% + tax 8.56%) — they&#x27;re nearly plan-neutral, so the differences are what matter.">i</span>
+    <p style="font-size:12.5px;color:var(--ink-orange);line-height:1.55;margin:0 0 12px">
+      <b style="color:var(--ink-green)">Done: on TOD + WHEV since Jul 2026</b>; the credit shows on every bill. <span class="tip" tabindex="0" data-tip="DONE — switched to TOD + WHEV (July 2026). CPP couldn&#x27;t be paired with the WHEV rider, but TOD/Power Hours is part of Rate No. 01, so WHEV attaches to it — and your Jul 2026 bill confirms it: the WHEV credit (294 kWh × 4.74¢ = −$13.94) is stacked on the TOD rate. WHEV is active, not pending. Figures are annual all-in, built on your actual billed usage (incl. the summer travel month), monthly net-metered, with the 18 kWh battery doing daily arbitrage and CPP critical-events assumed battery-covered (excluded). Model reconciles to your real bills: CPP ≈ $822 vs ~$802 actual. Riders &amp; taxes are broken out separately (RPS/TEP/FPPCAC per-kWh, EUEF, AMS, customer charge, franchise 2.0% + tax 8.56%) — they&#x27;re nearly plan-neutral, so the differences are what matter.">i</span>
     </p>
     <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:12.5px;background:white;border-radius:8px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border-radius:8px;overflow:hidden">
         <thead>
-          <tr style="background:#fed7aa;color:#7c2d12">
+          <tr style="background:var(--tint-orange-2);color:var(--ink-orange)">
             <th style="text-align:left;padding:8px 10px">Annual, battery on (current rates)</th>
             <th style="padding:8px 10px">Energy</th>
             <th style="padding:8px 10px">Riders&nbsp;+&nbsp;tax</th>
@@ -280,44 +301,44 @@ details.fold[open]>summary{margin-bottom:10px}
             <td style="padding:8px 10px;text-align:center">$460</td><td style="padding:8px 10px;text-align:center">$362</td>
             <td style="padding:8px 10px;text-align:center;font-weight:700">$822</td><td style="padding:8px 10px;text-align:center">—</td>
           </tr>
-          <tr style="border-bottom:1px solid #fde68a;background:#f0fdf4">
+          <tr style="border-bottom:1px solid #fde68a;background:var(--tint-green)">
             <td style="padding:8px 10px;font-weight:700">TOD + WHEV  ⟵ best</td>
             <td style="padding:8px 10px;text-align:center">$108</td><td style="padding:8px 10px;text-align:center">$333</td>
-            <td style="padding:8px 10px;text-align:center;font-weight:800">$441</td><td style="padding:8px 10px;text-align:center;color:#15803d;font-weight:700">−$381</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:800">$441</td><td style="padding:8px 10px;text-align:center;color:var(--ink-green);font-weight:700">−$381</td>
           </tr>
           <tr style="border-bottom:1px solid #fde68a">
             <td style="padding:8px 10px;font-weight:600">TOD, no WHEV <span style="font-weight:400">(if WHEV denied/revoked)</span></td>
             <td style="padding:8px 10px;text-align:center">$409</td><td style="padding:8px 10px;text-align:center">$356</td>
-            <td style="padding:8px 10px;text-align:center;font-weight:700">$765</td><td style="padding:8px 10px;text-align:center;color:#15803d;font-weight:700">−$57</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:700">$765</td><td style="padding:8px 10px;text-align:center;color:var(--ink-green);font-weight:700">−$57</td>
           </tr>
           <tr>
             <td style="padding:8px 10px;font-weight:600">Standard (flat) + WHEV <span style="font-weight:400">(dominated)</span></td>
             <td style="padding:8px 10px;text-align:center">$302</td><td style="padding:8px 10px;text-align:center">$353</td>
-            <td style="padding:8px 10px;text-align:center;font-weight:700">$655</td><td style="padding:8px 10px;text-align:center;color:#15803d;font-weight:700">−$167</td>
+            <td style="padding:8px 10px;text-align:center;font-weight:700">$655</td><td style="padding:8px 10px;text-align:center;color:var(--ink-green);font-weight:700">−$167</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div style="overflow-x:auto;margin-top:10px">
-      <table style="width:100%;border-collapse:collapse;font-size:12px;background:white;border-radius:8px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;background:var(--card);border-radius:8px;overflow:hidden">
         <thead>
-          <tr style="background:#fde68a;color:#7c2d12">
+          <tr style="background:var(--tint-amber-2);color:var(--ink-orange)">
             <th style="text-align:left;padding:6px 10px">TOTAL $/yr (Δ vs CPP) — rate-case sensitivity</th>
             <th style="padding:6px 10px">Current</th><th style="padding:6px 10px">Phase 1 (+27%)</th><th style="padding:6px 10px">Phase 2 (+50%)</th>
           </tr>
         </thead>
         <tbody>
           <tr style="border-bottom:1px solid #fde68a"><td style="padding:6px 10px;font-weight:600">CPP</td><td style="padding:6px 10px;text-align:center">$822</td><td style="padding:6px 10px;text-align:center">$959</td><td style="padding:6px 10px;text-align:center">$1,076</td></tr>
-          <tr style="border-bottom:1px solid #fde68a;background:#f0fdf4"><td style="padding:6px 10px;font-weight:700">TOD + WHEV</td><td style="padding:6px 10px;text-align:center">$441 <span style="color:#15803d">(−381)</span></td><td style="padding:6px 10px;text-align:center">$518 <span style="color:#15803d">(−441)</span></td><td style="padding:6px 10px;text-align:center">$605 <span style="color:#15803d">(−471)</span></td></tr>
-          <tr style="border-bottom:1px solid #fde68a"><td style="padding:6px 10px;font-weight:600">TOD, no WHEV</td><td style="padding:6px 10px;text-align:center">$765 <span style="color:#15803d">(−57)</span></td><td style="padding:6px 10px;text-align:center">$887 <span style="color:#15803d">(−72)</span></td><td style="padding:6px 10px;text-align:center">$991 <span style="color:#15803d">(−85)</span></td></tr>
-          <tr><td style="padding:6px 10px;font-weight:600">Standard + WHEV</td><td style="padding:6px 10px;text-align:center">$655 <span style="color:#15803d">(−167)</span></td><td style="padding:6px 10px;text-align:center">$842 <span style="color:#15803d">(−117)</span></td><td style="padding:6px 10px;text-align:center">$1,010 <span style="color:#15803d">(−66)</span></td></tr>
+          <tr style="border-bottom:1px solid #fde68a;background:var(--tint-green)"><td style="padding:6px 10px;font-weight:700">TOD + WHEV</td><td style="padding:6px 10px;text-align:center">$441 <span style="color:var(--ink-green)">(−381)</span></td><td style="padding:6px 10px;text-align:center">$518 <span style="color:var(--ink-green)">(−441)</span></td><td style="padding:6px 10px;text-align:center">$605 <span style="color:var(--ink-green)">(−471)</span></td></tr>
+          <tr style="border-bottom:1px solid #fde68a"><td style="padding:6px 10px;font-weight:600">TOD, no WHEV</td><td style="padding:6px 10px;text-align:center">$765 <span style="color:var(--ink-green)">(−57)</span></td><td style="padding:6px 10px;text-align:center">$887 <span style="color:var(--ink-green)">(−72)</span></td><td style="padding:6px 10px;text-align:center">$991 <span style="color:var(--ink-green)">(−85)</span></td></tr>
+          <tr><td style="padding:6px 10px;font-weight:600">Standard + WHEV</td><td style="padding:6px 10px;text-align:center">$655 <span style="color:var(--ink-green)">(−167)</span></td><td style="padding:6px 10px;text-align:center">$842 <span style="color:var(--ink-green)">(−117)</span></td><td style="padding:6px 10px;text-align:center">$1,010 <span style="color:var(--ink-green)">(−66)</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:12px 0 0">
+    <p style="font-size:12px;color:var(--ink-orange);line-height:1.55;margin:12px 0 0">
       <b>Why TOD wins:</b> low on-peak share, cheap off-peak, plus the WHEV credit. <span class="tip" tabindex="0" data-tip="TOD wins because: your usage is overnight/evening-heavy with midday solar export, and on-peak is only ~11% of summer use (your Jun bill: 144 of 1,363 kWh), which the battery easily covers. TOD&#x27;s off-peak (5.5¢) beats CPP&#x27;s (6.8¢) and crushes Standard&#x27;s tier-2 (10.9¢); WHEV then adds a 4.74¢/kWh credit on all midnight–8AM kWh, a year-round night→day arbitrage on top of the summer on-peak shifting.">i</span>
     </p>
-    <p style="font-size:12px;color:#7c2d12;line-height:1.55;margin:10px 0 0">
+    <p style="font-size:12px;color:var(--ink-orange);line-height:1.55;margin:10px 0 0">
       <b>Watch:</b> WHEV could be revoked; summer battery downtime costs 22¢/kWh. <span class="tip" tabindex="0" data-tip="Done: on TOD (Power Hours) + WHEV since July 2026. Leaving the CPP pilot was a one-way door, but TOD beats CPP in every rate scenario even with no WHEV at all (−$57 to −$85/yr), so that was covered regardless — and WHEV did stack, so you&#x27;re on the best case. Remaining watch-items, all modest: (1) WHEV &quot;outlier&quot; review risk from battery arbitrage — but the TOD-no-WHEV fallback still beats CPP; (2) TOD&#x27;s 22¢ on-peak makes you battery-dependent on summer afternoons — only a problem if the battery is down a whole summer and WHEV is revoked (≈$15/yr worse than CPP). FPPCAC is variable (±~1¢/kWh, plan-neutral); minimum-bill floor caps the WHEV credit in low-usage months.">i</span>
     </p>
   </div>
@@ -328,28 +349,28 @@ details.fold[open]>summary{margin-bottom:10px}
   <details class="fold">
   <summary>📅 Modeled plan comparison by month (pre-battery year, battery simulated)</summary>
   <div>
-    <p style="font-size:11.5px;color:#64748b;margin:0 0 12px;line-height:1.5">
+    <p style="font-size:11.5px;color:var(--muted);margin:0 0 12px;line-height:1.5">
       Modeled on your meter data with the battery. Standard is the do-nothing baseline. <span class="tip" tabindex="0" data-tip="Worst→best: Standard → CPP → TOD → TOD+WHEV. Each column is the all-in bill (energy + riders + taxes + customer charge) computed directly from your 12-month GreenButton 15-min meter data (Aug 2025–Jul 2026), with your 3× battery simulated the same way as the Battery Economics tab — one engine. CPP/TOD/TOD+WHEV are billed with the battery covering the highest-rate load; Standard has no time-of-use so the battery adds ~nothing there. CPP critical-events excluded (battery-covered). Net kWh = meter import − export.">i</span>
     </p>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead>
-          <tr style="border-bottom:2px solid #e2e8f0;color:#64748b">
+          <tr style="border-bottom:2px solid var(--border);color:var(--muted)">
             <th style="text-align:left;padding:5px 8px">Month</th>
             <th style="text-align:right;padding:5px 8px">Net kWh</th>
             <th style="text-align:right;padding:5px 8px">Standard</th>
             <th style="text-align:right;padding:5px 8px">CPP</th>
             <th style="text-align:right;padding:5px 8px">TOD</th>
-            <th style="text-align:right;padding:5px 8px;background:#f0fdf4;color:#15803d">TOD+WHEV</th>
+            <th style="text-align:right;padding:5px 8px;background:var(--tint-green);color:var(--ink-green)">TOD+WHEV</th>
           </tr>
         </thead>
         <tbody id="monthlyCmpBody"></tbody>
         <tfoot>
-          <tr id="monthlyCmpFoot" style="border-top:2px solid #e2e8f0;font-weight:800;color:#0f172a"></tr>
+          <tr id="monthlyCmpFoot" style="border-top:2px solid var(--border);font-weight:800;color:var(--text)"></tr>
         </tfoot>
       </table>
     </div>
-    <p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Battery alone ≈ <b>$396/yr</b> of the gap. <span class="tip" tabindex="0" data-tip="Standard is the do-nothing baseline (flat/tiered) — worst in every month, driven by summer tier-2 (10.9¢). On the meter data the battery saves ≈ $396/yr on TOD+WHEV (the gap between TOD+WHEV here and the same plan with no battery); that same figure appears in the Battery Economics tab. Non-summer TOD off-peak assumed 3.428¢ (per parsed-bill rate history); FPPCAC held at a representative −0.8¢/kWh (plan-neutral). Calendar months, so individual months differ slightly from your mid-month bills; annual totals reconcile to the meter.">i</span></p>
+    <p style="font-size:11px;color:var(--faint);margin:8px 0 0">Battery alone ≈ <b>$396/yr</b> of the gap. <span class="tip" tabindex="0" data-tip="Standard is the do-nothing baseline (flat/tiered) — worst in every month, driven by summer tier-2 (10.9¢). On the meter data the battery saves ≈ $396/yr on TOD+WHEV (the gap between TOD+WHEV here and the same plan with no battery); that same figure appears in the Battery Economics tab. Non-summer TOD off-peak assumed 3.428¢ (per parsed-bill rate history); FPPCAC held at a representative −0.8¢/kWh (plan-neutral). Calendar months, so individual months differ slightly from your mid-month bills; annual totals reconcile to the meter.">i</span></p>
   </div>
   </details>
   <script>
@@ -361,12 +382,12 @@ details.fold[open]>summary{margin-bottom:10px}
     var b=document.getElementById('monthlyCmpBody');
     (typeof MCMP_ROWS!=='undefined'?MCMP_ROWS:[]).forEach(function(r){
       var tr=document.createElement('tr'); tr.style.borderBottom='1px solid #f1f5f9';
-      tr.innerHTML='<td style="padding:5px 8px;font-weight:600;color:#334155">'+r[0]+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;color:#64748b">'+r[1].toLocaleString()+'</td>'+
+      tr.innerHTML='<td style="padding:5px 8px;font-weight:600;color:var(--text-2)">'+r[0]+'</td>'+
+        '<td style="text-align:right;padding:5px 8px;color:var(--muted)">'+r[1].toLocaleString()+'</td>'+
         '<td style="text-align:right;padding:5px 8px">$'+r[2]+'</td>'+
         '<td style="text-align:right;padding:5px 8px">$'+r[3]+'</td>'+
         '<td style="text-align:right;padding:5px 8px">$'+r[4]+'</td>'+
-        '<td style="text-align:right;padding:5px 8px;background:#f0fdf4;color:#15803d;font-weight:700">$'+r[5]+'</td>';
+        '<td style="text-align:right;padding:5px 8px;background:var(--tint-green);color:var(--ink-green);font-weight:700">$'+r[5]+'</td>';
       b.appendChild(tr);
     });
     if(typeof MCMP_YEAR!=='undefined'){
@@ -377,7 +398,7 @@ details.fold[open]>summary{margin-bottom:10px}
         '<td style="text-align:right;padding:6px 8px">$'+y.std.toLocaleString()+'</td>'+
         '<td style="text-align:right;padding:6px 8px">$'+y.cpp.toLocaleString()+'</td>'+
         '<td style="text-align:right;padding:6px 8px">$'+y.tod.toLocaleString()+'</td>'+
-        '<td style="text-align:right;padding:6px 8px;background:#f0fdf4;color:#15803d">$'+y.todw.toLocaleString()+'</td>';
+        '<td style="text-align:right;padding:6px 8px;background:var(--tint-green);color:var(--ink-green)">$'+y.todw.toLocaleString()+'</td>';
     }
   })();
   </script>
@@ -393,7 +414,7 @@ details.fold[open]>summary{margin-bottom:10px}
     </div>
   </details>
 
-  <p class="note" style="margin:4px 0 10px;font-style:normal;color:#92400e">⚠️ Pending EPE rate case (filed Mar 27, 2026): ~$30/mo residential; decision expected end of 2026. <span class="tip" tabindex="0" data-tip="EPE seeking ~$70M additional NM base revenue. Average residential impact: ~$30/month. Decision expected end of 2026. Current simulator uses approved 14th Revised Rate No. 01 tariff. A higher base rate widens TOU/CPP advantage over Standard and improves battery arbitrage spreads.">i</span></p>
+  <p class="note" style="margin:4px 0 10px;font-style:normal;color:var(--ink-amber)">⚠️ Pending EPE rate case (filed Mar 27, 2026): ~$30/mo residential; decision expected end of 2026. <span class="tip" tabindex="0" data-tip="EPE seeking ~$70M additional NM base revenue. Average residential impact: ~$30/month. Decision expected end of 2026. Current simulator uses approved 14th Revised Rate No. 01 tariff. A higher base rate widens TOU/CPP advantage over Standard and improves battery arbitrage spreads.">i</span></p>
   <p class="footer">Data: EPE bills, EPE 15-min meter, Anker app · updated Nov 2026 <span class="tip" tabindex="0" data-tip="Data: El Paso Electric bills parsed from PDF · Solar &amp; grid meters · Apr 2026 Simulator: All-in costs include Energy + Customer + FPPCAC + RPS + TEP + AMS + EUEF + Franchise Fee + Taxes · Rider rates era-matched to each bill period · FPPCAC extracted per-bill from PDFs Updated Apr 2026: isSummer corrected (TOU/Standard Jun–Oct, CPP Jun–Sep) · Plan history corrected (Nov 2025 rate drop = plan switch TOU→CPP, not tariff revision) · WHEV rider confirmed as Rate No. 01 rider ($0.0474/kWh, AN289) · CPP event model updated (full battery utilization on high-demand event days) · Battery non-arbitrage value adjustments added · Rate case what-if tracker added · Emporia Vue hourly data integrated (actual on-peak ratios replace estimates) · 2026 forward projection tab added with EV + WHEV scenario modeling">i</span></p>
 </div>
 
@@ -413,6 +434,26 @@ details.fold[open]>summary{margin-bottom:10px}
   addEventListener('scroll', hide, {passive:true});
 })();
 function tipHTML(detail){ const d = document.createElement('span'); d.className = 'tip'; d.tabIndex = 0; d.dataset.tip = detail; d.textContent = 'i'; return d.outerHTML; }
+// ── Theme toggle (light/dark), remembered per browser and shared across the site ──
+function isDark(){ return document.documentElement.dataset.theme === 'dark'; }
+function renderThemeBtn(){ const b = document.getElementById('themeBtn'); if (b) b.textContent = isDark() ? '☀️ Light' : '🌙 Dark'; }
+function toggleTheme(){
+  const t = isDark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem('epeTheme', t); } catch(e) {}
+  renderThemeBtn();
+  if (typeof onThemeChange === 'function') onThemeChange();
+}
+window.toggleTheme = toggleTheme;
+// Chart.js draws on canvas, so theme colors are applied in JS and charts are re-rendered on toggle
+function gridColor(){ return isDark() ? '#243049' : '#f1f5f9'; }
+function applyChartTheme(){
+  const d = isDark();
+  Chart.defaults.color = d ? '#cbd5e1' : '#666';
+  PAL.load = d ? '#e2e8f0' : '#0f172a';
+  Object.assign(YC, d ? {2024:'#475569', 2025:'#94a3b8', 2026:'#e2e8f0'} : {2024:'#cbd5e1', 2025:'#94a3b8', 2026:'#334155'});
+}
+function onThemeChange(){ applyChartTheme(); renderChart(); }
 function setNote(el, short, detail){ el.textContent = short; if (detail) el.insertAdjacentHTML('beforeend', tipHTML(detail)); }
 // Register datalabels plugin but default to off — enable only per-dataset
 Chart.register(ChartDataLabels);
@@ -423,7 +464,7 @@ Chart.register({ id:'eventLines',
     o.bands.forEach(b=>{ const x0=x.getPixelForValue(b.from), x1=x.getPixelForValue(b.to); g.fillStyle=b.color; g.fillRect(x0,a.top,x1-x0,a.bottom-a.top); });
     g.restore(); },
   afterDatasetsDraw(c){ const o=c.options.plugins.eventLines; if(!o||!o.lines) return;
-    const x=c.scales.x, a=c.chartArea, g=c.ctx; g.save(); g.setLineDash([4,3]); g.strokeStyle='#64748b'; g.fillStyle='#334155';
+    const x=c.scales.x, a=c.chartArea, g=c.ctx; g.save(); g.setLineDash([4,3]); g.strokeStyle='#64748b'; g.fillStyle=isDark()?'#cbd5e1':'#334155';
     g.font='600 10px -apple-system,"Segoe UI",sans-serif';
     o.lines.forEach((l,k)=>{ if(l.i==null||l.i<0) return; const px=x.getPixelForValue(l.i);
       g.beginPath(); g.moveTo(px,a.top); g.lineTo(px,a.bottom); g.stroke();
@@ -859,7 +900,7 @@ YEARS.forEach(yr => {
   const t = { bill:0,net:0,sol:0,home:0,exp:0 };
   rows.forEach(b => { t.bill+=b.bill; t.net+=b.net; t.sol+=b.sol||0; t.home+=b.home||0; t.exp+=b.rcvd; });
   cardsEl.innerHTML += `<div class="card" style="border-top:4px solid ${YC[yr]}">
-    <div class="card-title" style="color:${YC[yr]}">${yr} (${rows.length} bills)</div>
+    <div class="card-title" style="color:var(--text)">${yr} (${rows.length} bills)</div>
     <div class="card-row">
       Home: <b>${t.home.toLocaleString()} kWh</b><br>
       Solar: <b>${t.sol.toLocaleString()} kWh</b><br>
@@ -1092,17 +1133,17 @@ function renderChart(){
         plugins:{ legend:{position:'top', labels:{font:{size:10}, boxWidth:12}},
           tooltip:{ mode:'index', callbacks:{ footer:items=>{ const b=BILLS[items[0].dataIndex]; return b.home!=null ? 'Home use: '+b.home.toLocaleString()+' kWh' : ''; } } } },
         scales:{ x:{stacked:true, grid:{display:false}, ticks:{display:false}},
-          y:{stacked:true, grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh'}, ...FIXW} } }
+          y:{stacked:true, grid:{color:gridColor()}, title:{display:true,text:'kWh'}, ...FIXW} } }
     });
     addEvents(chart, billEvents());
     chart2 = new Chart(chart2Ctx(190), {
       type:'bar',
-      data:{ labels:LABELS, datasets:[{ label:'Bill $', data:BILLS.map(b=>b.bill), backgroundColor:'#475569', borderRadius:3 }]},
+      data:{ labels:LABELS, datasets:[{ label:'Bill $', data:BILLS.map(b=>b.bill), backgroundColor:isDark()?'#94a3b8':'#475569', borderRadius:3 }]},
       options:{ responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>'Bill: $'+c.raw.toFixed(2),
           afterLabel:c=>{ const b=BILLS[c.dataIndex]; return [b.net>0?'All-in '+(b.bill/b.net*100).toFixed(2)+'¢/kWh':'', b.opk!=null?'On-peak '+b.opk+' kWh':''].filter(Boolean); } } } },
         scales:{ x:{grid:{display:false}, ticks:{maxRotation:90,minRotation:90,font:{size:9}}},
-          y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Bill'}, ...FIXW} } }
+          y:{grid:{color:gridColor()}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Bill'}, ...FIXW} } }
     });
     alignPanels(chart, chart2); addEvents(chart2, billEvents().map(e=>({...e, text:''})));
 
@@ -1129,7 +1170,7 @@ function renderChart(){
       },
       options: { responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{position:'top',labels:{font:{size:12}}} },
-        scales:{ x:{grid:{color:'#f1f5f9'}}, y:{grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh'}} }
+        scales:{ x:{grid:{color:gridColor()}}, y:{grid:{color:gridColor()}, title:{display:true,text:'kWh'}} }
       }
     });
   } else if(activeView==='tou'){
@@ -1188,7 +1229,7 @@ function renderChart(){
         color: alreadyPaid ? '#16a34a' : '#f59e0b' },
     ].map(c => `<div class="sim-card" style="border-top:4px solid ${c.color}">
       <div class="plan-name" style="color:${c.color}">${c.label}</div>
-      <div class="plan-total" style="color:#0f172a">${c.val}</div>
+      <div class="plan-total" style="color:var(--text)">${c.val}</div>
       <div class="plan-detail">${c.sub}</div>
     </div>`).join('');
 
@@ -1208,7 +1249,7 @@ function renderChart(){
                 return sol ? sol + ' kWh' : '';
               },
               font: { size: 9, weight: '600' },
-              color: '#475569',
+              color: isDark()?'#cbd5e1':'#475569',
             }
           },
           { type:'line', label:'Cumulative Savings ($)', data:cumData,
@@ -1227,8 +1268,8 @@ function renderChart(){
           datalabels: { display: false },  // off by default; overridden per-dataset above
         },
         scales:{
-          x:{ grid:{color:'#f1f5f9'}, ticks:{maxRotation:40,font:{size:10}} },
-          y:{ grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Monthly Savings ($)'} },
+          x:{ grid:{color:gridColor()}, ticks:{maxRotation:40,font:{size:10}} },
+          y:{ grid:{color:gridColor()}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Monthly Savings ($)'} },
           y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative ($)'} },
         }
       }
@@ -1276,10 +1317,10 @@ function renderWeatherNorm(ctx, title, note){
     type:'scatter',
     data:{ datasets:[
       { label:'2025 daily (pre-battery)', data:pt(W25),
-        backgroundColor:'#3b82f6', borderColor:'#ffffff', borderWidth:1.5,
+        backgroundColor:'#3b82f6', borderColor:isDark()?'#131c2e':'#ffffff', borderWidth:1.5,
         pointRadius:4.5, pointHoverRadius:7, order:3 },
       { label:'2026 daily (post-battery)', data:pt(W26),
-        backgroundColor:'#f59e0b', borderColor:'#ffffff', borderWidth:1.5,
+        backgroundColor:'#f59e0b', borderColor:isDark()?'#131c2e':'#ffffff', borderWidth:1.5,
         pointRadius:4.5, pointHoverRadius:7, order:3 },
       { label:'Jun 15\u201324 2026 (pre-battery, occupied)', data:pt(J26),
         backgroundColor:'transparent', borderColor:'#b45309', borderWidth:2,
@@ -1299,10 +1340,10 @@ function renderWeatherNorm(ctx, title, note){
       { label:'Unexplained by weather (+4.5 kWh/day)',
         data:[{x:F.y2026.meanC,y:WX_CF},{x:F.y2026.meanC,y:F.y2026.meanH}], showLine:true,
         borderColor:'#64748b', borderWidth:3, borderDash:[4,3],
-        pointBackgroundColor:'#64748b', pointBorderColor:'#ffffff', pointBorderWidth:2,
+        pointBackgroundColor:'#64748b', pointBorderColor:isDark()?'#131c2e':'#ffffff', pointBorderWidth:2,
         pointRadius:5, pointHoverRadius:8, fill:false, order:0, pointStyle:'circle',
         datalabels:{ display:c=>c.dataIndex===1, anchor:'end', align:'right', offset:6,
-          color:'#475569', font:{size:10,weight:700}, formatter:()=>'+4.5 kWh/day' } },
+          color:isDark()?'#cbd5e1':'#475569', font:{size:10,weight:700}, formatter:()=>'+4.5 kWh/day' } },
     ]},
     options:{
       responsive:true, maintainAspectRatio:false,
@@ -1318,9 +1359,9 @@ function renderWeatherNorm(ctx, title, note){
         } } }
       },
       scales:{
-        x:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Cooling degree days  (base 65\u00b0F)',font:{size:11}},
+        x:{ grid:{color:gridColor()}, title:{display:true,text:'Cooling degree days  (base 65\u00b0F)',font:{size:11}},
             ticks:{font:{size:10}}, min:4, max:24 },
-        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Home consumption (kWh/day)',font:{size:11}},
+        y:{ grid:{color:gridColor()}, title:{display:true,text:'Home consumption (kWh/day)',font:{size:11}},
             ticks:{font:{size:10}}, beginAtZero:false }
       }
     }
@@ -1349,7 +1390,7 @@ function renderLadder(ctx, title, note){
           label:c=>c.dataset.label.replace('…','').replace(' saved','')+': $'+Math.round(c.raw),
           afterBody:(items)=>{ const i=items[0].dataIndex; return 'Total saved vs Standard: $'+Math.round(std[i]-tb[i]); } } } },
       scales:{ x:{ grid:{display:false}, ticks:{font:{size:10}} },
-        y:{ grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative $ over the year'} } }
+        y:{ grid:{color:gridColor()}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative $ over the year'} } }
     }
   });
   renderLadderCards();
@@ -1364,8 +1405,8 @@ function renderLadderCards(){
     {t:'→ switch to TOD', v:'−$'+dPlan, s:'TOD alone: $'+t.tod+'/yr', c:PAL.tod},
     {t:'→ add WHEV rider', v:'−$'+dWhev, s:'TOD+WHEV: $'+t.todw+'/yr', c:PAL.whev},
     {t:'→ add 3× battery', v:'−$'+dBatt, s:'the marginal battery value', c:PAL.batt},
-    {t:'You pay (full stack)', v:'$'+t.todwb, s:'TOD+WHEV+Battery', c:'#0f172a'},
-    {t:'TOTAL saved vs Standard', v:'−$'+dTot, s:(dTot/t.std*100).toFixed(0)+'% lower', c:'#15803d'},
+    {t:'You pay (full stack)', v:'$'+t.todwb, s:'TOD+WHEV+Battery', c:'var(--text)'},
+    {t:'TOTAL saved vs Standard', v:'−$'+dTot, s:(dTot/t.std*100).toFixed(0)+'% lower', c:'var(--ink-green)'},
   ];
   el.innerHTML=cards.map(c=>`<div class="sim-card" style="border-top:4px solid ${c.c}"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:${c.c};font-size:20px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`).join('');
 }
@@ -1375,7 +1416,7 @@ function renderLadderCards(){
 let decChart = null;
 const DEC_CONST = { summerPct:0.473, octPct:0.078, ovnPct:0.325,
   offRate:0.05527, nsRate:0.03428, octRate:0.05816, sT1:0.07035, sT2:0.10876, sNS:0.05816,
-  eff:0.90, util:0.88, capture:0.87, homeVal:1500,
+  eff:0.90, util:0.88, capture:0.87, homeVal:1500, life:15,
   CUST:84, AMS:45.84, RPS:0.020215, TEP:0.001002, FPP:-0.008, EUEF:0.035, FRAN:0.020, TAX:0.084 };
 function decAllIn(energy, net){
   const k=DEC_CONST, kwh=Math.max(net,0);
@@ -1423,18 +1464,20 @@ function renderDecisionTool(){
   renderLadderCards();
   const inp=readDec(), m=decModel(inp);
   const hasBatt=inp.batt>0;
-  const bars=[m.std, m.tod, m.todw, m.todwb];
-  const labels=['Standard','TOD','TOD+WHEV','+ Battery'];
-  const cols=['#94a3b8',PAL.tod,PAL.whev,PAL.batt];
+  // One-time backup + home-resale value, spread over the battery's life so it sits alongside the annual bill figures
+  const resilOnce = hasBatt ? inp.outage + DEC_CONST.homeVal : 0, resilYr = resilOnce / DEC_CONST.life;
+  const bars=[m.std, m.tod, m.todw, m.todwb].concat(resilYr>0 ? [Math.max(0, m.todwb - resilYr)] : []);
+  const labels=['Standard','TOD','TOD+WHEV','+ Battery'].concat(resilYr>0 ? ['+ backup value'] : []);
+  const cols=['#94a3b8',PAL.tod,PAL.whev,PAL.batt,PAL.saved];
   if(decChart) decChart.destroy();
   decChart=new Chart(cv.getContext('2d'),{
     type:'bar',
     data:{ labels, datasets:[{ label:'All-in $/yr', data:bars.map(v=>Math.round(v)), backgroundColor:cols, borderRadius:4 }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false},
-        tooltip:{callbacks:{label:c=>'$'+c.raw+'/yr'}},
+        tooltip:{callbacks:{label:c=>'$'+c.raw+'/yr', afterLabel:c=>c.dataIndex===4 ? 'Bills minus $'+Math.round(resilYr)+'/yr of backup + home value ($'+resilOnce.toLocaleString()+' over '+DEC_CONST.life+' yr)' : ''}},
         title:{display:true, text:'Annual all-in cost by scenario (your inputs)', font:{size:12}} },
-      scales:{ x:{grid:{display:false}}, y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'$ / year'}} } }
+      scales:{ x:{grid:{display:false}}, y:{grid:{color:gridColor()}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'$ / year'}} } }
   });
   // verdict
   const battMarg=m.battSave, totVsStd=m.std-m.todwb;
@@ -1444,26 +1487,27 @@ function renderDecisionTool(){
   const fmtY=p=> p===Infinity?'never':(p<1?'<1':p.toFixed(0))+' yr';
   let bg,txt;
   if(!hasBatt){
-    bg='#eff6ff'; txt=`<span style="color:#1d4ed8">Plan only (no battery): <b>TOD+WHEV saves $${Math.round(m.std-m.todw)}/yr vs Standard</b> — near-zero cost, fully reversible. Add a battery below to test the capital bet.</span>`;
+    bg='var(--tint-blue)'; txt=`<span style="color:var(--ink-blue)">Plan only (no battery): <b>TOD+WHEV saves $${Math.round(m.std-m.todw)}/yr vs Standard</b> — near-zero cost, fully reversible. Add a battery below to test the capital bet.</span>`;
   } else {
     const good = payAdj<=10, ok = payAdj<=15;
-    bg = good?'#f0fdf4':(ok?'#fffbeb':'#fef2f2');
-    const col = good?'#15803d':(ok?'#b45309':'#b91c1c');
+    bg = good?'var(--tint-green)':(ok?'var(--tint-amber)':'var(--tint-red)');
+    const col = good?'var(--ink-green)':(ok?'var(--ink-brown)':'var(--ink-red)');
     const verdictWord = good?'pays off':(ok?'marginal':'slow payback');
-    txt=`<span style="color:${col}">Battery adds <b>$${Math.round(battMarg)}/yr</b> · payback <b>${fmtY(payArb)}</b> on arbitrage alone, <b>${fmtY(payAdj)}</b> counting backup/home value → <b>${verdictWord}</b>.` +
-        `  Full stack vs Standard: <b>−$${Math.round(totVsStd)}/yr</b>.` +
+    txt=`<span style="color:${col}">Battery adds <b>$${Math.round(battMarg)}/yr</b> in bills + <b>$${Math.round(resilYr)}/yr</b> backup/home value · payback <b>${fmtY(payArb)}</b> on arbitrage alone, <b>${fmtY(payAdj)}</b> counting backup/home value → <b>${verdictWord}</b>.` +
+        `  Full stack vs Standard: <b>−$${Math.round(totVsStd)}/yr</b> in bills, <b>−$${Math.round(totVsStd+resilYr)}/yr</b> counting backup value.` +
         (inp.whev<=0? `  <b>⚠ With no overnight credit</b>, the battery is mostly on-peak arbitrage only — this is the rider-revoked scenario.` : ``)+`</span>`;
   }
   vd.style.background=bg; vd.innerHTML=txt;
   // cards: the incremental ladder for THESE inputs
   const el=document.getElementById('decCards');
+  const sav = d => (d>=0 ? '−$' : '+$') + Math.abs(Math.round(d));   // a saving shows as −$, a cost increase as +$
   const c=[
     {t:'Standard', v:'$'+Math.round(m.std), s:'do-nothing baseline', col:'#94a3b8'},
-    {t:'→ TOD', v:'−$'+Math.round(m.std-m.tod), s:'rate switch (cheap, reversible)', col:PAL.tod},
-    {t:'→ + WHEV', v:'−$'+Math.round(m.tod-m.todw), s:'overnight credit (the multiplier)', col:PAL.whev},
-    {t:'→ + Battery', v:'−$'+Math.round(m.todw-m.todwb), s:hasBatt?('payback '+fmtY(payAdj)+' w/ backup'):'no battery', col:PAL.batt},
-    {t:'You pay', v:'$'+Math.round(m.todwb), s:'full stack', col:'#0f172a'},
-    {t:'Total vs Standard', v:'−$'+Math.round(totVsStd), s:(totVsStd/m.std*100).toFixed(0)+'% lower', col:'#15803d'},
+    {t:'→ TOD', v:sav(m.std-m.tod), s:'rate switch (cheap, reversible)', col:PAL.tod},
+    {t:'→ + WHEV', v:sav(m.tod-m.todw), s:'overnight credit (the multiplier)', col:PAL.whev},
+    {t:'→ + Battery', v:sav(m.todw-m.todwb), s:hasBatt?('+ $'+Math.round(resilYr)+'/yr backup value · payback '+fmtY(payAdj)):'no battery', col:PAL.batt},
+    {t:'You pay', v:'$'+Math.round(m.todwb), s:'full stack', col:'var(--text)'},
+    {t:'Total vs Standard', v:sav(totVsStd), s:(totVsStd/m.std*100).toFixed(0)+'% lower bills'+(resilYr>0?' · '+sav(totVsStd+resilYr)+' w/ backup':''), col:'var(--ink-green)'},
   ];
   el.innerHTML=c.map(x=>`<div class="sim-card" style="border-top:4px solid ${x.col}"><div class="plan-name">${x.t}</div><div class="plan-total" style="color:${x.col};font-size:18px">${x.v}</div><div class="plan-detail">${x.s}</div></div>`).join('');
 }
@@ -1479,13 +1523,13 @@ function renderGreenButton(ctx, title, note){
       { type:'bar', label:'Grid import (kWh)', data:M.map(r=>r.imp), backgroundColor:'#3b82f6', yAxisID:'y', order:3 },
       { type:'bar', label:'Grid export (kWh)', data:M.map(r=>-r.exp), backgroundColor:'#22c55e', yAxisID:'y', order:3 },
       { type:'line', label:'Solar produced (kWh)', data:M.map(r=>r.prod), borderColor:'#f59e0b', backgroundColor:'transparent', borderWidth:2.5, pointRadius:3, yAxisID:'y', order:1 },
-      { type:'line', label:'Net billed (kWh)', data:M.map(r=>r.net), borderColor:'#0f172a', borderDash:[4,3], backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, yAxisID:'y', order:0 },
+      { type:'line', label:'Net billed (kWh)', data:M.map(r=>r.net), borderColor:PAL.load, borderDash:[4,3], backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, yAxisID:'y', order:0 },
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{position:'top',labels:{font:{size:10},boxWidth:12}},
         tooltip:{ callbacks:{ afterBody:(items)=>{ const r=M[items[0].dataIndex]; return r.onpk!=null?`On-peak share of import: ${r.onpk}%`:''; } } } },
       scales:{ x:{ grid:{display:false}, ticks:{font:{size:10}} },
-        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'kWh / month (export below 0)'} } }
+        y:{ grid:{color:gridColor()}, title:{display:true,text:'kWh / month (export below 0)'} } }
     }
   });
   addEvents(chart, [{i:labels.indexOf('2025-10')+0.5, text:'CPP pilot'}, {i:labels.indexOf('2026-06')+0.5, text:'TOD + WHEV'}, {i:labels.indexOf('2026-08')-0.5, text:'Battery'}]);
@@ -1508,7 +1552,7 @@ function renderGBCards(){
     {t:'On-peak import share', v:avgOnpk+'% → '+battOnpk+'%', s:'3–7PM M–F: pre-battery summers → Aug–Oct 2026'},
     {t:'Net billed', v:a.net.toLocaleString()+' kWh', s:'import − export (net metered)'},
   ];
-  el.innerHTML=cards.map(c=>`<div class="sim-card" style="border-top:4px solid #0891b2"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#0e7490;font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`).join('');
+  el.innerHTML=cards.map(c=>`<div class="sim-card" style="border-top:4px solid #0891b2"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:var(--ink-cyan);font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`).join('');
 }
 
 function renderGBProfile(){
@@ -1528,7 +1572,7 @@ function renderGBProfile(){
       plugins:{ legend:{position:'top',labels:{font:{size:10},boxWidth:12}},
         tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+Math.abs(c.raw).toFixed(2)+' kWh' } } },
       scales:{ x:{ grid:{display:false}, ticks:{font:{size:9}} },
-        y:{ grid:{color:'#f1f5f9'}, title:{display:true,text:'Avg kWh per hour'} } }
+        y:{ grid:{color:gridColor()}, title:{display:true,text:'Avg kWh per hour'} } }
     }
   });
   addEvents(liveChart, [], HOUR_BANDS);
@@ -1569,7 +1613,7 @@ function renderLive(ctx, title, note){
           title:items=>{ const r=D[items[0].dataIndex]; return liveMode==='week' ? `Week of ${r.label} (${r.n} days, avg per day)` : '2026-'+r.label; },
           label:c=>c.raw==null ? null : c.dataset.label+': '+Math.abs(c.raw).toFixed(1)+' kWh' } } },
       scales:{ x:{stacked:true, grid:{display:false}, ticks:{maxRotation:90, minRotation:90, font:{size:9}, autoSkip:true, maxTicksLimit:30}},
-        y:{stacked:true, grid:{color:'#f1f5f9'}, title:{display:true, text:'kWh / day (below 0 = not serving load)'}} } }
+        y:{stacked:true, grid:{color:gridColor()}, title:{display:true, text:'kWh / day (below 0 = not serving load)'}} } }
   });
   const at = d => D.findIndex(r => r.label <= d && d <= r.end);
   addEvents(chart, [{i:at('07-29'), text:'Battery live'}, {i:at('09-16'), text:'3 PM fix'}]);
@@ -1597,7 +1641,7 @@ function renderLiveCards(){
     {t:'Grid → load / → charging', v:perDay(gtl)+' / '+perDay(gtb), s:'kWh/day — charging is the arbitrage, not load'},
   ];
   el.innerHTML = cards.map(c=>
-    `<div class="sim-card" style="border-top:4px solid #06b6d4"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#0891b2;font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`
+    `<div class="sim-card" style="border-top:4px solid #06b6d4"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:var(--ink-cyan-2);font-size:19px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`
   ).join('');
 }
 
@@ -1616,7 +1660,7 @@ function renderLiveProfile(){
         { type:'bar', label:'Battery charge', data:P.map(r=>-kw(r.bc)), backgroundColor:PAL.charge, stack:'p', order:3 },
         { type:'bar', label:'Grid export', data:P.map(r=>-kw(r.ge)), backgroundColor:'#22c55e', stack:'p', order:3 },
         { type:'line', label:'Solar', data:P.map(r=>kw(r.pv)), borderColor:'#f59e0b', backgroundColor:'transparent', borderWidth:2, pointRadius:0, tension:0.3, order:0 },
-        { type:'line', label:'Home load', data:P.map(r=>kw(r.load)), borderColor:'#0f172a', backgroundColor:'transparent', borderWidth:2.2, pointRadius:0, tension:0.3, order:0 },
+        { type:'line', label:'Home load', data:P.map(r=>kw(r.load)), borderColor:PAL.load, backgroundColor:'transparent', borderWidth:2.2, pointRadius:0, tension:0.3, order:0 },
       ]
     },
     options:{
@@ -1625,7 +1669,7 @@ function renderLiveProfile(){
         tooltip:{ callbacks:{ label:c=>c.dataset.label+': '+Math.abs(c.raw).toFixed(2)+' kW' } } },
       scales:{
         x:{ stacked:true, grid:{display:false}, ticks:{font:{size:9}} },
-        y:{ stacked:true, grid:{color:'#f1f5f9'}, title:{display:true,text:'Avg power (kW) — charge/export shown below zero'} }
+        y:{ stacked:true, grid:{color:gridColor()}, title:{display:true,text:'Avg power (kW) — charge/export shown below zero'} }
       }
     }
   });
@@ -1704,7 +1748,7 @@ function renderCounterfactual(ctx, title, note){
             b.net>0 ? '¢/kWh: '+(r.actual/b.net*100).toFixed(2)+' vs '+(r.cf/b.net*100).toFixed(2) : '',
             b.opk!=null ? 'On-peak: '+b.opk+' kWh' : '', b.whev ? 'WHEV credit: −$'+(b.whev*0.0474).toFixed(2) : '' ].filter(Boolean); } } } },
       scales:{ x:{grid:{display:false}, ticks:{display:false}},
-        y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'$ per bill'}, ...FIXW} } }
+        y:{grid:{color:gridColor()}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'$ per bill'}, ...FIXW} } }
   });
   chart2 = new Chart(chart2Ctx(190), {
     type:'line',
@@ -1715,7 +1759,7 @@ function renderCounterfactual(ctx, title, note){
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>'Cumulative saved: $'+c.raw.toFixed(0) } } },
       scales:{ x:{offset:true, grid:{display:false}, ticks:{maxRotation:90,minRotation:90,font:{size:9}}},
-        y:{grid:{color:'#f1f5f9'}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative saved'}, ...FIXW} } }
+        y:{grid:{color:gridColor()}, ticks:{callback:v=>'$'+v}, title:{display:true,text:'Cumulative saved'}, ...FIXW} } }
   });
   alignPanels(chart, chart2); addEvents(chart2, billEvents().map(e=>({...e, text:''})));
   addEvents(chart, billEvents());
@@ -1733,7 +1777,7 @@ function renderCounterfactual(ctx, title, note){
   ];
   const cardEl = document.getElementById('cfCards');
   if (cardEl) cardEl.innerHTML = cards.map(c=>
-    `<div class="sim-card" style="border-top:4px solid #2563eb"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:#1d4ed8;font-size:20px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`
+    `<div class="sim-card" style="border-top:4px solid #2563eb"><div class="plan-name">${c.t}</div><div class="plan-total" style="color:var(--ink-blue);font-size:20px">${c.v}</div><div class="plan-detail">${c.s}</div></div>`
   ).join('');
 
   const tbl = document.getElementById('cfTable');
@@ -1744,17 +1788,17 @@ function renderCounterfactual(ctx, title, note){
         <th>Month Δ</th><th>Cumulative actual</th><th>Cumulative ${cfBaseline==='std'?'Standard':base}</th><th>Running savings</th>
       </tr></thead><tbody>` +
       rows.map(r=>{
-        const dCol = r.delta>=0 ? '#15803d' : '#dc2626';
+        const dCol = r.delta>=0 ? 'var(--ink-green)' : '#dc2626';
         const bg = r.era==='tod' ? 'background:#fff7ed;' : '';
         return `<tr style="${bg}">
           <td style="text-align:left;font-weight:600">${r.label}${r.era==='tod'?' ⚡':''}</td>
           <td>${r.b.net}</td>
           <td>$${r.actual.toFixed(2)}</td>
-          <td style="color:#64748b">$${r.cf.toFixed(2)}</td>
+          <td style="color:var(--muted)">$${r.cf.toFixed(2)}</td>
           <td style="color:${dCol};font-weight:600">${r.delta>=0?'+':''}$${r.delta.toFixed(2)}</td>
           <td>$${r.cumA.toFixed(0)}</td>
-          <td style="color:#64748b">$${r.cumC.toFixed(0)}</td>
-          <td style="color:#1d4ed8;font-weight:700">$${r.cumDelta.toFixed(0)}</td>
+          <td style="color:var(--muted)">$${r.cumC.toFixed(0)}</td>
+          <td style="color:var(--ink-blue);font-weight:700">$${r.cumDelta.toFixed(0)}</td>
         </tr>`;
       }).join('') + '</tbody>';
   }
@@ -1765,8 +1809,8 @@ function chartOpts(yLabel, y2Label, dualAxis){
     responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{position:'top',labels:{font:{size:11}}} },
     scales:{
-      x:{ grid:{color:'#f1f5f9'}, ticks:{maxRotation:40,font:{size:10}} },
-      y:{ grid:{color:'#f1f5f9'}, position:'left', title:{display:true,text:yLabel,font:{size:11}}, stacked:true },
+      x:{ grid:{color:gridColor()}, ticks:{maxRotation:40,font:{size:10}} },
+      y:{ grid:{color:gridColor()}, position:'left', title:{display:true,text:yLabel,font:{size:11}}, stacked:true },
       y2: dualAxis ? { position:'right', title:{display:true,text:y2Label,font:{size:11}}, grid:{display:false}, ticks:{callback:v=>'$'+v} } : undefined
     }
   };
@@ -1787,17 +1831,17 @@ BILLS.forEach(b => {
   if(b.sum) tr.className='summer';
   tr.innerHTML = `
     <td style="font-weight:600">${b.d}</td>
-    <td style="color:#64748b;font-size:10px">${b.s}\u2013${b.e}</td>
+    <td style="color:var(--muted);font-size:10px">${b.s}\u2013${b.e}</td>
     <td>${b.del}</td>
     <td style="color:#22c55e">${b.rcvd}</td>
     <td style="font-weight:${b.net<0?700:400};color:${b.net<0?'#22c55e':'inherit'}">${b.net}</td>
     <td style="color:#f97316">${b.sol??'\u2013'}</td>
-    <td style="color:#b45309">${sh}</td>
+    <td style="color:var(--ink-brown)">${sh}</td>
     <td style="font-weight:600">${b.home??'\u2013'}</td>
     <td style="color:#dc2626">${b.opk??'\u2013'}</td>
     <td style="color:#6366f1">${b.fpk??'\u2013'}</td>
     <td style="font-weight:600">$${b.bill.toFixed(2)}</td>
-    <td style="color:#64748b">${b.net>0?(b.bill/b.net*100).toFixed(2):'\u2013'}</td>
+    <td style="color:var(--muted)">${b.net>0?(b.bill/b.net*100).toFixed(2):'\u2013'}</td>
     <td>${b.sum?'\u2600\uFE0F':''}</td>
   `;
   tbody.appendChild(tr);
@@ -1830,6 +1874,8 @@ function renderKPIs(){
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────
+applyChartTheme();
+renderThemeBtn();
 renderKPIs();
 setView(activeView);
 </script>

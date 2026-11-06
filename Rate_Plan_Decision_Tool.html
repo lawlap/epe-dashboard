@@ -1,35 +1,56 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head>
+<script>/* theme before first paint: saved choice, else the OS setting (shared by every page of the site) */
+(function(){var t=null;try{t=localStorage.getItem('epeTheme');}catch(e){}if(t!=='dark'&&t!=='light')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.dataset.theme=t;})();</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EPE Rate-Plan Decision Tool</title>
-<style>
+<style>/* ── Theme: light by default, dark via [data-theme=dark] (set before paint from saved choice or OS setting) ── */
+:root{--bg:#f8fafc;--card:#ffffff;--text:#0f172a;--text-2:#334155;--muted:#64748b;--faint:#94a3b8;--border:#e2e8f0;--border-2:#f1f5f9;
+  --surface-2:#f1f5f9;--surface-3:#e2e8f0;--tint-green:#f0fdf4;--tint-cyan:#ecfeff;--tint-amber:#fef3c7;--tint-orange:#fff7ed;
+  --tint-blue:#eff6ff;--tint-sky:#f0f9ff;--tint-orange-2:#fed7aa;--tint-amber-2:#fde68a;--tint-red:#fef2f2;
+  --ink-green:#15803d;--ink-green-2:#166534;--ink-orange:#7c2d12;--ink-cyan:#0e7490;--ink-cyan-2:#0891b2;--ink-blue:#1d4ed8;
+  --ink-blue-2:#1e40af;--ink-amber:#92400e;--ink-amber-2:#78350f;--ink-sky:#0c4a6e;--ink-sky-2:#0369a1;--ink-brown:#b45309;--ink-red:#b91c1c}
+html[data-theme=dark]{color-scheme:dark;--bg:#0b1120;--card:#131c2e;--text:#e2e8f0;--text-2:#cbd5e1;--muted:#94a3b8;--faint:#7c8aa3;
+  --border:#2a3650;--border-2:#1e293b;--surface-2:#1a2438;--surface-3:#243049;--tint-green:#0f2a1c;--tint-cyan:#0c2730;
+  --tint-amber:#2e2410;--tint-orange:#2e1d10;--tint-blue:#111f3d;--tint-sky:#0e2333;--tint-orange-2:#4a2c14;--tint-amber-2:#463812;
+  --tint-red:#2e1414;--ink-green:#4ade80;--ink-green-2:#86efac;--ink-orange:#fdba74;--ink-cyan:#67e8f9;--ink-cyan-2:#22d3ee;
+  --ink-blue:#93c5fd;--ink-blue-2:#93c5fd;--ink-amber:#fcd34d;--ink-amber-2:#fde68a;--ink-sky:#7dd3fc;--ink-sky-2:#38bdf8;
+  --ink-brown:#fbbf24;--ink-red:#fca5a5}
+html[data-theme=dark] .card,html[data-theme=dark] .section,html[data-theme=dark] .sim-card,html[data-theme=dark] .kpi,
+html[data-theme=dark] details.fold,html[data-theme=dark] .pcard{box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.theme-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--text-2);font-size:12px;font-weight:600;cursor:pointer}
+
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;color:#0f172a;padding:20px}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--surface-2);color:var(--text);padding:20px}
 .wrap{max-width:1000px;margin:0 auto}
 h1{font-size:21px;font-weight:800;letter-spacing:-.02em}
-.sub{color:#64748b;font-size:13px;margin:4px 0 16px}
-.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:16px 18px;margin-bottom:16px}
+.sub{color:var(--muted);font-size:13px;margin:4px 0 16px}
+.card{background:var(--card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:16px 18px;margin-bottom:16px}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
 @media(max-width:680px){.controls{grid-template-columns:1fr}}
-.ctl label{font-size:12px;font-weight:700;color:#334155;display:flex;justify-content:space-between}
-.ctl .val{color:#2563eb;font-weight:800}
+.ctl label{font-size:12px;font-weight:700;color:var(--text-2);display:flex;justify-content:space-between}
+.ctl .val{color:var(--ink-blue);font-weight:800}
 input[type=range]{width:100%;margin-top:6px}
-.toggle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text-2)}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 @media(max-width:680px){.cards{grid-template-columns:repeat(2,1fr)}}
-.pcard{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-top:4px solid #ccc}
-.pcard .nm{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#475569}
+.pcard{background:var(--card);border-radius:10px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-top:4px solid #ccc}
+.pcard .nm{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-2)}
 .pcard .amt{font-size:23px;font-weight:800;margin:3px 0}
 .pcard .delta{font-size:12px;font-weight:600}
 .badge{display:inline-block;background:#16a34a;color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:99px;vertical-align:middle;margin-left:4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:680px){.grid2{grid-template-columns:1fr}}
 .chart-title{font-size:14px;font-weight:700;margin-bottom:2px}
-.chart-note{font-size:11px;color:#94a3b8;margin-bottom:8px}
+.chart-note{font-size:11px;color:var(--faint);margin-bottom:8px}
 .box{position:relative;height:260px}
-.hint{font-size:11px;color:#64748b;line-height:1.5}
+.hint{font-size:11px;color:var(--muted);line-height:1.5}
 </style></head>
 <body><div class="wrap">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
 <h1>⚡ EPE Rate-Plan Decision Tool</h1>
+<button id="themeBtn" class="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
+</div>
 <p class="sub">Las Cruces, NM · Standard vs CPP vs TOD vs TOD+WHEV · battery 18 kWh · bill-validated (CPP ≈ actual ~$802). Drag the sliders to stress-test.</p>
 
 <div class="card">
@@ -77,6 +98,19 @@ input[type=range]{width:100%;margin-top:6px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const DATA={"STD": {"on": {"2025-04": {"kwh": 230.7, "e": 13.42, "c": 0.0}, "2025-05": {"kwh": 387.1, "e": 22.51, "c": 0.0}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 0.0}, "2025-07": {"kwh": 1289.5, "e": 117.2, "c": 0.0}, "2025-08": {"kwh": 1625.1, "e": 153.7, "c": 0.0}, "2025-09": {"kwh": 1212.5, "e": 108.83, "c": 0.0}, "2025-10": {"kwh": 878.3, "e": 51.08, "c": 0.0}, "2025-11": {"kwh": 653.4, "e": 38.0, "c": 0.0}, "2025-12": {"kwh": 953.0, "e": 55.43, "c": 0.0}, "2026-01": {"kwh": 854.1, "e": 49.68, "c": 0.0}, "2026-02": {"kwh": 474.7, "e": 27.61, "c": 0.0}, "2026-03": {"kwh": 294.2, "e": 17.11, "c": 0.0}}, "off": {"2025-04": {"kwh": 230.7, "e": 13.42, "c": 0.0}, "2025-05": {"kwh": 387.1, "e": 22.51, "c": 0.0}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 0.0}, "2025-07": {"kwh": 1289.5, "e": 117.2, "c": 0.0}, "2025-08": {"kwh": 1625.1, "e": 153.7, "c": 0.0}, "2025-09": {"kwh": 1212.5, "e": 108.83, "c": 0.0}, "2025-10": {"kwh": 878.3, "e": 51.08, "c": 0.0}, "2025-11": {"kwh": 653.4, "e": 38.0, "c": 0.0}, "2025-12": {"kwh": 953.0, "e": 55.43, "c": 0.0}, "2026-01": {"kwh": 854.1, "e": 49.68, "c": 0.0}, "2026-02": {"kwh": 474.7, "e": 27.61, "c": 0.0}, "2026-03": {"kwh": 294.2, "e": 17.11, "c": 0.0}}}, "CPP": {"on": {"2025-04": {"kwh": 230.7, "e": 7.91, "c": 0.0}, "2025-05": {"kwh": 387.1, "e": 13.27, "c": 0.0}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 0.0}, "2025-07": {"kwh": 1312.3, "e": 90.51, "c": 0.0}, "2025-08": {"kwh": 1657.5, "e": 119.38, "c": 0.0}, "2025-09": {"kwh": 1243.8, "e": 87.2, "c": 0.0}, "2025-10": {"kwh": 878.3, "e": 30.11, "c": 0.0}, "2025-11": {"kwh": 653.4, "e": 22.4, "c": 0.0}, "2025-12": {"kwh": 953.0, "e": 32.67, "c": 0.0}, "2026-01": {"kwh": 854.1, "e": 29.28, "c": 0.0}, "2026-02": {"kwh": 474.7, "e": 16.27, "c": 0.0}, "2026-03": {"kwh": 294.2, "e": 10.08, "c": 0.0}}, "off": {"2025-04": {"kwh": 230.7, "e": 7.91, "c": 0.0}, "2025-05": {"kwh": 387.1, "e": 13.27, "c": 0.0}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 0.0}, "2025-07": {"kwh": 1289.5, "e": 102.97, "c": 0.0}, "2025-08": {"kwh": 1625.1, "e": 137.12, "c": 0.0}, "2025-09": {"kwh": 1212.5, "e": 104.32, "c": 0.0}, "2025-10": {"kwh": 878.3, "e": 30.11, "c": 0.0}, "2025-11": {"kwh": 653.4, "e": 22.4, "c": 0.0}, "2025-12": {"kwh": 953.0, "e": 32.67, "c": 0.0}, "2026-01": {"kwh": 854.1, "e": 29.28, "c": 0.0}, "2026-02": {"kwh": 474.7, "e": 16.27, "c": 0.0}, "2026-03": {"kwh": 294.2, "e": 10.08, "c": 0.0}}}, "TOD": {"on": {"2025-04": {"kwh": 230.7, "e": 7.91, "c": 0.0}, "2025-05": {"kwh": 387.1, "e": 13.27, "c": 0.0}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 0.0}, "2025-07": {"kwh": 1308.9, "e": 73.16, "c": 0.0}, "2025-08": {"kwh": 1655.9, "e": 101.73, "c": 0.0}, "2025-09": {"kwh": 1237.6, "e": 70.87, "c": 0.0}, "2025-10": {"kwh": 878.3, "e": 30.11, "c": 0.0}, "2025-11": {"kwh": 653.4, "e": 22.4, "c": 0.0}, "2025-12": {"kwh": 953.0, "e": 32.67, "c": 0.0}, "2026-01": {"kwh": 854.1, "e": 29.28, "c": 0.0}, "2026-02": {"kwh": 474.7, "e": 16.27, "c": 0.0}, "2026-03": {"kwh": 294.2, "e": 10.08, "c": 0.0}}, "off": {"2025-04": {"kwh": 230.7, "e": 7.91, "c": 0.0}, "2025-05": {"kwh": 387.1, "e": 13.27, "c": 0.0}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 0.0}, "2025-07": {"kwh": 1289.5, "e": 100.98, "c": 0.0}, "2025-08": {"kwh": 1625.1, "e": 146.04, "c": 0.0}, "2025-09": {"kwh": 1212.5, "e": 106.87, "c": 0.0}, "2025-10": {"kwh": 878.3, "e": 30.11, "c": 0.0}, "2025-11": {"kwh": 653.4, "e": 22.4, "c": 0.0}, "2025-12": {"kwh": 953.0, "e": 32.67, "c": 0.0}, "2026-01": {"kwh": 854.1, "e": 29.28, "c": 0.0}, "2026-02": {"kwh": 474.7, "e": 16.27, "c": 0.0}, "2026-03": {"kwh": 294.2, "e": 10.08, "c": 0.0}}}, "TODW": {"on": {"2025-04": {"kwh": 266.4, "e": 9.13, "c": 24.6}, "2025-05": {"kwh": 436.1, "e": 14.95, "c": 35.77}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 22.46}, "2025-07": {"kwh": 1346.3, "e": 75.23, "c": 47.33}, "2025-08": {"kwh": 1687.1, "e": 103.45, "c": 51.66}, "2025-09": {"kwh": 1272.5, "e": 72.8, "c": 44.75}, "2025-10": {"kwh": 934.6, "e": 32.04, "c": 40.79}, "2025-11": {"kwh": 707.0, "e": 24.24, "c": 37.37}, "2025-12": {"kwh": 1013.7, "e": 34.75, "c": 41.85}, "2026-01": {"kwh": 912.9, "e": 31.29, "c": 41.44}, "2026-02": {"kwh": 518.3, "e": 17.77, "c": 33.03}, "2026-03": {"kwh": 328.7, "e": 11.27, "c": 25.62}}, "off": {"2025-04": {"kwh": 230.7, "e": 7.91, "c": 7.69}, "2025-05": {"kwh": 387.1, "e": 13.27, "c": 12.55}, "2025-06": {"kwh": 0.0, "e": 0.0, "c": 10.76}, "2025-07": {"kwh": 1289.5, "e": 100.98, "c": 20.4}, "2025-08": {"kwh": 1625.1, "e": 146.04, "c": 22.27}, "2025-09": {"kwh": 1212.5, "e": 106.87, "c": 16.31}, "2025-10": {"kwh": 878.3, "e": 30.11, "c": 14.09}, "2025-11": {"kwh": 653.4, "e": 22.4, "c": 11.96}, "2025-12": {"kwh": 953.0, "e": 32.67, "c": 13.07}, "2026-01": {"kwh": 854.1, "e": 29.28, "c": 13.59}, "2026-02": {"kwh": 474.7, "e": 16.27, "c": 12.38}, "2026-03": {"kwh": 294.2, "e": 10.08, "c": 9.27}}}};
+// ── Theme toggle (light/dark), remembered per browser and shared across the site ──
+function isDark(){ return document.documentElement.dataset.theme === 'dark'; }
+function renderThemeBtn(){ const b = document.getElementById('themeBtn'); if (b) b.textContent = isDark() ? '☀️ Light' : '🌙 Dark'; }
+function toggleTheme(){
+  const t = isDark() ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem('epeTheme', t); } catch(e) {}
+  renderThemeBtn();
+  if (typeof onThemeChange === 'function') onThemeChange();
+}
+window.toggleTheme = toggleTheme;
+function applyChartTheme(){ Chart.defaults.color = isDark() ? '#cbd5e1' : '#666'; Chart.defaults.borderColor = isDark() ? '#243049' : 'rgba(0,0,0,0.1)'; }
+function onThemeChange(){ applyChartTheme(); [barC,sweepC,monC,compC].forEach(c=>c&&c.destroy()); barC=sweepC=monC=compC=null; build(); }
 const MONTHS=Object.keys(DATA.CPP.on);
 const MLAB=MONTHS.map(m=>{const [y,mo]=m.split('-');return ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+mo]+" '"+y.slice(2);});
 const C={RPS:0.020215,TEP:0.001002,EUEF:0.00316,AMS:3.82,CUST:7.0,FRAN:0.020,TAX:0.0856,MIN:7.0};
@@ -110,7 +144,7 @@ function build(){
    return `<div class="pcard" style="border-top-color:${p.color}">
      <div class="nm">${p.label}${best?'<span class="badge">BEST</span>':''}</div>
      <div class="amt" style="color:${p.color}">${fmt(a.total)}</div>
-     <div class="delta" style="color:${d<0?'#16a34a':(d>0?'#dc2626':'#64748b')}">${p.k==='CPP'?'current plan':(d<=0?'−':'+')+'$'+Math.abs(Math.round(d))+'/yr vs CPP'}</div></div>`;}).join('');
+     <div class="delta" style="color:${d<0?'#16a34a':(d>0?'#dc2626':'var(--muted)')}">${p.k==='CPP'?'current plan':(d<=0?'−':'+')+'$'+Math.abs(Math.round(d))+'/yr vs CPP'}</div></div>`;}).join('');
  barNote.textContent='TOD+WHEV saves '+fmt(cpp-ann.TODW.total)+'/yr vs staying on CPP'+(o.rate>1?' at +'+Math.round((o.rate-1)*100)+'% rates':'')+'.';
  // bar
  const bd=PLANS.map(p=>ann[p.k].total);
@@ -140,6 +174,8 @@ const barC_el=document.getElementById('barC'),sweepC_el=document.getElementById(
 ['rate','use','fppc'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
   rateV.textContent=rate.value+'%';useV.textContent=use.value+'%';fppcV.textContent=(fppc.value/100).toFixed(2)+'¢';build();}));
 batt.addEventListener('change',build);
+applyChartTheme();
+renderThemeBtn();
 build();
 </script>
 </body></html>
