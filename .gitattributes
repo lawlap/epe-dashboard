@@ -1,0 +1,8 @@
+# Normalize line endings. The dashboard files are generated/edited with LF;
+# pin them to LF everywhere so Windows Git's autocrlf doesn't rewrite them
+# and turn small edits into whole-file diffs. Safe on all platforms.
+*.html     text eol=lf
+*.jsx      text eol=lf
+*.md       text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
