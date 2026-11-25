@@ -1,7 +1,7 @@
 {
-  "name": "EPE Energy Dashboard",
-  "short_name": "Energy",
-  "description": "Electric bills, solar, battery and savings vs the Standard rate",
+  "name": "Home Utilities",
+  "short_name": "Utilities",
+  "description": "Electric, gas, water, wastewater and solid waste bills, plus solar, battery and rate decisions",
   "id": "/epe-dashboard/",
   "start_url": "/epe-dashboard/",
   "scope": "/epe-dashboard/",
@@ -14,7 +14,13 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Rate-plan decision tool", "short_name": "Decision", "url": "/epe-dashboard/Rate_Plan_Decision_Tool.html",
+    { "name": "Gas", "short_name": "Gas", "url": "/epe-dashboard/#gas",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Water & city", "short_name": "Water", "url": "/epe-dashboard/#city",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Water heater decision", "short_name": "Water heater", "url": "/epe-dashboard/#wh",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Rate-plan decision tool", "short_name": "Rate tool", "url": "/epe-dashboard/Rate_Plan_Decision_Tool.html",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }
